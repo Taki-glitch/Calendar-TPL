@@ -104,3 +104,27 @@ button:hover {
     padding: 12px;
   }
 }
+
+/* 💾 Bouton de sauvegarde */
+#saveContainer {
+  text-align: center;
+  margin: 15px 0;
+}
+
+#saveNowBtn {
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+#saveNowBtn:hover {
+  background-color: #1e40af;
+  transform: scale(1.03);
+}
