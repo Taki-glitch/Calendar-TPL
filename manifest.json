@@ -3,7 +3,6 @@
   "short_name": "TPL",
   "start_url": ".",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#007bff",
   "theme_color": "#007bff",
   "icons": [
