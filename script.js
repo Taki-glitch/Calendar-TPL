@@ -16,7 +16,6 @@ const CATEGORY_COLORS = {
   "Autre": "#6c757d",
 };
 
-/* === UTILITAIRES === */
 function uid() {
   return String(Date.now()) + "-" + Math.floor(Math.random() * 10000);
 }
@@ -278,5 +277,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     saveTimeout = setTimeout(() => saveAllEvents(), 700);
   }
 
-  window.addEventListener("beforeunload", saveAllEvents);
+  // Sauvegarde locale avant fermeture
+  window.addEventListener("beforeunload", () => {
+    localStorage.setItem("tplEvents", JSON.stringify(calendar.getEvents()));
+  });
 });
