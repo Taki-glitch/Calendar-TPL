@@ -10,7 +10,7 @@
   ============================ */
 
 /* === CONFIGURATION === */
-const API_URL = "https://script.google.com/macros/s/AKfycbwZddKZ0DCv8Jkhb3Y2bFyqHxMZzJyGI1P3x0GXqTuRW-fPAQiDdXYPAoFcDlm4KNNa/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbx5XjXx-sQfFZoClN8PuYAK9g7-g10i5kqgJxEdLI7W4gOA0aRNRPHcs1DLM5qitGuf/exec";
 
 // Mot de passe admin (simple, côté client). Change-le ici.
 const ADMIN_CODE = "tpl-admin-2025";
