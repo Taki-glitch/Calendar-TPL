@@ -1,13 +1,11 @@
-/* 🌈 Styles généraux */
 body {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   background-color: #f5f7fb;
   margin: 0;
-  padding: 0;
   color: #333;
 }
 
-/* 🔹 En-tête */
+/* Header */
 header {
   display: flex;
   align-items: center;
@@ -25,12 +23,7 @@ header .logo {
   border-radius: 50%;
 }
 
-h1 {
-  font-size: 1.8em;
-  margin: 0;
-}
-
-/* 📅 Zone du calendrier */
+/* Calendar container */
 #planning {
   max-width: 900px;
   margin: 30px auto;
@@ -47,17 +40,35 @@ h1 {
   color: #555;
 }
 
-/* 🎨 FullCalendar */
+/* Offline banner */
+#offline-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #dc3545;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-weight: 600;
+  transition: transform 0.3s ease-in-out;
+}
+
+.hidden {
+  transform: translateY(100%);
+}
+
+/* FullCalendar */
 .fc-toolbar-title {
   font-size: 1.5em;
-  font-weight: 600;
   color: #007bff;
+  font-weight: 600;
 }
 
 .fc-button {
   background-color: #007bff !important;
-  border: none !important;
   color: white !important;
+  border: none !important;
   border-radius: 6px !important;
   font-weight: 500 !important;
 }
@@ -66,19 +77,10 @@ h1 {
   background-color: #0056b3 !important;
 }
 
-.fc-event {
-  border-radius: 6px !important;
-  padding: 2px 5px;
-}
-
-/* 📱 Responsive */
+/* Responsive */
 @media (max-width: 600px) {
   #planning {
     width: 95%;
     margin: 15px auto;
-  }
-
-  .fc-toolbar-title {
-    font-size: 1.1em;
   }
 }
