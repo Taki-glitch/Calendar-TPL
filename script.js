@@ -1,14 +1,15 @@
-// URL de ton script Google Apps (ne pas modifier sauf si tu le redéploies)
+// URL du script Google Apps
 const API_URL = "https://script.google.com/macros/s/AKfycbyTA-TjsPcl5n-rG14La4ZYCmI--K0cbCIqt4OSXE_Kqsle0EBWX9u5fUZ6slL53-11/exec";
 
 document.addEventListener("DOMContentLoaded", async function () {
   const calendarEl = document.getElementById("calendar");
 
-  // Charger les événements depuis Google Sheets
+  // 🔹 Charger les événements depuis Google Sheets ou cache local
   async function loadEvents() {
     try {
       const res = await fetch(API_URL);
       const data = await res.json();
+      localStorage.setItem("tplEvents", JSON.stringify(data)); // Mise en cache locale
       return data.map(ev => ({
         id: ev.id,
         title: ev.title,
@@ -17,12 +18,13 @@ document.addEventListener("DOMContentLoaded", async function () {
         allDay: ev.allDay === "TRUE" || ev.allDay === true
       }));
     } catch (e) {
-      console.error("Erreur de chargement des événements :", e);
-      return [];
+      console.warn("⚠️ Pas de connexion — chargement depuis le cache local.");
+      const cached = localStorage.getItem("tplEvents");
+      return cached ? JSON.parse(cached) : [];
     }
   }
 
-  // Sauvegarder tous les événements sur Google Sheets
+  // 🔹 Sauvegarder tous les événements vers Google Sheets
   async function saveAllEvents() {
     const allEvents = calendar.getEvents().map(ev => ({
       id: ev.id,
@@ -32,7 +34,7 @@ document.addEventListener("DOMContentLoaded", async function () {
       allDay: ev.allDay
     }));
 
-    localStorage.setItem("tplEvents", JSON.stringify(allEvents)); // sauvegarde locale
+    localStorage.setItem("tplEvents", JSON.stringify(allEvents)); // cache local
 
     try {
       await fetch(API_URL, {
@@ -40,40 +42,39 @@ document.addEventListener("DOMContentLoaded", async function () {
         body: JSON.stringify(allEvents),
         headers: { "Content-Type": "application/json" }
       });
+      console.log("✅ Sauvegarde réussie !");
     } catch (e) {
-      console.error("Erreur de sauvegarde :", e);
+      console.warn("⚠️ Impossible de sauvegarder (hors ligne). Les changements seront conservés localement.");
     }
   }
 
-  // Configuration du calendrier
+  // 🔹 Configuration du calendrier
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
+    initialView: window.innerWidth < 768 ? "listWeek" : "dayGridMonth",
     editable: true,
     selectable: true,
     locale: "fr",
     height: "auto",
-    aspectRatio: 1,
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek"
+      right: "dayGridMonth,timeGridWeek,listWeek"
     },
-    // Adaptation mobile
-    windowResize: function (view) {
+    // Adaptation automatique mobile / desktop
+    windowResize: function () {
       if (window.innerWidth < 768) {
         calendar.changeView("listWeek");
       } else {
         calendar.changeView("dayGridMonth");
       }
     },
-
-    // Ajout d'événement
+    // Ajout d'un événement
     select: function (info) {
       const title = prompt("Nom de l'événement :");
       if (title) {
-        const event = calendar.addEvent({
+        calendar.addEvent({
           id: String(Date.now()),
-          title: title,
+          title,
           start: info.startStr,
           end: info.endStr,
           allDay: info.allDay
@@ -82,11 +83,10 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
       calendar.unselect();
     },
-
-    // Modification de l'événement (clic)
+    // Modification / suppression
     eventClick: function (info) {
       const newTitle = prompt("Modifier le titre :", info.event.title);
-      if (newTitle === null) return; // Annulé
+      if (newTitle === null) return;
       if (newTitle === "") {
         if (confirm("Supprimer cet événement ?")) {
           info.event.remove();
@@ -96,13 +96,11 @@ document.addEventListener("DOMContentLoaded", async function () {
       }
       saveAllEvents();
     },
-
-    // Déplacement ou redimensionnement
     eventDrop: saveAllEvents,
-    eventResize: saveAllEvents,
+    eventResize: saveAllEvents
   });
 
-  // Charger et afficher les événements
+  // 🔹 Charger les événements et afficher le calendrier
   const events = await loadEvents();
   calendar.addEventSource(events);
   calendar.render();
