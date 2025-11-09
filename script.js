@@ -7,12 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: "dayGridMonth,timeGridWeek,timeGridDay"
+      right: "dayGridMonth,timeGridWeek,timeGridDay",
     },
     events: [
       { title: "Réunion équipe", start: "2025-11-10T10:00:00" },
       { title: "Cours de Yoga", start: "2025-11-13T18:30:00" },
-      { title: "Vacances", start: "2025-11-20", end: "2025-11-25" }
+      { title: "Vacances", start: "2025-11-20", end: "2025-11-25" },
     ],
   });
 
