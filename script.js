@@ -8,7 +8,9 @@
  **************************************************************/
 
 // ⚙️ URL de ton script Apps Script publié en tant qu'application web :
-const API_URL = "https://script.google.com/macros/s/AKfycbyU6zF4eMA2uPd76CxR3qSYv69uS9eTCd5Yo25KU9ZbXCLLP7E5Wf44FJ2M2_K5VTw_/exec";
+const API_URL = "https://corsproxy.io/?" + encodeURIComponent(
+  "https://script.google.com/macros/s/AKfycbyU6zF4eMA2uPd76CxR3qSYv69uS9eTCd5Yo25KU9ZbXCLLP7E5Wf44FJ2M2_K5VTw_/exec"
+);
 
 /**************************************************************
  * 🧠 FONCTIONS PRINCIPALES
