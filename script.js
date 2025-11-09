@@ -1,109 +1,127 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const calendarEl = document.getElementById("calendar");
-  const modal = document.getElementById("eventModal");
-  const modalTitle = document.getElementById("modalTitle");
-  const eventTitleInput = document.getElementById("eventTitle");
-  const saveBtn = document.getElementById("saveEvent");
-  const deleteBtn = document.getElementById("deleteEvent");
-  const cancelBtn = document.getElementById("cancelEvent");
+// ✅ Chargement du calendrier après le chargement du DOM
+document.addEventListener('DOMContentLoaded', function() {
+  const calendarEl = document.getElementById('calendar');
 
-  let selectedDate = null;
-  let selectedEvent = null;
+  // Charger les événements sauvegardés dans le localStorage
+  const savedEvents = JSON.parse(localStorage.getItem('tplEvents')) || [];
 
-  // 🔹 Charger les événements depuis le localStorage
-  function chargerEvenements() {
-    const data = localStorage.getItem("evenements");
-    return data ? JSON.parse(data) : [];
-  }
-
-  // 🔹 Sauvegarder les événements dans le localStorage
-  function sauvegarderEvenements(events) {
-    localStorage.setItem("evenements", JSON.stringify(events));
-  }
-
-  let evenements = chargerEvenements();
-
-  // 🔹 Créer le calendrier
+  // Initialiser le calendrier FullCalendar
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: "dayGridMonth",
-    locale: "fr",
+    initialView: 'dayGridMonth',
+    locale: 'fr',
+    height: 'auto',
     selectable: true,
-    editable: false,
+    editable: true,
     headerToolbar: {
-      left: "prev,next today",
-      center: "title",
-      right: "dayGridMonth,timeGridWeek,timeGridDay",
+      left: 'prev,next today',
+      center: 'title',
+      right: 'dayGridMonth,timeGridWeek,listWeek'
     },
-    events: evenements,
+    events: savedEvents,
 
-    // 🔸 Clic sur une date : ajouter un événement
-    dateClick: function (info) {
-      selectedDate = info.dateStr;
-      selectedEvent = null;
-      modalTitle.textContent = "Nouvel événement";
-      eventTitleInput.value = "";
-      deleteBtn.style.display = "none";
-      modal.style.display = "block";
-      eventTitleInput.focus();
+    // 📅 Quand on clique sur un jour vide → ouvrir la modale d’ajout
+    dateClick: function(info) {
+      openModal({ start: info.dateStr });
     },
 
-    // 🔸 Clic sur un événement : le modifier ou supprimer
-    eventClick: function (info) {
-      selectedEvent = info.event;
-      selectedDate = info.event.startStr;
-      modalTitle.textContent = "Modifier l'événement";
-      eventTitleInput.value = info.event.title;
-      deleteBtn.style.display = "inline-block";
-      modal.style.display = "block";
+    // ✏️ Quand on clique sur un événement → ouvrir la modale d’édition
+    eventClick: function(info) {
+      const event = info.event;
+      openModal({
+        id: event.id,
+        title: event.title,
+        start: event.startStr
+      });
     },
+
+    // 🧩 Quand on déplace un événement → sauvegarder automatiquement
+    eventDrop: saveAllEvents,
+    eventResize: saveAllEvents
   });
 
   calendar.render();
 
-  // 🔹 Enregistrer ou modifier un événement
-  saveBtn.addEventListener("click", () => {
+  // 🪶 Sélection des éléments de la modale
+  const modal = document.getElementById('eventModal');
+  const eventTitleInput = document.getElementById('eventTitle');
+  const saveBtn = document.getElementById('saveEvent');
+  const deleteBtn = document.getElementById('deleteEvent');
+  const cancelBtn = document.getElementById('cancelEvent');
+  const modalTitle = document.getElementById('modalTitle');
+
+  let currentEvent = null; // événement en cours d’édition
+
+  // 🪟 Ouvrir la modale (création ou édition)
+  function openModal(eventData = {}) {
+    currentEvent = eventData;
+    modal.style.display = 'flex';
+    eventTitleInput.value = eventData.title || '';
+    deleteBtn.style.display = eventData.id ? 'inline-block' : 'none';
+    modalTitle.textContent = eventData.id ? 'Modifier l’événement' : 'Nouvel événement';
+    eventTitleInput.focus();
+  }
+
+  // ❌ Fermer la modale
+  function closeModal() {
+    modal.style.display = 'none';
+    eventTitleInput.value = '';
+    currentEvent = null;
+  }
+
+  // 💾 Sauvegarder un nouvel événement ou modification
+  saveBtn.addEventListener('click', function() {
     const title = eventTitleInput.value.trim();
     if (!title) {
-      alert("Veuillez entrer un titre d'événement !");
+      alert("Veuillez entrer un titre d'événement.");
       return;
     }
 
-    if (selectedEvent) {
-      // ✏️ Modification d’un événement existant
-      selectedEvent.setProp("title", title);
-      evenements = evenements.map((e) =>
-        e.start === selectedEvent.startStr ? { ...e, title } : e
-      );
+    if (currentEvent.id) {
+      // Modifier un événement existant
+      const event = calendar.getEventById(currentEvent.id);
+      event.setProp('title', title);
     } else {
-      // ➕ Ajout d’un nouvel événement
-      const newEvent = { title: title, start: selectedDate };
-      calendar.addEvent(newEvent);
-      evenements.push(newEvent);
+      // Créer un nouvel événement
+      const newId = Date.now().toString();
+      calendar.addEvent({
+        id: newId,
+        title: title,
+        start: currentEvent.start,
+        allDay: true
+      });
     }
 
-    sauvegarderEvenements(evenements);
-    modal.style.display = "none";
+    saveAllEvents();
+    closeModal();
   });
 
-  // 🔹 Supprimer un événement
-  deleteBtn.addEventListener("click", () => {
-    if (selectedEvent && confirm("Supprimer cet événement ?")) {
-      selectedEvent.remove();
-      evenements = evenements.filter(
-        (e) => e.start !== selectedEvent.startStr || e.title !== selectedEvent.title
-      );
-      sauvegarderEvenements(evenements);
-      modal.style.display = "none";
+  // 🗑️ Supprimer un événement
+  deleteBtn.addEventListener('click', function() {
+    if (currentEvent && currentEvent.id) {
+      const event = calendar.getEventById(currentEvent.id);
+      if (event) event.remove();
+      saveAllEvents();
     }
+    closeModal();
   });
 
-  // 🔹 Annuler
-  cancelBtn.addEventListener("click", () => {
-    modal.style.display = "none";
-  });
+  // ❎ Annuler
+  cancelBtn.addEventListener('click', closeModal);
 
-  // 🔹 Fermer la modale si on clique dehors
-  window.addEventListener("click", (e) => {
-    if (e.target === modal) modal.style.display = "none";
+  // 🔄 Sauvegarder tous les événements dans le localStorage
+  function saveAllEvents() {
+    const allEvents = calendar.getEvents().map(ev => ({
+      id: ev.id,
+      title: ev.title,
+      start: ev.startStr,
+      end: ev.endStr,
+      allDay: ev.allDay
+    }));
+    localStorage.setItem('tplEvents', JSON.stringify(allEvents));
+  }
+
+  // Fermer la modale en cliquant à l’extérieur (mobile-friendly)
+  window.addEventListener('click', function(e) {
+    if (e.target === modal) closeModal();
   });
 });
