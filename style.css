@@ -1,188 +1,173 @@
-/* 🌞 Mode clair par défaut */
+/* 🌈 Style global */
 body {
-  font-family: "Inter", Arial, sans-serif;
-  background-color: #f7f9fb;
-  color: #222;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  background-color: #f5f7fb;
   margin: 0;
   padding: 0;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  justify-content: center;
+  align-items: flex-start;
   min-height: 100vh;
+  color: #333;
 }
 
+/* 📅 Conteneur du calendrier */
 #calendar {
   max-width: 900px;
-  width: 95%;
-  margin: 30px auto;
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  margin: 20px auto;
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* 💬 Modale (fond) */
+/* 🧭 FullCalendar : couleurs et bordures */
+.fc-toolbar-title {
+  font-size: 1.6em;
+  font-weight: 600;
+  color: #007bff;
+}
+
+.fc-button {
+  background-color: #007bff !important;
+  border: none !important;
+  color: white !important;
+  border-radius: 8px !important;
+  font-weight: 500 !important;
+  transition: background 0.2s ease-in-out;
+}
+
+.fc-button:hover {
+  background-color: #0056b3 !important;
+}
+
+.fc-event {
+  background-color: #007bff !important;
+  border: none !important;
+  border-radius: 6px !important;
+  font-size: 0.85em;
+  padding: 2px 4px;
+}
+
+/* 🪶 Fenêtre modale (ajout / édition d'événement) */
 .modal {
-  display: none;
+  display: none; /* Cachée par défaut */
   position: fixed;
-  z-index: 1000;
+  z-index: 999;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.4);
-  align-items: center;
   justify-content: center;
-  backdrop-filter: blur(3px);
+  align-items: center;
 }
 
-/* 🧩 Contenu modale */
 .modal-content {
-  background: #fff;
-  border-radius: 10px;
+  background-color: #fff;
   padding: 20px;
-  width: 90%;
+  border-radius: 16px;
   max-width: 400px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  animation: fadeIn 0.3s ease;
+  width: 90%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  animation: fadeIn 0.2s ease-in-out;
 }
 
-.modal-content h3 {
-  margin-top: 0;
-  font-size: 1.4rem;
-  color: #333;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.modal-content input {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  box-sizing: border-box;
-}
-
-/* 🔘 Boutons */
+/* 🧩 Boutons modale */
 .modal-buttons {
+  margin-top: 20px;
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  margin-top: 15px;
-  justify-content: flex-end;
+  justify-content: space-between;
+  gap: 8px;
 }
 
 .modal-buttons button {
   flex: 1;
-  min-width: 100px;
   padding: 10px;
+  font-size: 1em;
   border: none;
   border-radius: 8px;
-  font-size: 1rem;
   cursor: pointer;
-  color: white;
-  transition: background 0.2s ease;
+  font-weight: 600;
+  transition: transform 0.1s ease-in-out;
 }
 
 #saveEvent {
-  background: #007bff;
+  background-color: #007bff;
+  color: white;
 }
+
 #saveEvent:hover {
-  background: #0069d9;
+  background-color: #0056b3;
+  transform: scale(1.03);
 }
 
 #deleteEvent {
-  background: #dc3545;
+  background-color: #dc3545;
+  color: white;
 }
+
 #deleteEvent:hover {
-  background: #c82333;
+  background-color: #a71d2a;
+  transform: scale(1.03);
 }
 
 #cancelEvent {
-  background: #6c757d;
-}
-#cancelEvent:hover {
-  background: #5a6268;
+  background-color: #e0e0e0;
+  color: #333;
 }
 
-/* 📱 Responsive */
+#cancelEvent:hover {
+  background-color: #cfcfcf;
+  transform: scale(1.03);
+}
+
+/* 📱 Responsive : petits écrans */
 @media (max-width: 600px) {
   #calendar {
-    width: 100%;
+    width: 95%;
     margin: 10px;
-    padding: 10px;
-    box-shadow: none;
-    border-radius: 0;
+    padding: 5px;
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.2em;
+  }
+
+  .fc-button {
+    font-size: 0.8em !important;
+    padding: 4px 6px !important;
   }
 
   .modal-content {
-    width: 95%;
-    max-width: 350px;
+    width: 90%;
     padding: 15px;
   }
 
-  .modal-buttons {
-    flex-direction: column;
-  }
-
-  .modal-buttons button {
-    width: 100%;
+  #eventTitle {
+    font-size: 1em;
   }
 }
 
-/* ✨ Animation d’apparition */
-@keyframes fadeIn {
-  from {
-    transform: scale(0.9);
-    opacity: 0;
-  }
-  to {
-    transform: scale(1);
-    opacity: 1;
-  }
+/* ✏️ Champ texte */
+#eventTitle {
+  width: 100%;
+  padding: 10px;
+  font-size: 1.1em;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  outline: none;
+  transition: border-color 0.2s;
 }
 
-/* 🌙 Mode sombre automatique */
-@media (prefers-color-scheme: dark) {
-  body {
-    background-color: #121212;
-    color: #eee;
-  }
-
-  #calendar {
-    background: #1e1e1e;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
-  }
-
-  .modal-content {
-    background: #2b2b2b;
-    color: #eee;
-  }
-
-  .modal-content input {
-    background: #333;
-    border: 1px solid #555;
-    color: #eee;
-  }
-
-  #saveEvent {
-    background: #3b82f6;
-  }
-  #saveEvent:hover {
-    background: #2563eb;
-  }
-
-  #deleteEvent {
-    background: #ef4444;
-  }
-  #deleteEvent:hover {
-    background: #dc2626;
-  }
-
-  #cancelEvent {
-    background: #6b7280;
-  }
-  #cancelEvent:hover {
-    background: #4b5563;
-  }
+#eventTitle:focus {
+  border-color: #007bff;
 }
