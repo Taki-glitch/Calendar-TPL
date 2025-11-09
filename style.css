@@ -1,130 +1,84 @@
-/* 🌈 Style global */
+/* 🌈 Styles généraux */
 body {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   background-color: #f5f7fb;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
   color: #333;
 }
 
-/* 🧭 En-tête (logo + titre) */
+/* 🔹 En-tête */
 header {
-  width: 100%;
-  text-align: center;
-  padding: 30px 10px;
-  background-color: #fff;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-  margin-bottom: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-header img {
-  width: 120px; /* ✅ taille contrôlée du logo */
-  height: auto;
-  border-radius: 12px;
-  object-fit: contain;
-  display: block;
-  margin: 0 auto 10px;
+header .logo {
+  width: 48px;
+  height: 48px;
+  margin-right: 10px;
+  border-radius: 50%;
 }
 
-header h1 {
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: #222;
+h1 {
+  font-size: 1.8em;
   margin: 0;
 }
 
-/* 📅 Conteneur du calendrier */
+/* 📅 Zone du calendrier */
 #planning {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 20px;
-  width: 90%;
-  max-width: 1100px;
-  margin-bottom: 50px;
+  max-width: 900px;
+  margin: 30px auto;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* 🧩 Case d’un créneau (slot) */
-.slot {
-  background: #ffffff;
-  border-radius: 14px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  padding: 16px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.slot:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-/* 🕒 Contenu d’un créneau */
-.slot h3 {
-  font-size: 1.1rem;
-  color: #2a2a2a;
-  margin-bottom: 8px;
-}
-
-.slot p {
-  font-size: 0.95rem;
-  color: #555;
-  margin: 3px 0;
-}
-
-/* 🎨 Boutons ou interactions */
-button {
-  background-color: #0078ff;
-  color: #fff;
-  border: none;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-button:hover {
-  background-color: #005fcc;
-}
-
-/* 📱 Responsive design */
-@media (max-width: 600px) {
-  header img {
-    width: 90px;
-  }
-
-  header h1 {
-    font-size: 1.4rem;
-  }
-
-  .slot {
-    padding: 12px;
-  }
-}
-
-/* 💾 Bouton de sauvegarde */
-#saveContainer {
+#loader {
   text-align: center;
-  margin: 15px 0;
+  margin-top: 25px;
+  font-weight: 500;
+  color: #555;
 }
 
-#saveNowBtn {
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  padding: 10px 18px;
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
+/* 🎨 FullCalendar */
+.fc-toolbar-title {
+  font-size: 1.5em;
   font-weight: 600;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  color: #007bff;
 }
 
-#saveNowBtn:hover {
-  background-color: #1e40af;
-  transform: scale(1.03);
+.fc-button {
+  background-color: #007bff !important;
+  border: none !important;
+  color: white !important;
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+}
+
+.fc-button:hover {
+  background-color: #0056b3 !important;
+}
+
+.fc-event {
+  border-radius: 6px !important;
+  padding: 2px 5px;
+}
+
+/* 📱 Responsive */
+@media (max-width: 600px) {
+  #planning {
+    width: 95%;
+    margin: 15px auto;
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.1em;
+  }
 }
