@@ -6,19 +6,19 @@
   <title>Planning TPL</title>
 
   <!-- Icônes et logo -->
-  <link rel="icon" href="A_flat,_circular_digital_vector_graphic_features_a.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="A_flat,_circular_digital_vector_graphic_features_a.png" />
+  <link rel="icon" href="tpl-logo.png" />
+  <link rel="apple-touch-icon" sizes="180x180" href="tpl-logo.png" />
   <meta name="theme-color" content="#1E40AF" />
 
   <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet">
 
-  <!-- Ton style -->
-  <link rel="stylesheet" href="style.css">
+  <!-- Style principal -->
+  <link rel="stylesheet" href="./style.css">
 </head>
 <body>
   <header>
-    <img src="A_flat,_circular_digital_vector_graphic_features_a.png" alt="Logo TPL">
+    <img src="tpl-logo.png" alt="Logo TPL">
     <h1>Planning TPL</h1>
   </header>
 
@@ -28,7 +28,16 @@
   <!-- FullCalendar JS -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.js"></script>
 
-  <!-- Ton script -->
-  <script src="script.js"></script>
+  <!-- Script principal -->
+  <script src="./script.js"></script>
+
+  <!-- Enregistrement du service worker -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./service-workers.js')
+        .then(() => console.log("✅ Service Worker enregistré"))
+        .catch(err => console.warn("⚠️ SW non enregistré", err));
+    }
+  </script>
 </body>
 </html>
