@@ -1,28 +1,22 @@
 document.addEventListener("DOMContentLoaded", function () {
   const calendarEl = document.getElementById("calendar");
-
-  // Modale "ajout"
   const modal = document.getElementById("eventModal");
+  const modalTitle = document.getElementById("modalTitle");
   const eventTitleInput = document.getElementById("eventTitle");
   const saveBtn = document.getElementById("saveEvent");
-  const cancelBtn = document.getElementById("cancelEvent");
-
-  // Modale "édition"
-  const editModal = document.getElementById("editModal");
-  const editTitleInput = document.getElementById("editTitle");
-  const updateBtn = document.getElementById("updateEvent");
   const deleteBtn = document.getElementById("deleteEvent");
-  const cancelEditBtn = document.getElementById("cancelEdit");
+  const cancelBtn = document.getElementById("cancelEvent");
 
   let selectedDate = null;
   let selectedEvent = null;
 
-  // 🔹 Charger / sauvegarder localStorage
+  // 🔹 Charger les événements depuis le localStorage
   function chargerEvenements() {
     const data = localStorage.getItem("evenements");
     return data ? JSON.parse(data) : [];
   }
 
+  // 🔹 Sauvegarder les événements dans le localStorage
   function sauvegarderEvenements(events) {
     localStorage.setItem("evenements", JSON.stringify(events));
   }
@@ -34,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     initialView: "dayGridMonth",
     locale: "fr",
     selectable: true,
-    editable: true,
+    editable: false,
     headerToolbar: {
       left: "prev,next today",
       center: "title",
@@ -42,83 +36,74 @@ document.addEventListener("DOMContentLoaded", function () {
     },
     events: evenements,
 
-    // ➕ Clic sur une date → ouvrir modale ajout
+    // 🔸 Clic sur une date : ajouter un événement
     dateClick: function (info) {
       selectedDate = info.dateStr;
-      modal.style.display = "block";
+      selectedEvent = null;
+      modalTitle.textContent = "Nouvel événement";
       eventTitleInput.value = "";
+      deleteBtn.style.display = "none";
+      modal.style.display = "block";
       eventTitleInput.focus();
     },
 
-    // ✏️ Clic sur un événement → ouvrir modale édition
+    // 🔸 Clic sur un événement : le modifier ou supprimer
     eventClick: function (info) {
       selectedEvent = info.event;
-      editTitleInput.value = selectedEvent.title;
-      editModal.style.display = "block";
+      selectedDate = info.event.startStr;
+      modalTitle.textContent = "Modifier l'événement";
+      eventTitleInput.value = info.event.title;
+      deleteBtn.style.display = "inline-block";
+      modal.style.display = "block";
     },
   });
 
   calendar.render();
 
-  // ➕ Enregistrer un nouvel événement
+  // 🔹 Enregistrer ou modifier un événement
   saveBtn.addEventListener("click", () => {
     const title = eventTitleInput.value.trim();
-    if (title) {
-      const newEvent = { title, start: selectedDate };
-      evenements.push(newEvent);
+    if (!title) {
+      alert("Veuillez entrer un titre d'événement !");
+      return;
+    }
+
+    if (selectedEvent) {
+      // ✏️ Modification d’un événement existant
+      selectedEvent.setProp("title", title);
+      evenements = evenements.map((e) =>
+        e.start === selectedEvent.startStr ? { ...e, title } : e
+      );
+    } else {
+      // ➕ Ajout d’un nouvel événement
+      const newEvent = { title: title, start: selectedDate };
       calendar.addEvent(newEvent);
+      evenements.push(newEvent);
+    }
+
+    sauvegarderEvenements(evenements);
+    modal.style.display = "none";
+  });
+
+  // 🔹 Supprimer un événement
+  deleteBtn.addEventListener("click", () => {
+    if (selectedEvent && confirm("Supprimer cet événement ?")) {
+      selectedEvent.remove();
+      evenements = evenements.filter(
+        (e) => e.start !== selectedEvent.startStr || e.title !== selectedEvent.title
+      );
       sauvegarderEvenements(evenements);
       modal.style.display = "none";
-    } else {
-      alert("Veuillez entrer un titre d'événement !");
     }
   });
 
-  cancelBtn.addEventListener("click", () => (modal.style.display = "none"));
-
-  // ✏️ Mettre à jour un événement existant
-  updateBtn.addEventListener("click", () => {
-    const newTitle = editTitleInput.value.trim();
-    if (newTitle && selectedEvent) {
-      selectedEvent.setProp("title", newTitle);
-
-      // mettre à jour dans localStorage
-      const idx = evenements.findIndex(
-        (ev) => ev.start === selectedEvent.startStr && ev.title === selectedEvent.title
-      );
-      if (idx !== -1) {
-        evenements[idx].title = newTitle;
-        sauvegarderEvenements(evenements);
-      }
-
-      editModal.style.display = "none";
-    }
+  // 🔹 Annuler
+  cancelBtn.addEventListener("click", () => {
+    modal.style.display = "none";
   });
 
-  // ❌ Supprimer un événement
-  deleteBtn.addEventListener("click", () => {
-    if (selectedEvent) {
-      // Supprimer de FullCalendar
-      selectedEvent.remove();
-
-      // Supprimer du localStorage
-      evenements = evenements.filter(
-        (ev) =>
-          !(ev.start === selectedEvent.startStr && ev.title === selectedEvent.title)
-      );
-      sauvegarderEvenements(evenements);
-
-      editModal.style.display = "none";
-    }
-  });
-
-  cancelEditBtn.addEventListener("click", () => {
-    editModal.style.display = "none";
-  });
-
-  // Fermer les modales si on clique à l’extérieur
+  // 🔹 Fermer la modale si on clique dehors
   window.addEventListener("click", (e) => {
     if (e.target === modal) modal.style.display = "none";
-    if (e.target === editModal) editModal.style.display = "none";
   });
 });
