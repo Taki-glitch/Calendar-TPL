@@ -11,15 +11,15 @@
   <meta name="theme-color" content="#1E40AF" />
 
   <!-- FullCalendar CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet" />
 
   <!-- Ton style -->
   <link rel="stylesheet" href="./style.css" />
 
-  <!-- ✅ FullCalendar JS (avant ton script.js) -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.js"></script>
-  
-  <!-- ✅ Ton script principal (chargé après FullCalendar) -->
+  <!-- ✅ FullCalendar JS global build -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+  <!-- ✅ Script principal (après FullCalendar) -->
   <script src="./script.js" defer></script>
 </head>
 
@@ -35,7 +35,7 @@
   <!-- Enregistrement du Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-workers.js')
+      navigator.serviceWorker.register('./service-worker.js') // ✅ corrige le nom
         .then(() => console.log("✅ Service Worker enregistré"))
         .catch(err => console.warn("⚠️ SW non enregistré", err));
     }
