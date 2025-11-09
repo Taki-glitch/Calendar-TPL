@@ -7,7 +7,21 @@ document.addEventListener("DOMContentLoaded", function () {
 
   let selectedDate = null;
 
-  // Créer le calendrier
+  // 🔹 Charger les événements depuis le localStorage
+  function chargerEvenements() {
+    const data = localStorage.getItem("evenements");
+    return data ? JSON.parse(data) : [];
+  }
+
+  // 🔹 Sauvegarder les événements dans le localStorage
+  function sauvegarderEvenements(events) {
+    localStorage.setItem("evenements", JSON.stringify(events));
+  }
+
+  // 🔹 Liste initiale
+  let evenements = chargerEvenements();
+
+  // 🔹 Créer le calendrier
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     locale: "fr",
@@ -17,10 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
       center: "title",
       right: "dayGridMonth,timeGridWeek,timeGridDay",
     },
-    events: [
-      { title: "Réunion équipe", start: "2025-11-10T10:00:00" },
-      { title: "Vacances", start: "2025-11-20", end: "2025-11-25" },
-    ],
+    events: evenements, // Charger les événements sauvegardés
     dateClick: function (info) {
       selectedDate = info.dateStr;
       modal.style.display = "block";
@@ -31,23 +42,26 @@ document.addEventListener("DOMContentLoaded", function () {
 
   calendar.render();
 
-  // Bouton "Enregistrer"
+  // 🔹 Ajouter un nouvel événement
   saveBtn.addEventListener("click", () => {
     const title = eventTitleInput.value.trim();
     if (title) {
-      calendar.addEvent({ title: title, start: selectedDate });
+      const newEvent = { title: title, start: selectedDate };
+      evenements.push(newEvent);
+      calendar.addEvent(newEvent);
+      sauvegarderEvenements(evenements);
       modal.style.display = "none";
     } else {
       alert("Veuillez entrer un titre d'événement !");
     }
   });
 
-  // Bouton "Annuler"
+  // 🔹 Annuler
   cancelBtn.addEventListener("click", () => {
     modal.style.display = "none";
   });
 
-  // Fermer si on clique en dehors
+  // 🔹 Fermer la fenêtre si on clique dehors
   window.addEventListener("click", (e) => {
     if (e.target === modal) modal.style.display = "none";
   });
