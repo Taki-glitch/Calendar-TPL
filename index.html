@@ -3,50 +3,90 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📅 Calendrier TPL</title>
+  <title>Calendrier TPL</title>
 
-  <!-- Icônes -->
+  <!-- Icônes et manifest -->
   <link rel="icon" type="image/png" sizes="32x32" href="tpl-logo.png">
   <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png">
   <link rel="apple-touch-icon" href="tpl-logo.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#007bff">
-  <meta name="description" content="Calendrier TPL — un planning simple, modifiable et accessible depuis téléphone, tablette ou PC.">
 
-  <!-- FullCalendar CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
+  <!-- Mode app sur iPhone -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css">
+  <!-- Police -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+
+  <!-- Style global -->
+  <style>
+    body {
+      margin: 0;
+      font-family: "Poppins", sans-serif;
+      background-color: #f9f9f9;
+      color: #333;
+    }
+
+    header {
+      background: #007bff;
+      color: white;
+      text-align: center;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    }
+
+    header img {
+      height: 40px;
+      width: 40px;
+      border-radius: 10px;
+    }
+
+    #calendar {
+      max-width: 95%;
+      margin: 20px auto;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      padding: 10px;
+    }
+
+    #loader {
+      text-align: center;
+      margin-top: 30px;
+      font-size: 1.1em;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      body { background-color: #1e1e1e; color: #eee; }
+      #calendar { background: #2b2b2b; color: white; }
+      header { background: #0056b3; }
+    }
+  </style>
 </head>
-
 <body>
+
+  <!-- En-tête avec petit logo -->
   <header>
-    <img src="tpl-logo.png" alt="Logo TPL" class="logo">
-    <h1>Calendrier TPL</h1>
+    <img src="tpl-logo.png" alt="Logo TPL">
+    <span>Calendrier TPL</span>
   </header>
 
-  <main>
-    <div id="calendar"></div>
-  </main>
+  <!-- Zone de chargement -->
+  <div id="loader">Chargement du planning...</div>
 
-  <footer>
-    <p>© 2025 TPL — Projet Planning Open Source</p>
-  </footer>
-
-  <!-- FullCalendar JS -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+  <!-- Calendrier -->
+  <div id="calendar"></div>
 
   <!-- Script principal -->
   <script src="script.js"></script>
-
-  <!-- Enregistrement du Service Worker -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("✅ Service Worker enregistré"))
-        .catch(err => console.error("Erreur SW :", err));
-    }
-  </script>
 </body>
 </html>
