@@ -1,13 +1,18 @@
 {
   "name": "Calendrier TPL",
-  "short_name": "Calendrier",
-  "start_url": "./index.html",
+  "short_name": "TPL",
+  "start_url": ".",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#007bff",
   "theme_color": "#007bff",
   "icons": [
     {
-      "src": "https://cdn-icons-png.flaticon.com/512/747/747310.png",
+      "src": "tpl-logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "tpl-logo.png",
       "sizes": "512x512",
       "type": "image/png"
     }
