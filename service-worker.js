@@ -1,89 +1,92 @@
 /**************************************************************
- * ⚙️ Service Worker — Planning TPL (v3)
- * ------------------------------------------------------------
- * - Met en cache les fichiers essentiels
- * - Ignore les erreurs réseau (pour éviter Failed to execute addAll)
- * - Sert les fichiers depuis le cache si offline
+ * ⚙️ SERVICE WORKER — Planning TPL (v2.0)
+ * Fonctionne avec GitHub Pages + FullCalendar + PWA
  **************************************************************/
 
-const CACHE_NAME = "tpl-cache-v3";
+const CACHE_NAME = "tpl-calendar-cache-v2";
 
-const ASSETS = [
+// 🧱 Liste des fichiers à précharger (offline)
+const OFFLINE_ASSETS = [
   "./",
   "./index.html",
   "./style.css",
   "./script.js",
   "./manifest.json",
-  "./tpl-logo.png"
+  "./tpl-logo.png",
+  "./Othertpl-logo.png",
+  // ✅ FullCalendar CSS
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css",
+  // ✅ FullCalendar JS
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.js",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.js",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/index.global.min.js",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js"
 ];
 
-// 📦 Installation : on met en cache les fichiers essentiels
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(async cache => {
-      const cachePromises = ASSETS.map(async url => {
-        try {
-          const response = await fetch(url);
-          if (response.ok) await cache.put(url, response);
-        } catch (err) {
-          console.warn("⚠️ Échec de mise en cache :", url);
-        }
-      });
-      await Promise.all(cachePromises);
-    })
-  );
+/**************************************************************
+ * 🧩 INSTALLATION — préchargement du cache
+ **************************************************************/
+self.addEventListener("install", (event) => {
   console.log("✅ Service Worker installé");
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(OFFLINE_ASSETS))
+      .then(() => self.skipWaiting())
+  );
 });
 
-// 🧹 Activation : supprime les anciens caches
-self.addEventListener("activate", event => {
+/**************************************************************
+ * 🚀 ACTIVATION — nettoyage de l’ancien cache
+ **************************************************************/
+self.addEventListener("activate", (event) => {
+  console.log("🚀 Service Worker actif");
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(k => k !== CACHE_NAME)
-          .map(k => {
-            console.log("🗑️ Suppression ancien cache :", k);
-            return caches.delete(k);
-          })
-      )
+    caches.keys().then((keys) => 
+      Promise.all(keys.map((key) => {
+        if (key !== CACHE_NAME) {
+          console.log("🧹 Suppression ancien cache :", key);
+          return caches.delete(key);
+        }
+      }))
     )
   );
-  console.log("🚀 Service Worker actif");
+  self.clients.claim();
 });
 
-// 🌐 Interception des requêtes
-self.addEventListener("fetch", event => {
-  const { request } = event;
+/**************************************************************
+ * 🌐 FETCH — stratégie cache-first avec fallback réseau
+ **************************************************************/
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
 
-  // On ne met pas en cache les appels au Google Script ou aux proxys
-  if (request.url.includes("script.google.com") || request.url.includes("allorigins.win")) {
-    event.respondWith(fetch(request).catch(() => new Response("[]", { headers: { "Content-Type": "application/json" } })));
-    return;
-  }
+  // ⚠️ On ignore les requêtes non-HTTP
+  if (!request.url.startsWith("http")) return;
 
-  // Réponse depuis le cache, sinon réseau
   event.respondWith(
-    caches.match(request).then(cachedResponse => {
-      return (
-        cachedResponse ||
-        fetch(request)
-          .then(networkResponse => {
-            // On met à jour le cache en arrière-plan
-            caches.open(CACHE_NAME).then(cache => {
-              if (networkResponse && networkResponse.ok) {
-                cache.put(request, networkResponse.clone());
-              }
-            });
-            return networkResponse;
-          })
-          .catch(() => {
-            // Si offline → retour du cache de secours
-            if (request.mode === "navigate") {
-              return caches.match("./index.html");
-            }
-          })
-      );
+    caches.match(request).then((response) => {
+      // 🗂️ 1. On retourne la ressource du cache si elle existe
+      if (response) {
+        console.log("⚙ Cache hit:", request.url);
+        return response;
+      }
+
+      // 🌍 2. Sinon on la télécharge et on la met en cache
+      return fetch(request)
+        .then((networkResponse) => {
+          if (!networkResponse || networkResponse.status !== 200) return networkResponse;
+          const cloned = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
+          console.log("🌐 Fetched & cached:", request.url);
+          return networkResponse;
+        })
+        .catch(() => {
+          // 📵 3. Si offline et non en cache → page d’accueil offline
+          return caches.match("./index.html");
+        });
     })
   );
 });
