@@ -1,28 +1,27 @@
 /**************************************************************
- * 📅 script.js — version stable (TPL + Google Sheets v2.1)
+ * 📅 script.js — version GitHub Pages compatible
  * ------------------------------------------------------------
- * - Récupère les événements depuis Google Sheets
- * - Enregistre localement (localStorage)
- * - Sauvegarde partielle et complète sur Google Sheets
- * - Compatible avec FullCalendar v6
+ * - Appels à Google Apps Script via proxy AllOrigins
+ * - CORS géré automatiquement
  **************************************************************/
 
-// ⚙️ URL de ton script Apps Script publié en tant qu'application web :
-const API_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(
-  "https://script.google.com/macros/s/AKfycbyU6zF4eMA2uPd76CxR3qSYv69uS9eTCd5Yo25KU9ZbXCLLP7E5Wf44FJ2M2_K5VTw_/exec"
-);
-
-/**************************************************************
- * 🧠 FONCTIONS PRINCIPALES
- **************************************************************/
+const GAS_URL = "https://script.google.com/macros/s/AKfycbyU6zF4eMA2uPd76CxR3qSYv69uS9eTCd5Yo25KU9ZbXCLLP7E5Wf44FJ2M2_K5VTw_/exec";
+const API_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(GAS_URL);
 
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
   loader.textContent = "Chargement du planning...";
 
   try {
-    const res = await fetch(API_URL);
-    const data = await res.json();
+    const res = await fetch(API_URL, { mode: "cors" });
+    const text = await res.text();
+
+    let data = [];
+    try {
+      data = JSON.parse(text);
+    } catch {
+      console.warn("Réponse non JSON :", text);
+    }
 
     afficherPlanning(data);
     localStorage.setItem("tplEvents", JSON.stringify(data));
@@ -30,51 +29,42 @@ async function chargerPlanning() {
   } catch (err) {
     console.error("Erreur de chargement :", err);
     loader.textContent = "⚠️ Erreur de connexion au serveur";
-    // 🧭 Fallback local
     const saved = localStorage.getItem("tplEvents");
     if (saved) afficherPlanning(JSON.parse(saved));
   }
 }
 
-/**************************************************************
- * 🗓️ AFFICHAGE FULLCALENDAR
- **************************************************************/
-
-let calendar; // déclaré globalement
+let calendar;
 
 function afficherPlanning(events) {
-  // 🧩 IMPORTANT : l’élément HTML doit être #calendar (et non #planning)
-  const calendarEl = document.getElementById("calendar");
+  const el = document.getElementById("planning");
 
-  if (!calendarEl) {
-    console.error("❌ Élément #calendar introuvable !");
+  if (typeof FullCalendar === "undefined") {
+    console.error("❌ FullCalendar non chargé !");
+    document.getElementById("loader").textContent =
+      "Erreur : FullCalendar non chargé.";
     return;
   }
 
-  // ✅ Initialisation de FullCalendar
-  calendar = new FullCalendar.Calendar(calendarEl, {
+  calendar = new FullCalendar.Calendar(el, {
     initialView: "dayGridMonth",
     locale: "fr",
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: "dayGridMonth,timeGridWeek,listWeek",
+      right: "dayGridMonth,timeGridWeek,listWeek"
     },
+    selectable: true,
+    editable: true,
     events: events.map(e => ({
       id: e.id,
       title: e.title,
       start: e.start,
       end: e.end,
       allDay: e.allDay === "TRUE" || e.allDay === true,
-      category: e.category || "Autre"
+      category: e.category || "Autre",
     })),
-    editable: true,
-    selectable: true,
-    selectMirror: true,
-    eventColor: "#1E40AF",
-    eventTextColor: "#fff",
 
-    // 🟢 Création d’un nouvel événement
     select: info => {
       const title = prompt("Nom de l'événement :");
       if (title) {
@@ -84,7 +74,7 @@ function afficherPlanning(events) {
           start: info.startStr,
           end: info.endStr,
           allDay: info.allDay,
-          category: "Autre"
+          category: "Autre",
         };
         calendar.addEvent(event);
         saveEvent(event);
@@ -92,7 +82,6 @@ function afficherPlanning(events) {
       calendar.unselect();
     },
 
-    // ✏️ Modification d’un événement
     eventChange: info => {
       const ev = info.event;
       const updated = {
@@ -101,12 +90,11 @@ function afficherPlanning(events) {
         start: ev.startStr,
         end: ev.endStr,
         allDay: ev.allDay,
-        category: ev.extendedProps.category
+        category: ev.extendedProps.category,
       };
       saveEvent(updated);
     },
 
-    // ❌ Suppression d’un événement
     eventClick: info => {
       if (confirm(`Supprimer "${info.event.title}" ?`)) {
         info.event.remove();
@@ -119,18 +107,18 @@ function afficherPlanning(events) {
 }
 
 /**************************************************************
- * 💾 SAUVEGARDE SUR GOOGLE SHEETS
+ * 💾 SAUVEGARDE (via AllOrigins proxy)
  **************************************************************/
-
 async function saveEvent(event) {
   try {
     const body = { mode: "patch", data: [event] };
     await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      mode: "cors",
     });
-    console.log("✅ Événement sauvegardé :", event.title);
+    console.log("✅ Sauvegardé :", event.title);
   } catch (err) {
     console.error("⚠️ Erreur de sauvegarde :", err);
   }
@@ -138,11 +126,15 @@ async function saveEvent(event) {
 
 async function deleteEvent(id) {
   try {
-    const body = { mode: "patch", data: [{ id, title: "", start: "", end: "", allDay: false, category: "" }] };
+    const body = {
+      mode: "patch",
+      data: [{ id, title: "", start: "", end: "", allDay: false, category: "" }],
+    };
     await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      mode: "cors",
     });
     console.log(`🗑️ Événement ${id} supprimé`);
   } catch (err) {
@@ -151,96 +143,6 @@ async function deleteEvent(id) {
 }
 
 /**************************************************************
- * 🔁 SAUVEGARDE COMPLÈTE AVANT FERMETURE
+ * 🚀 Lancement
  **************************************************************/
-
-window.addEventListener("beforeunload", async () => {
-  if (!calendar) return;
-
-  const allEvents = calendar.getEvents().map(ev => ({
-    id: ev.id,
-    title: ev.title,
-    start: ev.startStr,
-    end: ev.endStr,
-    allDay: ev.allDay,
-    category: ev.extendedProps.category
-  }));
-
-  try {
-    const body = { mode: "replace", data: allEvents };
-    await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-    console.log("💾 Sauvegarde complète avant fermeture");
-  } catch (err) {
-    console.warn("⚠️ Impossible de sauvegarder avant fermeture :", err);
-  }
-});
-
-/**************************************************************
- * 🚀 INITIALISATION DU CALENDRIER
- **************************************************************/
-/**************************************************************
- * 💾 SAUVEGARDE MANUELLE (bouton)
- **************************************************************/
-
-async function saveAllNow() {
-  if (!calendar) {
-    alert("Le calendrier n'est pas encore chargé.");
-    return;
-  }
-
-  const allEvents = calendar.getEvents().map(ev => ({
-    id: ev.id,
-    title: ev.title,
-    start: ev.startStr,
-    end: ev.endStr,
-    allDay: ev.allDay,
-    category: ev.extendedProps.category
-  }));
-
-  try {
-    const body = { mode: "replace", data: allEvents };
-    const res = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body)
-    });
-
-    const result = await res.json();
-    if (result.status === "ok") {
-      alert(`✅ Sauvegarde réussie (${allEvents.length} événements enregistrés)`);
-    } else {
-      alert("⚠️ Erreur lors de la sauvegarde !");
-      console.error(result);
-    }
-  } catch (err) {
-    console.error("Erreur lors de la sauvegarde :", err);
-    alert("❌ Impossible de sauvegarder (vérifie ta connexion).");
-  }
-}
-
-/**************************************************************
- * 🚀 INITIALISATION DU CALENDRIER
- **************************************************************/
-
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof FullCalendar === "undefined") {
-    console.error("❌ FullCalendar non chargé !");
-  } else {
-    chargerPlanning();
-  }
-
-  // ✅ Lier le bouton à la fonction de sauvegarde
-  const saveBtn = document.getElementById("saveNowBtn");
-  if (saveBtn) saveBtn.addEventListener("click", saveAllNow);
-});
-document.addEventListener("DOMContentLoaded", () => {
-  if (typeof FullCalendar === "undefined") {
-    console.error("❌ FullCalendar non chargé !");
-  } else {
-    chargerPlanning();
-  }
-});
+document.addEventListener("DOMContentLoaded", chargerPlanning);
