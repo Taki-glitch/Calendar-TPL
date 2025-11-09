@@ -3,7 +3,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Calendrier TPL</title>
+  <title>📅 Mon Calendrier TPL</title>
+
+  <!-- Icône (favicon) -->
+  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/747/747310.png">
+
+  <!-- Couleur du thème pour mobile -->
+  <meta name="theme-color" content="#007bff">
+
+  <!-- Description pour le référencement -->
+  <meta name="description" content="Calendrier simple et modifiable en ligne, créé avec FullCalendar et hébergé sur GitHub Pages.">
 
   <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
@@ -14,7 +23,7 @@
 <body>
   <div id="calendar"></div>
 
-  <!-- Fenêtre modale pour ajout / modification -->
+  <!-- Fenêtre modale -->
   <div id="eventModal" class="modal">
     <div class="modal-content">
       <h3 id="modalTitle">Nouvel événement</h3>
@@ -29,8 +38,7 @@
 
   <!-- FullCalendar JS -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-
-  <!-- Ton script personnel : doit venir APRÈS FullCalendar -->
+  <!-- Ton script -->
   <script src="script.js"></script>
 </body>
 </html>
