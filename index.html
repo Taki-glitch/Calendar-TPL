@@ -13,28 +13,29 @@
   <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet">
 
-  <!-- Style principal -->
-  <link rel="stylesheet" href="./style.css">
+  <!-- Ton style -->
+  <link rel="stylesheet" href="./style.css" />
+
+  <!-- ✅ FullCalendar JS (avant ton script.js) -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.js"></script>
+  
+  <!-- ✅ Ton script principal (chargé après FullCalendar) -->
+  <script src="./script.js" defer></script>
 </head>
+
 <body>
   <header>
-    <img src="tpl-logo.png" alt="Logo TPL">
+    <img src="tpl-logo.png" alt="Logo TPL" class="logo">
     <h1>Planning TPL</h1>
   </header>
 
   <div id="loader">Chargement du calendrier...</div>
   <div id="calendar"></div>
 
-  <!-- FullCalendar JS -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.js"></script>
-
-  <!-- Script principal -->
-  <script src="./script.js"></script>
-
-  <!-- Enregistrement du service worker -->
+  <!-- Enregistrement du Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js')
+      navigator.serviceWorker.register('./service-workers.js')
         .then(() => console.log("✅ Service Worker enregistré"))
         .catch(err => console.warn("⚠️ SW non enregistré", err));
     }
