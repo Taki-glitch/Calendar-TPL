@@ -10,8 +10,12 @@
   <link rel="apple-touch-icon" sizes="180x180" href="tpl-logo.png" />
   <meta name="theme-color" content="#007bff" />
 
-  <!-- ✅ FullCalendar CSS (version modulaire 6.x) -->
-  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.css" rel="stylesheet" />
+  <!-- ✅ FullCalendar CSS -->
+  <link 
+    href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.css" 
+    rel="stylesheet" 
+    crossorigin="anonymous"
+  />
 
   <!-- ✅ FullCalendar JS (modules nécessaires uniquement) -->
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js"></script>
@@ -43,9 +47,6 @@
   <div id="loader">Chargement du calendrier...</div>
   <div id="planning"></div>
 
-  <!-- ✅ Script principal -->
-  <script src="./script.js"></script>
-
   <!-- ✅ Enregistrement du Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
@@ -54,5 +55,8 @@
         .catch(err => console.warn("⚠️ Service Worker non enregistré :", err));
     }
   </script>
+
+  <!-- ✅ Script principal (à la toute fin pour que le DOM soit prêt) -->
+  <script src="./script.js"></script>
 </body>
 </html>
