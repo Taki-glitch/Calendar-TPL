@@ -5,42 +5,48 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>📅 Calendrier TPL</title>
 
-  <!-- 🧩 Icônes et couleurs -->
+  <!-- Icônes -->
   <link rel="icon" type="image/png" sizes="32x32" href="tpl-logo.png">
   <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png">
   <link rel="apple-touch-icon" href="tpl-logo.png">
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#007bff">
-  <meta name="description" content="Calendrier TPL — un planning simple, modifiable et accessible depuis votre téléphone ou ordinateur.">
+  <meta name="description" content="Calendrier TPL — un planning simple, modifiable et accessible depuis téléphone, tablette ou PC.">
 
-  <!-- 🎨 FullCalendar CSS -->
+  <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 
-  <!-- 🌈 Ton fichier CSS -->
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-  <!-- 📅 Conteneur du calendrier -->
-  <div id="calendar"></div>
+  <header>
+    <img src="tpl-logo.png" alt="Logo TPL" class="logo">
+    <h1>Calendrier TPL</h1>
+  </header>
 
-  <!-- 🪶 Fenêtre modale pour créer / modifier un événement -->
-  <div id="eventModal" class="modal">
-    <div class="modal-content">
-      <h3 id="modalTitle">Nouvel événement</h3>
-      <input type="text" id="eventTitle" placeholder="Titre de l'événement">
-      <div class="modal-buttons">
-        <button id="saveEvent">Enregistrer</button>
-        <button id="deleteEvent" style="display:none;">Supprimer</button>
-        <button id="cancelEvent">Annuler</button>
-      </div>
-    </div>
-  </div>
+  <main>
+    <div id="calendar"></div>
+  </main>
 
-  <!-- 📚 Librairie FullCalendar -->
+  <footer>
+    <p>© 2025 TPL — Projet Planning Open Source</p>
+  </footer>
+
+  <!-- FullCalendar JS -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
-  <!-- 🧠 Ton script -->
+  <!-- Script principal -->
   <script src="script.js"></script>
+
+  <!-- Enregistrement du Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("✅ Service Worker enregistré"))
+        .catch(err => console.error("Erreur SW :", err));
+    }
+  </script>
 </body>
 </html>
