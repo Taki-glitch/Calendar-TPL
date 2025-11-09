@@ -180,7 +180,61 @@ window.addEventListener("beforeunload", async () => {
 /**************************************************************
  * 🚀 INITIALISATION DU CALENDRIER
  **************************************************************/
+/**************************************************************
+ * 💾 SAUVEGARDE MANUELLE (bouton)
+ **************************************************************/
 
+async function saveAllNow() {
+  if (!calendar) {
+    alert("Le calendrier n'est pas encore chargé.");
+    return;
+  }
+
+  const allEvents = calendar.getEvents().map(ev => ({
+    id: ev.id,
+    title: ev.title,
+    start: ev.startStr,
+    end: ev.endStr,
+    allDay: ev.allDay,
+    category: ev.extendedProps.category
+  }));
+
+  try {
+    const body = { mode: "replace", data: allEvents };
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body)
+    });
+
+    const result = await res.json();
+    if (result.status === "ok") {
+      alert(`✅ Sauvegarde réussie (${allEvents.length} événements enregistrés)`);
+    } else {
+      alert("⚠️ Erreur lors de la sauvegarde !");
+      console.error(result);
+    }
+  } catch (err) {
+    console.error("Erreur lors de la sauvegarde :", err);
+    alert("❌ Impossible de sauvegarder (vérifie ta connexion).");
+  }
+}
+
+/**************************************************************
+ * 🚀 INITIALISATION DU CALENDRIER
+ **************************************************************/
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof FullCalendar === "undefined") {
+    console.error("❌ FullCalendar non chargé !");
+  } else {
+    chargerPlanning();
+  }
+
+  // ✅ Lier le bouton à la fonction de sauvegarde
+  const saveBtn = document.getElementById("saveNowBtn");
+  if (saveBtn) saveBtn.addEventListener("click", saveAllNow);
+});
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof FullCalendar === "undefined") {
     console.error("❌ FullCalendar non chargé !");
