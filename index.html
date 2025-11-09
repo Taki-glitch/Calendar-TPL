@@ -34,7 +34,7 @@
   <!-- Enregistrement du service worker -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-workers.js')
+      navigator.serviceWorker.register('./service-worker.js')
         .then(() => console.log("✅ Service Worker enregistré"))
         .catch(err => console.warn("⚠️ SW non enregistré", err));
     }
