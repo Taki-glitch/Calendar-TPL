@@ -1,4 +1,4 @@
-const CACHE = "tpl-cache-v1";
+const CACHE = "tpl-offline-v2";
 const ASSETS = [
   "/",
   "/index.html",
@@ -10,7 +10,7 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", e => {
-  e.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
 });
 
 self.addEventListener("activate", e => {
@@ -23,13 +23,12 @@ self.addEventListener("activate", e => {
 
 self.addEventListener("fetch", e => {
   e.respondWith(
-    caches.match(e.request).then(res =>
-      res ||
-      fetch(e.request).then(fetchRes => {
+    caches.match(e.request).then(res => {
+      return res || fetch(e.request).then(fetchRes => {
         const clone = fetchRes.clone();
-        caches.open(CACHE).then(cache => cache.put(e.request, clone));
+        caches.open(CACHE).then(c => c.put(e.request, clone));
         return fetchRes;
-      }).catch(() => caches.match("/index.html"))
-    )
+      }).catch(() => caches.match("/index.html"));
+    })
   );
 });
