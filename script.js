@@ -1,46 +1,74 @@
 /**************************************************************
- * 📅 script.js — version GitHub Pages compatible
+ * 📅 script.js — version offline-ready (GitHub Pages)
  * ------------------------------------------------------------
- * - Appels à Google Apps Script via proxy AllOrigins
- * - CORS géré automatiquement
+ * - Charge les données via proxy AllOrigins
+ * - Utilise localStorage si offline
+ * - Indique visuellement le mode hors ligne
  **************************************************************/
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyU6zF4eMA2uPd76CxR3qSYv69uS9eTCd5Yo25KU9ZbXCLLP7E5Wf44FJ2M2_K5VTw_/exec";
 const API_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(GAS_URL);
+const OFFLINE_BANNER = document.getElementById("offline-banner");
 
+let isOffline = !navigator.onLine;
+
+/**************************************************************
+ * 🔁 Gestion connexion
+ **************************************************************/
+window.addEventListener("online", () => {
+  isOffline = false;
+  OFFLINE_BANNER.classList.add("hidden");
+  chargerPlanning();
+});
+
+window.addEventListener("offline", () => {
+  isOffline = true;
+  OFFLINE_BANNER.classList.remove("hidden");
+});
+
+/**************************************************************
+ * 🔁 Chargement du planning
+ **************************************************************/
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
-  loader.textContent = "Chargement du planning...";
+  loader.textContent = isOffline
+    ? "Mode hors ligne — affichage du cache local"
+    : "Chargement du planning...";
 
   try {
-    const res = await fetch(API_URL, { mode: "cors" });
-    const text = await res.text();
+    let data;
 
-    let data = [];
-    try {
-      data = JSON.parse(text);
-    } catch {
-      console.warn("Réponse non JSON :", text);
+    if (isOffline) {
+      const cached = localStorage.getItem("tplEvents");
+      data = cached ? JSON.parse(cached) : [];
+    } else {
+      const res = await fetch(API_URL, { mode: "cors" });
+      const text = await res.text();
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = [];
+      }
+      localStorage.setItem("tplEvents", JSON.stringify(data));
     }
 
     afficherPlanning(data);
-    localStorage.setItem("tplEvents", JSON.stringify(data));
-    loader.textContent = "Planning chargé ✅";
+    loader.textContent = "Planning prêt ✅";
   } catch (err) {
     console.error("Erreur de chargement :", err);
-    loader.textContent = "⚠️ Erreur de connexion au serveur";
-    const saved = localStorage.getItem("tplEvents");
-    if (saved) afficherPlanning(JSON.parse(saved));
+    loader.textContent = "⚠️ Erreur de connexion";
   }
 }
 
+/**************************************************************
+ * 🗓️ FullCalendar
+ **************************************************************/
 let calendar;
 
 function afficherPlanning(events) {
   const el = document.getElementById("planning");
 
   if (typeof FullCalendar === "undefined") {
-    console.error("❌ FullCalendar non chargé !");
     document.getElementById("loader").textContent =
       "Erreur : FullCalendar non chargé.";
     return;
@@ -52,19 +80,11 @@ function afficherPlanning(events) {
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: "dayGridMonth,timeGridWeek,listWeek"
+      right: "dayGridMonth,timeGridWeek,listWeek",
     },
     selectable: true,
     editable: true,
-    events: events.map(e => ({
-      id: e.id,
-      title: e.title,
-      start: e.start,
-      end: e.end,
-      allDay: e.allDay === "TRUE" || e.allDay === true,
-      category: e.category || "Autre",
-    })),
-
+    events: events,
     select: info => {
       const title = prompt("Nom de l'événement :");
       if (title) {
@@ -81,68 +101,77 @@ function afficherPlanning(events) {
       }
       calendar.unselect();
     },
-
     eventChange: info => {
-      const ev = info.event;
-      const updated = {
-        id: ev.id,
-        title: ev.title,
-        start: ev.startStr,
-        end: ev.endStr,
-        allDay: ev.allDay,
-        category: ev.extendedProps.category,
-      };
-      saveEvent(updated);
+      saveEvent({
+        id: info.event.id,
+        title: info.event.title,
+        start: info.event.startStr,
+        end: info.event.endStr,
+        allDay: info.event.allDay,
+        category: info.event.extendedProps.category,
+      });
     },
-
     eventClick: info => {
       if (confirm(`Supprimer "${info.event.title}" ?`)) {
         info.event.remove();
         deleteEvent(info.event.id);
       }
-    }
+    },
   });
 
   calendar.render();
 }
 
 /**************************************************************
- * 💾 SAUVEGARDE (via AllOrigins proxy)
+ * 💾 Sauvegarde avec cache
  **************************************************************/
 async function saveEvent(event) {
+  const saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  const index = saved.findIndex(e => e.id === event.id);
+
+  if (index >= 0) saved[index] = event;
+  else saved.push(event);
+
+  localStorage.setItem("tplEvents", JSON.stringify(saved));
+
+  if (isOffline) {
+    console.log("📦 Événement stocké localement :", event.title);
+    return;
+  }
+
   try {
-    const body = { mode: "patch", data: [event] };
     await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ mode: "patch", data: [event] }),
       mode: "cors",
     });
     console.log("✅ Sauvegardé :", event.title);
   } catch (err) {
-    console.error("⚠️ Erreur de sauvegarde :", err);
+    console.warn("⚠️ Erreur de sauvegarde (offline probable).");
   }
 }
 
 async function deleteEvent(id) {
+  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  saved = saved.filter(e => e.id !== id);
+  localStorage.setItem("tplEvents", JSON.stringify(saved));
+
+  if (isOffline) return;
+
   try {
-    const body = {
-      mode: "patch",
-      data: [{ id, title: "", start: "", end: "", allDay: false, category: "" }],
-    };
     await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ mode: "patch", data: [{ id, title: "" }] }),
       mode: "cors",
     });
-    console.log(`🗑️ Événement ${id} supprimé`);
   } catch (err) {
-    console.error("Erreur suppression :", err);
+    console.warn("⚠️ Suppression locale seulement.");
   }
 }
 
 /**************************************************************
- * 🚀 Lancement
+ * 🚀 Démarrage
  **************************************************************/
 document.addEventListener("DOMContentLoaded", chargerPlanning);
