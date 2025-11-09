@@ -1,72 +1,149 @@
+/* 🌙 Style global */
 body {
-  font-family: "Segoe UI", Arial, sans-serif;
-  background: #f4f6fa;
-  text-align: center;
+  font-family: "Inter", Arial, sans-serif;
+  background-color: #f7f9fb;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
 }
 
-h1 {
-  background: #007bff;
-  color: white;
-  margin: 0;
-  padding: 1rem 0;
-}
-
+/* 🗓️ Conteneur du calendrier */
 #calendar {
   max-width: 900px;
-  margin: 40px auto;
+  width: 95%;
+  margin: 30px auto;
   background: white;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* ===== Fenêtre modale ===== */
+/* 📱 Fenêtre modale (fond) */
 .modal {
-  display: none; /* cachée par défaut */
+  display: none;
   position: fixed;
-  z-index: 999;
+  z-index: 1000;
   left: 0;
   top: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.4);
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(3px);
 }
 
+/* 🧩 Contenu de la modale */
 .modal-content {
-  background-color: white;
-  margin: 15% auto;
+  background: #fff;
+  border-radius: 10px;
   padding: 20px;
-  border-radius: 8px;
-  width: 300px;
-  text-align: center;
-}
-
-.modal-content input {
   width: 90%;
-  padding: 8px;
-  margin-bottom: 15px;
+  max-width: 400px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  animation: fadeIn 0.3s ease;
 }
 
-.modal-content .buttons {
+/* ✏️ Titre du modal */
+.modal-content h3 {
+  margin-top: 0;
+  font-size: 1.4rem;
+  color: #333;
+}
+
+/* 🧾 Champ de texte */
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+/* 🔘 Boutons */
+.modal-buttons {
   display: flex;
-  justify-content: space-around;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: flex-end;
 }
 
-.modal-content button {
-  padding: 8px 15px;
+.modal-buttons button {
+  flex: 1;
+  min-width: 100px;
+  padding: 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 8px;
+  font-size: 1rem;
   cursor: pointer;
+  color: white;
+  transition: background 0.2s ease;
 }
 
 #saveEvent {
-  background-color: #007bff;
-  color: white;
+  background: #007bff;
+}
+#saveEvent:hover {
+  background: #0069d9;
+}
+
+#deleteEvent {
+  background: #dc3545;
+}
+#deleteEvent:hover {
+  background: #c82333;
 }
 
 #cancelEvent {
-  background-color: #aaa;
-  color: white;
+  background: #6c757d;
+}
+#cancelEvent:hover {
+  background: #5a6268;
+}
+
+/* 📱 Adaptation mobile */
+@media (max-width: 600px) {
+  body {
+    padding: 0;
+  }
+
+  #calendar {
+    width: 100%;
+    margin: 10px;
+    padding: 10px;
+    box-shadow: none;
+    border-radius: 0;
+  }
+
+  .modal-content {
+    width: 95%;
+    max-width: 350px;
+    padding: 15px;
+  }
+
+  .modal-buttons {
+    flex-direction: column;
+  }
+
+  .modal-buttons button {
+    width: 100%;
+  }
+}
+
+/* ✨ Animation d’apparition */
+@keyframes fadeIn {
+  from {
+    transform: scale(0.9);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
