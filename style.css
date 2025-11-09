@@ -1,4 +1,3 @@
-/* 🌈 Style global */
 body {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   background-color: #f5f7fb;
@@ -11,7 +10,15 @@ body {
   color: #333;
 }
 
-/* 📅 Conteneur du calendrier */
+/* Loader */
+#loader {
+  margin: 20px auto;
+  text-align: center;
+  font-size: 1.1em;
+  color: #555;
+}
+
+/* Calendrier */
 #calendar {
   max-width: 900px;
   width: 100%;
@@ -22,7 +29,7 @@ body {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-/* 🧭 FullCalendar : couleurs et bordures */
+/* FullCalendar */
 .fc-toolbar-title {
   font-size: 1.6em;
   font-weight: 600;
@@ -50,86 +57,7 @@ body {
   padding: 2px 4px;
 }
 
-/* 🪶 Fenêtre modale (ajout / édition d'événement) */
-.modal {
-  display: none; /* Cachée par défaut */
-  position: fixed;
-  z-index: 999;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  justify-content: center;
-  align-items: center;
-}
-
-.modal-content {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 16px;
-  max-width: 400px;
-  width: 90%;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-  text-align: center;
-  animation: fadeIn 0.2s ease-in-out;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-/* 🧩 Boutons modale */
-.modal-buttons {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-}
-
-.modal-buttons button {
-  flex: 1;
-  padding: 10px;
-  font-size: 1em;
-  border: none;
-  border-radius: 8px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: transform 0.1s ease-in-out;
-}
-
-#saveEvent {
-  background-color: #007bff;
-  color: white;
-}
-
-#saveEvent:hover {
-  background-color: #0056b3;
-  transform: scale(1.03);
-}
-
-#deleteEvent {
-  background-color: #dc3545;
-  color: white;
-}
-
-#deleteEvent:hover {
-  background-color: #a71d2a;
-  transform: scale(1.03);
-}
-
-#cancelEvent {
-  background-color: #e0e0e0;
-  color: #333;
-}
-
-#cancelEvent:hover {
-  background-color: #cfcfcf;
-  transform: scale(1.03);
-}
-
-/* 📱 Responsive : petits écrans */
+/* Responsive */
 @media (max-width: 600px) {
   #calendar {
     width: 95%;
@@ -145,29 +73,4 @@ body {
     font-size: 0.8em !important;
     padding: 4px 6px !important;
   }
-
-  .modal-content {
-    width: 90%;
-    padding: 15px;
-  }
-
-  #eventTitle {
-    font-size: 1em;
-  }
-}
-
-/* ✏️ Champ texte */
-#eventTitle {
-  width: 100%;
-  padding: 10px;
-  font-size: 1.1em;
-  margin-top: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-#eventTitle:focus {
-  border-color: #007bff;
 }
