@@ -19,7 +19,7 @@
   <!-- ✅ FullCalendar JS global build -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
 
-  <!-- ✅ Script principal (après FullCalendar) -->
+  <!-- ✅ Script principal -->
   <script src="./script.js" defer></script>
 </head>
 
@@ -30,12 +30,18 @@
   </header>
 
   <div id="loader">Chargement du calendrier...</div>
+
+  <!-- ✅ Bouton de sauvegarde manuelle -->
+  <div id="saveContainer">
+    <button id="saveNowBtn">💾 Sauvegarder maintenant</button>
+  </div>
+
   <div id="calendar"></div>
 
   <!-- Enregistrement du Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./service-worker.js') // ✅ corrige le nom
+      navigator.serviceWorker.register('./service-worker.js')
         .then(() => console.log("✅ Service Worker enregistré"))
         .catch(err => console.warn("⚠️ SW non enregistré", err));
     }
