@@ -1,9 +1,10 @@
 /**************************************************************
- * 📅 script.js — version améliorée (TPL + Google Sheets v2)
+ * 📅 script.js — version stable (TPL + Google Sheets v2.1)
  * ------------------------------------------------------------
  * - Récupère les événements depuis Google Sheets
  * - Enregistre localement (localStorage)
- * - Sauvegarde partielle ou complète sur Google Sheets
+ * - Sauvegarde partielle et complète sur Google Sheets
+ * - Compatible avec FullCalendar v6
  **************************************************************/
 
 // ⚙️ URL de ton script Apps Script publié en tant qu'application web :
@@ -27,7 +28,7 @@ async function chargerPlanning() {
   } catch (err) {
     console.error("Erreur de chargement :", err);
     loader.textContent = "⚠️ Erreur de connexion au serveur";
-    // fallback local
+    // 🧭 Fallback local
     const saved = localStorage.getItem("tplEvents");
     if (saved) afficherPlanning(JSON.parse(saved));
   }
@@ -37,11 +38,18 @@ async function chargerPlanning() {
  * 🗓️ AFFICHAGE FULLCALENDAR
  **************************************************************/
 
-let calendar;
+let calendar; // déclaré globalement
 
 function afficherPlanning(events) {
-  const calendarEl = document.getElementById("planning");
+  // 🧩 IMPORTANT : l’élément HTML doit être #calendar (et non #planning)
+  const calendarEl = document.getElementById("calendar");
 
+  if (!calendarEl) {
+    console.error("❌ Élément #calendar introuvable !");
+    return;
+  }
+
+  // ✅ Initialisation de FullCalendar
   calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
     locale: "fr",
@@ -60,8 +68,11 @@ function afficherPlanning(events) {
     })),
     editable: true,
     selectable: true,
+    selectMirror: true,
+    eventColor: "#1E40AF",
+    eventTextColor: "#fff",
 
-    // 🟢 Quand on crée un nouvel événement
+    // 🟢 Création d’un nouvel événement
     select: info => {
       const title = prompt("Nom de l'événement :");
       if (title) {
@@ -79,7 +90,7 @@ function afficherPlanning(events) {
       calendar.unselect();
     },
 
-    // ✏️ Quand on déplace ou redimensionne un événement
+    // ✏️ Modification d’un événement
     eventChange: info => {
       const ev = info.event;
       const updated = {
@@ -93,7 +104,7 @@ function afficherPlanning(events) {
       saveEvent(updated);
     },
 
-    // ❌ Suppression manuelle
+    // ❌ Suppression d’un événement
     eventClick: info => {
       if (confirm(`Supprimer "${info.event.title}" ?`)) {
         info.event.remove();
@@ -125,7 +136,6 @@ async function saveEvent(event) {
 
 async function deleteEvent(id) {
   try {
-    // Ici on envoie une ligne vide avec le même ID pour l'effacer côté sheet
     const body = { mode: "patch", data: [{ id, title: "", start: "", end: "", allDay: false, category: "" }] };
     await fetch(API_URL, {
       method: "POST",
@@ -139,10 +149,12 @@ async function deleteEvent(id) {
 }
 
 /**************************************************************
- * 🔁 SAUVEGARDE COMPLÈTE (avant de quitter)
+ * 🔁 SAUVEGARDE COMPLÈTE AVANT FERMETURE
  **************************************************************/
 
 window.addEventListener("beforeunload", async () => {
+  if (!calendar) return;
+
   const allEvents = calendar.getEvents().map(ev => ({
     id: ev.id,
     title: ev.title,
@@ -166,7 +178,13 @@ window.addEventListener("beforeunload", async () => {
 });
 
 /**************************************************************
- * 🚀 LANCEMENT
+ * 🚀 INITIALISATION DU CALENDRIER
  **************************************************************/
 
-document.addEventListener("DOMContentLoaded", chargerPlanning);
+document.addEventListener("DOMContentLoaded", () => {
+  if (typeof FullCalendar === "undefined") {
+    console.error("❌ FullCalendar non chargé !");
+  } else {
+    chargerPlanning();
+  }
+});
