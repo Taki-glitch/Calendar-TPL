@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hors ligne — Planning TPL</title>
+  <link rel="icon" href="tpl-logo.png" />
+
+  <style>
+    :root {
+      --tpl-blue: #007bff;
+      --tpl-light: #f5f7fb;
+      --tpl-dark: #333;
+    }
+
+    /* 🌊 Animation de fond */
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      color: var(--tpl-dark);
+      background: linear-gradient(180deg, #eaf2ff 0%, #f9fbff 100%);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .wave {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 200%;
+      height: 200px;
+      background: rgba(0, 123, 255, 0.2);
+      border-radius: 50%;
+      animation: wave 8s infinite linear;
+      transform-origin: center;
+    }
+
+    .wave:nth-child(1) {
+      bottom: -50px;
+      opacity: 0.5;
+      animation-duration: 9s;
+    }
+
+    .wave:nth-child(2) {
+      bottom: -60px;
+      opacity: 0.3;
+      animation-duration: 12s;
+    }
+
+    .wave:nth-child(3) {
+      bottom: -70px;
+      opacity: 0.15;
+      animation-duration: 16s;
+    }
+
+    @keyframes wave {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* 🧭 Contenu principal */
+    main {
+      z-index: 2;
+      text-align: center;
+      padding: 0 20px;
+    }
+
+    img {
+      width: 100px;
+      height: auto;
+      margin-bottom: 20px;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+    }
+
+    h1 {
+      color: var(--tpl-blue);
+      font-size: 1.8rem;
+      margin-bottom: 10px;
+    }
+
+    p {
+      color: #555;
+      max-width: 340px;
+      margin: 0 auto 20px;
+      line-height: 1.5;
+      font-size: 1.05rem;
+    }
+
+    button {
+      background: var(--tpl-blue);
+      color: white;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+      transition: all 0.2s ease;
+    }
+
+    button:hover {
+      background: #005dc1;
+      transform: translateY(-2px);
+    }
+
+    footer {
+      position: absolute;
+      bottom: 10px;
+      font-size: 0.85rem;
+      color: #777;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    <img src="tpl-logo.png" alt="Logo TPL" />
+    <h1>Vous êtes hors ligne</h1>
+    <p>Le planning TPL n’est pas accessible sans connexion.<br>
+    Vérifiez votre réseau et réessayez.</p>
+    <button onclick="window.location.reload()">🔄 Réessayer</button>
+  </main>
+
+  <!-- 🌊 Ondes animées -->
+  <div class="wave"></div>
+  <div class="wave"></div>
+  <div class="wave"></div>
+
+  <footer>Planning TPL © 2025</footer>
+</body>
+</html>
