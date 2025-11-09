@@ -1,26 +1,32 @@
 {
   "name": "Planning TPL",
   "short_name": "TPL",
-  "description": "Application de gestion de planning TPL connectée à Google Sheets",
+  "description": "Calendrier interactif du planning TPL — consultable même hors ligne.",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#f5f7fb",
   "theme_color": "#007bff",
-  "scope": "./",
-  "id": "tpl-planning",
+  "orientation": "portrait-primary",
   "icons": [
     {
       "src": "tpl-logo.png",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/png"
     },
     {
       "src": "tpl-logo.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "Othertpl-logo.png",
+      "sizes": "1024x1024",
+      "type": "image/png",
+      "purpose": "any"
     }
-  ]
+  ],
+  "lang": "fr",
+  "dir": "ltr"
 }
