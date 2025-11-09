@@ -1,30 +1,30 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <link rel="icon" type="image/svg+xml" href="https://raw.githubusercontent.com/Taki-glitch/tpl-assets/main/icons/tpl-logo-blue.svg">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>📅 Mon Calendrier TPL</title>
+  <title>📅 Calendrier TPL</title>
 
-  <!-- Icône (favicon) -->
-  <link rel="icon" type="image/png" href="https://cdn-icons-png.flaticon.com/512/747/747310.png">
-
-  <!-- Couleur du thème pour mobile -->
+  <!-- 🧩 Icônes et couleurs -->
+  <link rel="icon" type="image/png" sizes="32x32" href="tpl-logo.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png">
+  <link rel="apple-touch-icon" href="tpl-logo.png">
+  <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#007bff">
+  <meta name="description" content="Calendrier TPL — un planning simple, modifiable et accessible depuis votre téléphone ou ordinateur.">
 
-  <!-- Description pour le référencement -->
-  <meta name="description" content="Calendrier simple et modifiable en ligne, créé avec FullCalendar et hébergé sur GitHub Pages.">
-
-  <!-- FullCalendar CSS -->
+  <!-- 🎨 FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet">
 
-  <!-- Ton fichier CSS -->
+  <!-- 🌈 Ton fichier CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <!-- 📅 Conteneur du calendrier -->
   <div id="calendar"></div>
 
-  <!-- Fenêtre modale -->
+  <!-- 🪶 Fenêtre modale pour créer / modifier un événement -->
   <div id="eventModal" class="modal">
     <div class="modal-content">
       <h3 id="modalTitle">Nouvel événement</h3>
@@ -37,9 +37,10 @@
     </div>
   </div>
 
-  <!-- FullCalendar JS -->
+  <!-- 📚 Librairie FullCalendar -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
-  <!-- Ton script -->
+
+  <!-- 🧠 Ton script -->
   <script src="script.js"></script>
 </body>
 </html>
