@@ -3,24 +3,36 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Mon calendrier</title>
+    <title>Calendrier interactif</title>
 
-    <!-- Feuilles de style -->
+    <!-- FullCalendar -->
     <link
       href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css" />
-
-    <!-- Librairie FullCalendar -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.js"></script>
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css" />
   </head>
 
   <body>
-    <h1>📅 Mon calendrier</h1>
+    <h1>📅 Mon calendrier interactif</h1>
     <div id="calendar"></div>
 
-    <!-- Ton script -->
+    <!-- Fenêtre modale pour ajouter un événement -->
+    <div id="eventModal" class="modal">
+      <div class="modal-content">
+        <h2>Nouvel événement</h2>
+        <input type="text" id="eventTitle" placeholder="Titre de l'événement" />
+        <div class="buttons">
+          <button id="saveEvent">Enregistrer</button>
+          <button id="cancelEvent">Annuler</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Script -->
     <script src="script.js"></script>
   </body>
 </html>
