@@ -5,14 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Calendrier interactif</title>
 
-    <!-- FullCalendar -->
     <link
       href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css"
       rel="stylesheet"
     />
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.js"></script>
 
-    <!-- Styles -->
     <link rel="stylesheet" href="style.css" />
   </head>
 
@@ -20,7 +18,7 @@
     <h1>📅 Mon calendrier interactif</h1>
     <div id="calendar"></div>
 
-    <!-- Fenêtre modale pour ajouter un événement -->
+    <!-- Fenêtre modale d'ajout -->
     <div id="eventModal" class="modal">
       <div class="modal-content">
         <h2>Nouvel événement</h2>
@@ -32,7 +30,19 @@
       </div>
     </div>
 
-    <!-- Script -->
+    <!-- Fenêtre modale de modification -->
+    <div id="editModal" class="modal">
+      <div class="modal-content">
+        <h2>Modifier l'événement</h2>
+        <input type="text" id="editTitle" />
+        <div class="buttons">
+          <button id="updateEvent">Mettre à jour</button>
+          <button id="deleteEvent">Supprimer</button>
+          <button id="cancelEdit">Annuler</button>
+        </div>
+      </div>
+    </div>
+
     <script src="script.js"></script>
   </body>
 </html>
