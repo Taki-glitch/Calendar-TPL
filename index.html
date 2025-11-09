@@ -5,33 +5,50 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Planning TPL</title>
 
+  <!-- Icônes et logo -->
   <link rel="icon" href="tpl-logo.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="tpl-logo.png" />
   <meta name="theme-color" content="#1E40AF" />
 
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="style.css" />
+  <!-- ✅ FullCalendar CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.css" rel="stylesheet">
+
+  <!-- ✅ FullCalendar JS (modules nécessaires) -->
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/index.global.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js"></script>
+
+  <!-- Ton style -->
+  <link rel="stylesheet" href="./style.css" />
 </head>
+
 <body>
   <header>
-    <img src="tpl-logo.png" alt="Logo TPL" class="logo">
+    <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
     <h1>Planning TPL</h1>
   </header>
 
-  <main>
-    <div id="loader">Chargement du calendrier...</div>
-    <div id="planning"></div>
-    <div id="offline-banner" class="hidden">🔴 Mode hors ligne — modifications enregistrées localement</div>
-  </main>
+  <!-- Bannière mode hors ligne -->
+  <div id="offline-banner" class="hidden">
+    ⚠️ Mode hors ligne activé — vos modifications seront sauvegardées plus tard.
+  </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.js"></script>
-  <script src="script.js"></script>
+  <!-- Zone principale -->
+  <div id="loader">Chargement du calendrier...</div>
+  <div id="planning"></div>
 
+  <!-- ✅ Script principal -->
+  <script src="./script.js"></script>
+
+  <!-- ✅ Enregistrement du Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js')
         .then(() => console.log("✅ Service Worker enregistré"))
-        .catch(err => console.warn("⚠️ SW non enregistré", err));
+        .catch(err => console.warn("⚠️ SW non enregistré :", err));
     }
   </script>
 </body>
