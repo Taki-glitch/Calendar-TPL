@@ -1,7 +1,8 @@
-/* 🌙 Style global */
+/* 🌞 Mode clair par défaut */
 body {
   font-family: "Inter", Arial, sans-serif;
   background-color: #f7f9fb;
+  color: #222;
   margin: 0;
   padding: 0;
   display: flex;
@@ -10,7 +11,6 @@ body {
   min-height: 100vh;
 }
 
-/* 🗓️ Conteneur du calendrier */
 #calendar {
   max-width: 900px;
   width: 95%;
@@ -21,7 +21,7 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-/* 📱 Fenêtre modale (fond) */
+/* 💬 Modale (fond) */
 .modal {
   display: none;
   position: fixed;
@@ -36,7 +36,7 @@ body {
   backdrop-filter: blur(3px);
 }
 
-/* 🧩 Contenu de la modale */
+/* 🧩 Contenu modale */
 .modal-content {
   background: #fff;
   border-radius: 10px;
@@ -47,14 +47,12 @@ body {
   animation: fadeIn 0.3s ease;
 }
 
-/* ✏️ Titre du modal */
 .modal-content h3 {
   margin-top: 0;
   font-size: 1.4rem;
   color: #333;
 }
 
-/* 🧾 Champ de texte */
 .modal-content input {
   width: 100%;
   padding: 10px;
@@ -107,12 +105,8 @@ body {
   background: #5a6268;
 }
 
-/* 📱 Adaptation mobile */
+/* 📱 Responsive */
 @media (max-width: 600px) {
-  body {
-    padding: 0;
-  }
-
   #calendar {
     width: 100%;
     margin: 10px;
@@ -145,5 +139,50 @@ body {
   to {
     transform: scale(1);
     opacity: 1;
+  }
+}
+
+/* 🌙 Mode sombre automatique */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #121212;
+    color: #eee;
+  }
+
+  #calendar {
+    background: #1e1e1e;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.05);
+  }
+
+  .modal-content {
+    background: #2b2b2b;
+    color: #eee;
+  }
+
+  .modal-content input {
+    background: #333;
+    border: 1px solid #555;
+    color: #eee;
+  }
+
+  #saveEvent {
+    background: #3b82f6;
+  }
+  #saveEvent:hover {
+    background: #2563eb;
+  }
+
+  #deleteEvent {
+    background: #ef4444;
+  }
+  #deleteEvent:hover {
+    background: #dc2626;
+  }
+
+  #cancelEvent {
+    background: #6b7280;
+  }
+  #cancelEvent:hover {
+    background: #4b5563;
   }
 }
