@@ -1,11 +1,9 @@
 /**************************************************************
- * ⚙️ SERVICE WORKER — Planning TPL (v2.0)
- * Fonctionne avec GitHub Pages + FullCalendar + PWA
+ * ⚙️ SERVICE WORKER — Planning TPL (v2.2 incassable)
  **************************************************************/
 
-const CACHE_NAME = "tpl-calendar-cache-v2";
+const CACHE_NAME = "tpl-calendar-cache-v2.2";
 
-// 🧱 Liste des fichiers à précharger (offline)
 const OFFLINE_ASSETS = [
   "./",
   "./index.html",
@@ -28,14 +26,29 @@ const OFFLINE_ASSETS = [
 ];
 
 /**************************************************************
- * 🧩 INSTALLATION — préchargement du cache
+ * 🧩 INSTALLATION — préchargement intelligent
  **************************************************************/
 self.addEventListener("install", (event) => {
   console.log("✅ Service Worker installé");
+
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(OFFLINE_ASSETS))
-      .then(() => self.skipWaiting())
+    (async () => {
+      const cache = await caches.open(CACHE_NAME);
+      for (const url of OFFLINE_ASSETS) {
+        try {
+          const response = await fetch(url, { mode: "no-cors" });
+          if (response && (response.ok || response.type === "opaque")) {
+            await cache.put(url, response);
+            console.log("📦 Cached:", url);
+          } else {
+            console.warn("⚠️ Skip (HTTP error):", url);
+          }
+        } catch (err) {
+          console.warn("⚠️ Skip (fetch failed):", url, err);
+        }
+      }
+      self.skipWaiting();
+    })()
   );
 });
 
@@ -45,13 +58,8 @@ self.addEventListener("install", (event) => {
 self.addEventListener("activate", (event) => {
   console.log("🚀 Service Worker actif");
   event.waitUntil(
-    caches.keys().then((keys) => 
-      Promise.all(keys.map((key) => {
-        if (key !== CACHE_NAME) {
-          console.log("🧹 Suppression ancien cache :", key);
-          return caches.delete(key);
-        }
-      }))
+    caches.keys().then(keys =>
+      Promise.all(keys.map(key => key !== CACHE_NAME && caches.delete(key)))
     )
   );
   self.clients.claim();
@@ -61,32 +69,21 @@ self.addEventListener("activate", (event) => {
  * 🌐 FETCH — stratégie cache-first avec fallback réseau
  **************************************************************/
 self.addEventListener("fetch", (event) => {
-  const request = event.request;
-
-  // ⚠️ On ignore les requêtes non-HTTP
+  const { request } = event;
   if (!request.url.startsWith("http")) return;
 
   event.respondWith(
-    caches.match(request).then((response) => {
-      // 🗂️ 1. On retourne la ressource du cache si elle existe
-      if (response) {
-        console.log("⚙ Cache hit:", request.url);
-        return response;
-      }
-
-      // 🌍 2. Sinon on la télécharge et on la met en cache
+    caches.match(request).then(response => {
+      if (response) return response;
       return fetch(request)
-        .then((networkResponse) => {
-          if (!networkResponse || networkResponse.status !== 200) return networkResponse;
-          const cloned = networkResponse.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, cloned));
-          console.log("🌐 Fetched & cached:", request.url);
+        .then(networkResponse => {
+          if (networkResponse.ok) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+          }
           return networkResponse;
         })
-        .catch(() => {
-          // 📵 3. Si offline et non en cache → page d’accueil offline
-          return caches.match("./index.html");
-        });
+        .catch(() => caches.match("./index.html"));
     })
   );
 });
