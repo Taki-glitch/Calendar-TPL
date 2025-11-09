@@ -9,7 +9,7 @@
 
 // 🌐 URLs
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyU6zF4eMA2uPd76CxR3qSYv69uS9eTCd5Yo25KU9ZbXCLLP7E5Wf44FJ2M2_K5VTw_/exec";
-const PROXY_URL = "https://tpl-proxy.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
+const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 const OFFLINE_BANNER = document.getElementById("offline-banner");
 
 let isOffline = !navigator.onLine;
