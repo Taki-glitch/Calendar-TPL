@@ -5,15 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Planning TPL</title>
 
-  <!-- Icônes -->
   <link rel="icon" href="tpl-logo.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="tpl-logo.png" />
   <meta name="theme-color" content="#1E40AF" />
 
-  <!-- FullCalendar -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet">
-
-  <!-- Style -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -25,15 +21,12 @@
   <main>
     <div id="loader">Chargement du calendrier...</div>
     <div id="planning"></div>
+    <div id="offline-banner" class="hidden">🔴 Mode hors ligne — modifications enregistrées localement</div>
   </main>
 
-  <!-- Librairie FullCalendar -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.js"></script>
-
-  <!-- Script principal -->
   <script src="script.js"></script>
 
-  <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js')
