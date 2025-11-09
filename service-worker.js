@@ -1,66 +1,61 @@
-/**************************************************************
- * ⚙️ SERVICE WORKER — Planning TPL (v3.0 final)
- * Fonctionne avec GitHub Pages + FullCalendar + PWA + offline.html
- **************************************************************/
+/****************************************************
+ * 📦 SERVICE WORKER v3.2 — Planning TPL (cache forcé)
+ ****************************************************/
 
-const CACHE_NAME = "tpl-calendar-cache-v3.0";
+const CACHE_VERSION = "v3.2-" + Date.now(); // 🔥 cache unique à chaque build
+const CACHE_NAME = `tpl-calendar-cache-${CACHE_VERSION}`;
 
-/* 🗂️ Liste des fichiers à précharger */
-const OFFLINE_ASSETS = [
+const ASSETS = [
   "./",
   "./index.html",
-  "./offline.html",  // ✅ page hors ligne animée
+  "./offline.html",
   "./style.css",
   "./script.js",
   "./manifest.json",
   "./tpl-logo.png",
-  // ✅ FullCalendar CSS
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css",
-  // ✅ FullCalendar JS
+  // ✅ FullCalendar assets
   "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/index.global.min.js",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js"
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css"
 ];
 
-/**************************************************************
- * 🧩 INSTALLATION — préchargement intelligent
- **************************************************************/
+/****************************************************
+ * 🧱 INSTALLATION
+ ****************************************************/
 self.addEventListener("install", (event) => {
-  console.log("✅ Service Worker installé");
-
+  console.log("✅ Service Worker installé — version", CACHE_VERSION);
   event.waitUntil(
-    (async () => {
-      const cache = await caches.open(CACHE_NAME);
-      // On ajoute les ressources une par une avec gestion d'erreur
-      for (const url of OFFLINE_ASSETS) {
-        try {
-          const response = await fetch(url, { mode: "no-cors" });
-          if (response && (response.ok || response.type === "opaque")) {
-            await cache.put(url, response);
-            console.log("📦 Cached:", url);
-          } else {
-            console.warn("⚠️ Skip (HTTP error):", url);
-          }
-        } catch (err) {
-          console.warn("⚠️ Skip (fetch failed):", url, err);
-        }
-      }
-      self.skipWaiting(); // activation immédiate
-    })()
+    caches.open(CACHE_NAME)
+      .then((cache) =>
+        Promise.all(
+          ASSETS.map((url) =>
+            fetch(url)
+              .then((response) => {
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                cache.put(url, response.clone());
+                console.log("📦 Cached:", url);
+              })
+              .catch((err) =>
+                console.warn(`⚠️ Skip (HTTP error): ${url}`, err.message)
+              )
+          )
+        )
+      )
+      .then(() => self.skipWaiting())
   );
 });
 
-/**************************************************************
- * 🚀 ACTIVATION — suppression des anciens caches
- **************************************************************/
+/****************************************************
+ * 🚀 ACTIVATION (suppression complète anciens caches)
+ ****************************************************/
 self.addEventListener("activate", (event) => {
-  console.log("🚀 Service Worker actif");
-
+  console.log("🚀 Service Worker actif — purge des anciens caches…");
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
@@ -71,43 +66,31 @@ self.addEventListener("activate", (event) => {
           }
         })
       )
-    )
+    ).then(() => self.clients.claim())
   );
-
-  self.clients.claim();
 });
 
-/**************************************************************
- * 🌐 FETCH — stratégie cache-first + fallback réseau + offline
- **************************************************************/
+/****************************************************
+ * ⚙️ FETCH : prioriser le cache, fallback réseau
+ ****************************************************/
 self.addEventListener("fetch", (event) => {
-  const { request } = event;
-
-  // ⚠️ On ignore les requêtes non HTTP (chrome-extension:// etc.)
-  if (!request.url.startsWith("http")) return;
-
+  const request = event.request;
   event.respondWith(
-    caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
+    caches.match(request).then((response) => {
+      if (response) {
         console.log("⚙️ Cache hit:", request.url);
-        return cachedResponse;
+        return response;
       }
-
-      // 🌍 Si pas dans le cache → requête réseau
       return fetch(request)
-        .then((networkResponse) => {
-          // On met en cache la nouvelle ressource si elle est OK
-          if (networkResponse.ok) {
-            const clone = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+        .then((netRes) => {
+          if (netRes && netRes.ok) {
+            caches.open(CACHE_NAME).then((cache) =>
+              cache.put(request, netRes.clone())
+            );
           }
-          return networkResponse;
+          return netRes;
         })
-        .catch(() => {
-          // 📵 Si tout échoue → page hors ligne
-          console.warn("📴 Hors ligne, affichage de offline.html");
-          return caches.match("./offline.html");
-        });
+        .catch(() => caches.match("./offline.html"));
     })
   );
 });
