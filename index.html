@@ -5,40 +5,35 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Planning TPL</title>
 
-  <!-- Icônes et logo -->
+  <!-- Icônes -->
   <link rel="icon" href="tpl-logo.png" />
   <link rel="apple-touch-icon" sizes="180x180" href="tpl-logo.png" />
   <meta name="theme-color" content="#1E40AF" />
 
-  <!-- FullCalendar CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet" />
+  <!-- FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.css" rel="stylesheet">
 
-  <!-- Ton style -->
-  <link rel="stylesheet" href="./style.css" />
-
-  <!-- ✅ FullCalendar JS global build -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
-
-  <!-- ✅ Script principal -->
-  <script src="./script.js" defer></script>
+  <!-- Style -->
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
   <header>
     <img src="tpl-logo.png" alt="Logo TPL" class="logo">
     <h1>Planning TPL</h1>
   </header>
 
-  <div id="loader">Chargement du calendrier...</div>
+  <main>
+    <div id="loader">Chargement du calendrier...</div>
+    <div id="planning"></div>
+  </main>
 
-  <!-- ✅ Bouton de sauvegarde manuelle -->
-  <div id="saveContainer">
-    <button id="saveNowBtn">💾 Sauvegarder maintenant</button>
-  </div>
+  <!-- Librairie FullCalendar -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/main.min.js"></script>
 
-  <div id="calendar"></div>
+  <!-- Script principal -->
+  <script src="script.js"></script>
 
-  <!-- Enregistrement du Service Worker -->
+  <!-- Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js')
