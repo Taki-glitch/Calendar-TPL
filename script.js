@@ -1,29 +1,31 @@
 /**************************************************************
- * 📅 script.js — version offline-ready (GitHub Pages)
+ * 📅 script.js — version offline + proxy Cloudflare (OK)
  * ------------------------------------------------------------
- * - Charge les données via proxy AllOrigins
+ * - Charge les données via ton proxy personnel Cloudflare
+ * - Sauvegarde via le même proxy
  * - Utilise localStorage si offline
  * - Indique visuellement le mode hors ligne
  **************************************************************/
 
+// 🌐 URLs
 const GAS_URL = "https://script.google.com/macros/s/AKfycbyU6zF4eMA2uPd76CxR3qSYv69uS9eTCd5Yo25KU9ZbXCLLP7E5Wf44FJ2M2_K5VTw_/exec";
-const API_URL = "https://api.allorigins.win/raw?url=" + encodeURIComponent(GAS_URL);
+const PROXY_URL = "https://tpl-proxy.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 const OFFLINE_BANNER = document.getElementById("offline-banner");
 
 let isOffline = !navigator.onLine;
 
 /**************************************************************
- * 🔁 Gestion connexion
+ * 🔁 Gestion de la connexion
  **************************************************************/
 window.addEventListener("online", () => {
   isOffline = false;
-  OFFLINE_BANNER.classList.add("hidden");
+  OFFLINE_BANNER?.classList.add("hidden");
   chargerPlanning();
 });
 
 window.addEventListener("offline", () => {
   isOffline = true;
-  OFFLINE_BANNER.classList.remove("hidden");
+  OFFLINE_BANNER?.classList.remove("hidden");
 });
 
 /**************************************************************
@@ -42,13 +44,10 @@ async function chargerPlanning() {
       const cached = localStorage.getItem("tplEvents");
       data = cached ? JSON.parse(cached) : [];
     } else {
-      const res = await fetch(API_URL, { mode: "cors" });
+      const res = await fetch(PROXY_URL, { mode: "cors" });
+      if (!res.ok) throw new Error("Réponse invalide du serveur");
       const text = await res.text();
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = [];
-      }
+      data = JSON.parse(text || "[]");
       localStorage.setItem("tplEvents", JSON.stringify(data));
     }
 
@@ -73,6 +72,8 @@ function afficherPlanning(events) {
       "Erreur : FullCalendar non chargé.";
     return;
   }
+
+  if (calendar) calendar.destroy();
 
   calendar = new FullCalendar.Calendar(el, {
     initialView: "dayGridMonth",
@@ -123,7 +124,7 @@ function afficherPlanning(events) {
 }
 
 /**************************************************************
- * 💾 Sauvegarde avec cache
+ * 💾 Sauvegarde avec cache et proxy
  **************************************************************/
 async function saveEvent(event) {
   const saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
@@ -140,7 +141,7 @@ async function saveEvent(event) {
   }
 
   try {
-    await fetch(API_URL, {
+    await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mode: "patch", data: [event] }),
@@ -148,7 +149,7 @@ async function saveEvent(event) {
     });
     console.log("✅ Sauvegardé :", event.title);
   } catch (err) {
-    console.warn("⚠️ Erreur de sauvegarde (offline probable).");
+    console.warn("⚠️ Erreur de sauvegarde :", err);
   }
 }
 
@@ -160,14 +161,14 @@ async function deleteEvent(id) {
   if (isOffline) return;
 
   try {
-    await fetch(API_URL, {
+    await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mode: "patch", data: [{ id, title: "" }] }),
       mode: "cors",
     });
   } catch (err) {
-    console.warn("⚠️ Suppression locale seulement.");
+    console.warn("⚠️ Suppression locale seulement :", err);
   }
 }
 
