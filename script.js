@@ -8,7 +8,7 @@
  **************************************************************/
 
 // ⚙️ URL de ton script Apps Script publié en tant qu'application web :
-const API_URL = "https://script.google.com/macros/s/AKfycbxwCjB_XWGR9l5m8y7jGdzdPL1_CDf7bONTa4D2EVjXZI5AZI0AZLeEqE6sr-75hfU/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyU6zF4eMA2uPd76CxR3qSYv69uS9eTCd5Yo25KU9ZbXCLLP7E5Wf44FJ2M2_K5VTw_/exec";
 
 /**************************************************************
  * 🧠 FONCTIONS PRINCIPALES
