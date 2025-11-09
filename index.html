@@ -1,25 +1,26 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
   <head>
-    <meta charset="utf-8">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mon calendrier</title>
-    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css" rel="stylesheet">
+
+    <!-- Feuilles de style -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Librairie FullCalendar -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.js"></script>
   </head>
+
   <body>
+    <h1>📅 Mon calendrier</h1>
     <div id="calendar"></div>
-    <script>
-      document.addEventListener('DOMContentLoaded', function() {
-        const calendarEl = document.getElementById('calendar');
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-          initialView: 'dayGridMonth',
-          events: [
-            { title: 'Réunion', start: '2025-11-10' },
-            { title: 'Vacances', start: '2025-11-20', end: '2025-11-25' }
-          ]
-        });
-        calendar.render();
-      });
-    </script>
+
+    <!-- Ton script -->
+    <script src="script.js"></script>
   </body>
 </html>
