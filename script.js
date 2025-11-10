@@ -1,243 +1,255 @@
 /**************************************************************
- * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline)
- * ------------------------------------------------------------
- * - Charge les données via ton proxy Cloudflare Workers
- * - Sauvegarde via le même proxy
- * - Stocke localement en cas de déconnexion
- * - Gère les thèmes clair/sombre et le bouton d’ajout mobile
+ * 🌈 STYLE GLOBAL
  **************************************************************/
-
-// 🌐 URLs
-const GAS_URL =
-  "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
-const PROXY_URL =
-  "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" +
-  encodeURIComponent(GAS_URL);
-
-const OFFLINE_BANNER = document.getElementById("offline-banner");
-const ADD_EVENT_BTN = document.getElementById("add-event-btn");
-let isOffline = !navigator.onLine;
-let calendar = null;
-
-/**************************************************************
- * 🔌 Gestion de la connexion
- **************************************************************/
-window.addEventListener("online", () => {
-  isOffline = false;
-  OFFLINE_BANNER?.classList.add("hidden");
-  chargerPlanning();
-});
-
-window.addEventListener("offline", () => {
-  isOffline = true;
-  OFFLINE_BANNER?.classList.remove("hidden");
-});
-
-/**************************************************************
- * 🔁 Chargement du planning
- **************************************************************/
-async function chargerPlanning() {
-  const loader = document.getElementById("loader");
-  loader.textContent = isOffline
-    ? "Mode hors ligne — affichage des données locales..."
-    : "Chargement du calendrier...";
-  loader.classList.remove("hidden");
-
-  let events = [];
-
-  if (isOffline) {
-    events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-    loader.classList.add("hidden");
-    if (calendar) {
-      calendar.removeAllEvents();
-      calendar.addEventSource(events);
-    } else {
-      renderCalendar(events);
-    }
-    return;
-  }
-
-  try {
-    const res = await fetch(PROXY_URL, { method: "GET", mode: "cors" });
-    if (!res.ok) throw new Error(`Erreur HTTP: ${res.status} ${res.statusText}`);
-    const data = await res.json();
-    if (data.status === "error") throw new Error(`Erreur Apps Script: ${data.message}`);
-    events = data;
-    localStorage.setItem("tplEvents", JSON.stringify(events));
-  } catch (err) {
-    console.error("❌ Erreur de chargement:", err);
-    loader.textContent = `❌ Échec du chargement (${err.message})`;
-    events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  }
-
-  loader.classList.add("hidden");
-  renderCalendar(events);
+body {
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  background-color: #f5f7fb;
+  margin: 0;
+  padding: 0;
+  color: #333;
+  overflow-x: hidden;
 }
 
 /**************************************************************
- * 📅 Rendu FullCalendar
+ * ⚠️ BANNIÈRE OFFLINE
  **************************************************************/
-function renderCalendar(events) {
-  const calendarEl = document.getElementById("planning");
-  if (!calendarEl) return;
-
-  if (calendar) calendar.destroy();
-
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
-
-  calendar = new FullCalendar.Calendar(calendarEl, {
-    locale: "fr",
-    initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
-    headerToolbar: {
-      left: "prev,next today",
-      center: "title",
-      right: isMobile ? "timeGridWeek,listWeek" : "dayGridMonth,timeGridWeek,listWeek",
-    },
-    height: "auto",
-    selectable: true,
-    editable: true,
-    events: events.map((event) => {
-      const color = getCategoryColor(event.category);
-      return {
-        id: String(event.id),
-        title: event.title,
-        start: event.start,
-        end: event.end,
-        allDay: event.allDay === true,
-        backgroundColor: color,
-        borderColor: color,
-        textColor: "#fff",
-        extendedProps: { category: event.category },
-      };
-    }),
-
-    // Sélection d’un créneau vide
-    select: (info) => openEventModal(null, info.startStr, info.endStr),
-
-    // Clic sur un événement existant
-    eventClick: (info) => {
-      const ev = info.event;
-      openEventModal({
-        id: ev.id,
-        title: ev.title,
-        start: ev.startStr,
-        end: ev.endStr,
-        category: ev.extendedProps.category,
-        allDay: ev.allDay,
-      });
-    },
-
-    eventDrop: (info) => saveEvent(eventToData(info.event)),
-    eventResize: (info) => saveEvent(eventToData(info.event)),
-  });
-
-  calendar.render();
+#offline-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #dc3545;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-weight: 600;
+  z-index: 3000;
+  transition: transform 0.3s ease-in-out;
+}
+.hidden {
+  transform: translateY(100%);
 }
 
 /**************************************************************
- * 🪟 Modale d’ajout / édition
+ * 🔄 INDICATEUR DE CHARGEMENT
  **************************************************************/
-function openEventModal(event = null, start = null, end = null) {
-  const modal = document.getElementById("event-modal");
-  const titleInput = document.getElementById("event-title");
-  const startInput = document.getElementById("event-start");
-  const endInput = document.getElementById("event-end");
-  const categorySelect = document.getElementById("event-category");
-  const saveBtn = document.getElementById("save-event");
-  const cancelBtn = document.getElementById("cancel-event");
-
-  modal.classList.remove("hidden");
-  document.getElementById("modal-title").textContent = event ? "Modifier l’événement" : "Nouvel événement";
-
-  titleInput.value = event?.title || "";
-  startInput.value = event?.start || start || "";
-  endInput.value = event?.end || end || "";
-  categorySelect.value = event?.category || "Hôtel-Dieu";
-
-  saveBtn.onclick = () => {
-    const newEvent = {
-      id: event?.id || crypto.randomUUID(),
-      title: titleInput.value.trim() || "Sans titre",
-      start: startInput.value,
-      end: endInput.value,
-      allDay: false,
-      category: categorySelect.value,
-    };
-
-    if (calendar) {
-      const existing = calendar.getEventById(newEvent.id);
-      if (existing) existing.remove();
-      calendar.addEvent({
-        ...newEvent,
-        backgroundColor: getCategoryColor(newEvent.category),
-        borderColor: getCategoryColor(newEvent.category),
-        textColor: "#fff",
-      });
-    }
-
-    saveEvent(newEvent);
-    modal.classList.add("hidden");
-  };
-
-  cancelBtn.onclick = () => modal.classList.add("hidden");
+#loader {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: #007bff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: opacity 0.4s ease;
+  z-index: 2500;
+}
+#loader.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
 
 /**************************************************************
- * 💾 Sauvegarde / suppression
+ * 📅 CALENDRIER
  **************************************************************/
-function eventToData(event) {
-  return {
-    id: event.id,
-    title: event.title,
-    start: event.startStr,
-    end: event.end ? event.end.toISOString().substring(0, 10) : event.endStr,
-    allDay: event.allDay,
-    category: event.extendedProps.category || "Hôtel-Dieu",
-  };
+#planning {
+  max-width: 900px;
+  margin: 20px auto 80px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  overflow: hidden;
 }
 
-async function saveEvent(event) {
-  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  const i = saved.findIndex((e) => e.id === event.id);
-  if (i >= 0) saved[i] = event;
-  else saved.push(event);
-  localStorage.setItem("tplEvents", JSON.stringify(saved));
+/**************************************************************
+ * 🎨 LÉGENDE DES CATÉGORIES
+ **************************************************************/
+#legend {
+  max-width: 900px;
+  margin: 10px auto 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.9em;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
 
-  if (isOffline) return;
+/**************************************************************
+ * ➕ BOUTON FLOTTANT “+”
+ **************************************************************/
+#add-event-btn {
+  position: fixed;
+  bottom: 1.6rem;
+  right: 1.6rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 5000;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease, background 0.3s ease;
+}
+#add-event-btn:hover {
+  transform: scale(1.1);
+  background: #0056b3;
+}
 
-  try {
-    await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "patch", data: [event] }),
-      mode: "cors",
-    });
-  } catch (err) {
-    console.warn("⚠️ Sauvegarde différée (hors ligne ou erreur proxy)");
+/* ✅ Fix mobile (ne plus être recouvert par le calendrier) */
+@media (max-width: 768px) {
+  #add-event-btn {
+    bottom: 1rem;
+    right: 1rem;
+    width: 52px;
+    height: 52px;
+    font-size: 1.8rem;
+    z-index: 6000;
   }
 }
 
 /**************************************************************
- * 🎨 Couleurs par catégorie
+ * 🪟 MODALE D’AJOUT / MODIFICATION D’ÉVÉNEMENT
  **************************************************************/
-function getCategoryColor(category) {
-  switch (category) {
-    case "Hôtel-Dieu": return "#FFD43B";
-    case "Gréneraie/Resto du Cœur": return "#2ECC71";
-    case "Préfecture": return "#E74C3C";
-    case "Tour de Bretagne": return "#3498DB";
-    case "France Terre d’Asile": return "#9B59B6";
-    default: return "#7f8c8d";
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 7000;
+  animation: fadeIn 0.25s ease;
+  backdrop-filter: blur(4px);
+}
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: slideUp 0.3s ease;
+}
+.modal-content h2 {
+  margin-top: 0;
+  text-align: center;
+  color: #007bff;
+  font-size: 1.4rem;
+}
+
+/**************************************************************
+ * 📝 CHAMPS DE FORMULAIRE
+ **************************************************************/
+.modal-content label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.modal-content input,
+.modal-content select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+.modal-content select {
+  background: #fff;
+  cursor: pointer;
+}
+
+/**************************************************************
+ * 🔘 BOUTONS DE MODALE
+ **************************************************************/
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 15px;
+  gap: 10px;
+}
+.modal-actions .btn {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+}
+.modal-actions .btn.primary {
+  background: #007bff;
+  color: white;
+}
+.modal-actions .btn.secondary {
+  background: #888;
+  color: white;
+}
+.modal-actions .btn:hover {
+  opacity: 0.9;
+}
+
+/**************************************************************
+ * 📱 RESPONSIVE
+ **************************************************************/
+@media (max-width: 900px) {
+  #planning {
+    margin: 10px;
+    padding: 10px;
+  }
+  .fc-toolbar-title {
+    font-size: 1.1em;
+  }
+}
+@media (max-width: 600px) {
+  .modal-content {
+    max-width: 95%;
+    padding: 15px;
+  }
+  .modal-actions .btn {
+    padding: 10px;
+    font-size: 1em;
+  }
+  #legend {
+    flex-direction: column;
+    align-items: center;
   }
 }
 
 /**************************************************************
- * 🚀 Initialisation
+ * 🌈 ANIMATIONS
  **************************************************************/
-document.addEventListener("DOMContentLoaded", () => {
-  chargerPlanning();
-
-  ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
-
-  if (isOffline) OFFLINE_BANNER?.classList.remove("hidden");
-});
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
