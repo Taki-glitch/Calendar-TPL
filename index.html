@@ -10,12 +10,17 @@
   <link rel="apple-touch-icon" sizes="180x180" href="tpl-logo.png" />
   <meta name="theme-color" content="#007bff" />
 
-  <!-- ✅ FullCalendar CSS (chaque plugin a son fichier) -->
-  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css" rel="stylesheet">
-  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css" rel="stylesheet">
+  <!-- ⚠️ FullCalendar CSS supprimés (inutiles depuis v6.1.10)
+       Les fichiers .css séparés n'existent plus sur le CDN,
+       les styles sont désormais intégrés directement dans les JS globaux.
+       
+       Exemple des anciens liens (génèrent des 404) :
+       <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css" rel="stylesheet" />
+       <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css" rel="stylesheet" />
+       <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css" rel="stylesheet" />
+  -->
 
-  <!-- ✅ FullCalendar JS -->
+  <!-- ✅ FullCalendar JS (avec styles intégrés) -->
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.js"></script>
@@ -24,10 +29,13 @@
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js"></script>
 
   <!-- ✅ Ton style personnalisé -->
-  <link rel="stylesheet" href="./style.css" /> 
+  <link rel="stylesheet" href="./style.css" />
 
-  <!-- 🧩 Manifest pour le mode PWA -->
+  <!-- 🧩 Manifest pour PWA -->
   <link rel="manifest" href="./manifest.json" />
+
+  <!-- 🧠 Meta SEO -->
+  <meta name="description" content="Application de gestion de planning TPL connectée à Google Sheets." />
 </head>
 
 <body>
@@ -45,6 +53,9 @@
   <div id="loader">Chargement du calendrier...</div>
   <div id="planning"></div>
 
+  <!-- ✅ Script principal -->
+  <script src="./script.js"></script>
+
   <!-- ✅ Enregistrement du Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
@@ -53,8 +64,5 @@
         .catch(err => console.warn("⚠️ Service Worker non enregistré :", err));
     }
   </script>
-
-  <!-- ✅ Script principal (placé à la fin pour que le DOM soit prêt) -->
-  <script src="./script.js"></script>
 </body>
 </html>
