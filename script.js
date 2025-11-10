@@ -1,11 +1,11 @@
 /**************************************************************
- * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline)
+ * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline + Modale)
  * ------------------------------------------------------------
  * - Charge les données via ton proxy Cloudflare Workers
  * - Sauvegarde via le même proxy
  * - Stocke localement en cas de déconnexion
- * - Gère automatiquement les erreurs CORS et réseau
  * - Affiche un message doux “🔄 Mise à jour du calendrier…”
+ * - Permet d’ajouter des événements depuis mobile/tablette via une modale
  **************************************************************/
 
 // 🌐 URLs
@@ -120,6 +120,7 @@ function renderCalendar(events) {
       backgroundColor: getCategoryColor(event.category),
     })),
 
+    // ✏️ Clic sur un événement → modification ou suppression
     eventClick(info) {
       const event = info.event;
       const newTitle = prompt("Modifier le titre de l'événement:", event.title);
@@ -138,28 +139,17 @@ function renderCalendar(events) {
       saveEvent(eventToData(event));
     },
 
+    // ⤴️ Déplacement ou redimensionnement
     eventDrop(info) {
       saveEvent(eventToData(info.event));
     },
-
     eventResize(info) {
       saveEvent(eventToData(info.event));
     },
 
+    // ➕ Sélection pour créer un nouvel événement
     select(info) {
-      const newTitle = prompt("Ajouter un nouvel événement (laisser vide pour annuler):");
-      if (newTitle) {
-        const newEvent = {
-          id: crypto.randomUUID(),
-          title: newTitle,
-          start: info.startStr,
-          end: info.endStr,
-          allDay: info.allDay,
-          category: "Autre",
-        };
-        calendar.addEvent(newEvent);
-        saveEvent(newEvent);
-      }
+      openEventModal(info.startStr, info.endStr);
       calendar.unselect();
     },
   });
@@ -238,6 +228,47 @@ function getCategoryColor(category) {
     case "Formation": return "#ffc107";
     default: return "#6c757d";
   }
+}
+
+/**************************************************************
+ * 🪟 Modale tactile d’ajout d’événement
+ **************************************************************/
+function openEventModal(start, end) {
+  const modal = document.getElementById("event-modal");
+  const titleInput = document.getElementById("event-title");
+  const startInput = document.getElementById("event-start");
+  const endInput = document.getElementById("event-end");
+  const categorySelect = document.getElementById("event-category");
+
+  // Pré-remplissage
+  titleInput.value = "";
+  startInput.value = start.slice(0, 16);
+  endInput.value = end.slice(0, 16);
+  categorySelect.value = "Autre";
+
+  modal.classList.remove("hidden");
+
+  document.getElementById("save-event").onclick = () => {
+    const title = titleInput.value.trim();
+    if (!title) return modal.classList.add("hidden");
+
+    const newEvent = {
+      id: crypto.randomUUID(),
+      title,
+      start: startInput.value,
+      end: endInput.value,
+      allDay: false,
+      category: categorySelect.value,
+    };
+
+    calendar.addEvent(newEvent);
+    saveEvent(newEvent);
+    modal.classList.add("hidden");
+  };
+
+  document.getElementById("cancel-event").onclick = () => {
+    modal.classList.add("hidden");
+  };
 }
 
 /**************************************************************
