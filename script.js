@@ -221,9 +221,11 @@ async function deleteEvent(id) {
  **************************************************************/
 function getCategoryColor(category) {
   switch (category) {
-    case "Réunion": return "#007bff";
-    case "Projet": return "#28a745";
-    case "Formation": return "#ffc107";
+    case "Hôtel-Dieu": return "#FFD43B"; //Jaune
+    case "Gréneraie / Resto du Cœur": return "#2ECC71"; // Vert
+    case "Préfecture": return "#E74C3C"; // Rouge
+    case "Tour de Bretagne": return "#3498DB#; // Bleu
+    case "France Terre d’Asile": return "#9B59B6#; // Violet
     default: return "#6c757d";
   }
 }
