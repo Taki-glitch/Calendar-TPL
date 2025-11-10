@@ -55,13 +55,6 @@ header h1 {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-#loader {
-  text-align: center;
-  margin-top: 25px;
-  font-weight: 500;
-  color: #555;
-}
-
 /* ⚠️ Bannière offline */
 #offline-banner {
   position: fixed;
@@ -78,25 +71,6 @@ header h1 {
 
 .hidden {
   transform: translateY(100%);
-}
-
-/* 🎨 FullCalendar */
-.fc-toolbar-title {
-  font-size: 1.5em;
-  color: #007bff;
-  font-weight: 600;
-}
-
-.fc-button {
-  background-color: #007bff !important;
-  color: white !important;
-  border: none !important;
-  border-radius: 6px !important;
-  font-weight: 500 !important;
-}
-
-.fc-button:hover {
-  background-color: #0056b3 !important;
 }
 
 /* 🌗 Thème clair/sombre */
@@ -122,7 +96,6 @@ body.dark {
 body.dark header {
   background-color: #121417;
   color: var(--text-dark);
-  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
 }
 
 body.dark #planning {
@@ -130,58 +103,30 @@ body.dark #planning {
   color: var(--text-dark);
 }
 
-/* 📱 Responsive général */
+/* 📱 Responsive */
 @media (max-width: 900px) {
   header {
     flex-direction: row;
     justify-content: space-between;
     padding: 10px 15px;
   }
-
-  header h1 {
-    font-size: 1.2em;
-  }
-
-  #planning {
-    margin: 10px;
-    padding: 10px;
-  }
+  header h1 { font-size: 1.2em; }
+  #planning { margin: 10px; padding: 10px; }
 }
 
 @media (max-width: 600px) {
-  header {
-    flex-direction: row;
-    align-items: center;
-  }
-
-  header .logo {
-    width: 40px;
-    height: 40px;
-    margin-right: 6px;
-  }
-
-  #theme-toggle {
-    font-size: 1.2em;
-  }
-
-  .fc-toolbar-title {
-    font-size: 1.1em;
-  }
-
-  #planning {
-    margin: 5px;
-    padding: 8px;
-  }
+  header .logo { width: 40px; height: 40px; margin-right: 6px; }
+  #theme-toggle { font-size: 1.2em; }
+  .fc-toolbar-title { font-size: 1.1em; }
+  #planning { margin: 5px; padding: 8px; }
 }
 
-/* 📱 Correction spéciale iPhone (safe area + boutons compactes) */
+/* iPhone safe-area fix */
 @supports (padding: env(safe-area-inset-bottom)) {
-  body {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+  body { padding-bottom: env(safe-area-inset-bottom); }
 }
 
-/* ✅ Ajustements FullCalendar sur petit écran */
+/* Compact FullCalendar toolbar */
 .fc-header-toolbar {
   flex-wrap: wrap !important;
   gap: 6px !important;
@@ -198,4 +143,30 @@ body.dark #planning {
 .fc-button {
   padding: 4px 6px !important;
   font-size: 0.8em !important;
+}
+
+/* 🌀 Notification douce de chargement */
+#loader {
+  position: fixed;
+  top: 70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  color: #007bff;
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  transition: opacity 0.4s ease;
+  z-index: 2000;
+}
+
+body.dark #loader {
+  background: rgba(30, 30, 30, 0.9);
+  color: #5ca9ff;
+}
+
+#loader.hidden {
+  opacity: 0;
+  pointer-events: none;
 }
