@@ -1,5 +1,5 @@
 /**************************************************************
- * 📅 script.js — Planning TPL (Responsive vues + Bouton + Modales)
+ * 📅 script.js — Planning TPL (Catégories colorées + Responsive)
  **************************************************************/
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
@@ -77,44 +77,45 @@ async function chargerPlanning() {
 }
 
 /**************************************************************
- * 📅 Rendu FullCalendar (vue adaptative mobile / desktop)
+ * 📅 Rendu FullCalendar (vue adaptative mobile/desktop)
  **************************************************************/
 function renderCalendar(events) {
   const calendarEl = document.getElementById("planning");
   if (!calendarEl) return;
   if (calendar) calendar.destroy();
 
-  // 📱 Détection mobile
   const isMobile = window.innerWidth < 768;
-
-  // Vues et barre d’outils adaptées
   const headerToolbar = {
     left: "prev,next today",
     center: "title",
     right: isMobile
-      ? "timeGridWeek,listWeek" // mobile → semaine + planning
-      : "dayGridMonth,timeGridWeek,listWeek" // ordi/tablette → mois + semaine + planning
+      ? "timeGridWeek,listWeek"
+      : "dayGridMonth,timeGridWeek,listWeek",
   };
-
   const initialView = isMobile ? "timeGridWeek" : "dayGridMonth";
 
   calendar = new FullCalendar.Calendar(calendarEl, {
     locale: "fr",
-    initialView: initialView,
-    headerToolbar: headerToolbar,
+    initialView,
+    headerToolbar,
     editable: true,
     selectable: true,
     height: "auto",
     aspectRatio: isMobile ? 0.7 : 1.2,
-    events: events.map((event) => ({
-      id: String(event.id),
-      title: event.title,
-      start: event.start,
-      end: event.end,
-      allDay: event.allDay === true,
-      backgroundColor: getCategoryColor(event.category),
-      extendedProps: { category: event.category },
-    })),
+    events: events.map((event) => {
+      const color = getCategoryColor(event.category);
+      return {
+        id: String(event.id),
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        allDay: event.allDay === true,
+        backgroundColor: color,
+        borderColor: color,
+        textColor: "#fff",
+        extendedProps: { category: event.category },
+      };
+    }),
 
     eventClick(info) {
       openEditModal(info.event);
@@ -133,7 +134,6 @@ function renderCalendar(events) {
 
   calendar.render();
 
-  // 🔄 Mise à jour dynamique si on redimensionne (orientation mobile <-> paysage)
   window.addEventListener("resize", () => {
     const nowMobile = window.innerWidth < 768;
     const currentView = calendar.view.type;
@@ -165,7 +165,7 @@ function eventToData(event) {
     start: event.startStr,
     end: event.end ? event.end.toISOString().substring(0, 10) : event.endStr,
     allDay: event.allDay,
-    category: event.extendedProps.category || "Autre",
+    category: event.extendedProps.category || "Hôtel-Dieu",
   };
 }
 
@@ -217,16 +217,16 @@ async function deleteEvent(id) {
 }
 
 /**************************************************************
- * 🎨 Couleurs
+ * 🎨 Couleurs par catégorie
  **************************************************************/
 function getCategoryColor(category) {
   switch (category) {
-    case "Hôtel-Dieu": return "#FFD43B"; //Jaune
-    case "Gréneraie / Resto du Cœur": return "#2ECC71"; // Vert
+    case "Hôtel-Dieu": return "#FFD43B"; // Jaune
+    case "Gréneraie/Resto du Cœur": return "#2ECC71"; // Vert
     case "Préfecture": return "#E74C3C"; // Rouge
-    case "Tour de Bretagne": return "#3498DB#; // Bleu
-    case "France Terre d’Asile": return "#9B59B6#; // Violet
-    default: return "#6c757d";
+    case "Tour de Bretagne": return "#3498DB"; // Bleu
+    case "France Terre d’Asile": return "#9B59B6"; // Violet
+    default: return "#7f8c8d"; // Gris neutre
   }
 }
 
@@ -247,7 +247,7 @@ function openEventModal(start, end) {
   titleInput.value = "";
   startInput.value = start.slice(0, 16);
   endInput.value = end.slice(0, 16);
-  categorySelect.value = "Autre";
+  categorySelect.value = "Hôtel-Dieu";
 
   modal.classList.remove("hidden");
 
@@ -263,6 +263,11 @@ function openEventModal(start, end) {
       allDay: false,
       category: categorySelect.value,
     };
+
+    const color = getCategoryColor(newEvent.category);
+    newEvent.backgroundColor = color;
+    newEvent.borderColor = color;
+    newEvent.textColor = "#fff";
 
     calendar.addEvent(newEvent);
     saveEvent(newEvent);
@@ -290,7 +295,7 @@ function openEditModal(event) {
   titleInput.value = event.title;
   startInput.value = event.startStr?.slice(0, 16) || "";
   endInput.value = event.endStr?.slice(0, 16) || "";
-  categorySelect.value = event.extendedProps.category || "Autre";
+  categorySelect.value = event.extendedProps.category || "Hôtel-Dieu";
 
   modal.classList.remove("hidden");
 
@@ -302,9 +307,14 @@ function openEditModal(event) {
     if (!title) return;
     event.setProp("title", title);
     event.setExtendedProp("category", categorySelect.value);
+
+    const color = getCategoryColor(categorySelect.value);
+    event.setProp("backgroundColor", color);
+    event.setProp("borderColor", color);
+    event.setProp("textColor", "#fff");
+
     event.setStart(startInput.value);
     event.setEnd(endInput.value);
-    event.setProp("backgroundColor", getCategoryColor(categorySelect.value));
     saveEvent(eventToData(event));
     modal.classList.add("hidden");
   };
