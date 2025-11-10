@@ -11,6 +11,20 @@ body {
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+body.dark {
+  background-color: #1a1d21;
+  color: #e5e5e5;
+}
+
+body.dark header {
+  background-color: #121417;
+}
+
+body.dark #planning {
+  background-color: #22252b;
+  color: #e5e5e5;
+}
+
 /**************************************************************
  * ⚠️ BANNIÈRE OFFLINE
  **************************************************************/
@@ -91,6 +105,10 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
+}
+
+.legend-item span {
+  display: inline-block;
 }
 
 /**************************************************************
