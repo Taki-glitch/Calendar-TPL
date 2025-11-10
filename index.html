@@ -23,6 +23,13 @@
 </head>
 
 <body>
+  <!-- 🧭 En-tête -->
+  <header>
+    <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
+    <h1>Planning TPL</h1>
+    <button id="theme-toggle" title="Changer de thème">🌓</button>
+  </header>
+
   <!-- 🚨 Bannière hors ligne -->
   <div id="offline-banner" class="hidden">
     ⚠️ Vous êtes hors ligne — les modifications seront enregistrées localement.
@@ -37,19 +44,19 @@
   <!-- 🎨 Légende des catégories -->
   <div id="legend">
     <div class="legend-item">
-      <span class="legend-color" style="background-color:#FFD43B;"></span> Hôtel-Dieu
+      <span class="legend-color hotel"></span> Hôtel-Dieu
     </div>
     <div class="legend-item">
-      <span class="legend-color" style="background-color:#2ECC71;"></span> Gréneraie / Resto du Cœur
+      <span class="legend-color greneraie"></span> Gréneraie / Resto du Cœur
     </div>
     <div class="legend-item">
-      <span class="legend-color" style="background-color:#E74C3C;"></span> Préfecture
+      <span class="legend-color pref"></span> Préfecture
     </div>
     <div class="legend-item">
-      <span class="legend-color" style="background-color:#3498DB;"></span> Tour de Bretagne
+      <span class="legend-color tour"></span> Tour de Bretagne
     </div>
     <div class="legend-item">
-      <span class="legend-color" style="background-color:#9B59B6;"></span> France Terre d’Asile
+      <span class="legend-color fta"></span> France Terre d’Asile
     </div>
   </div>
 
@@ -69,22 +76,22 @@
 
       <label for="event-category">Catégorie :</label>
       <select id="event-category" class="category-select">
-        <option value="Hôtel-Dieu" data-color="#FFD43B">🟡 Hôtel-Dieu</option>
-        <option value="Gréneraie/Resto du Cœur" data-color="#2ECC71">🟢 Gréneraie / Resto du Cœur</option>
-        <option value="Préfecture" data-color="#E74C3C">🔴 Préfecture</option>
-        <option value="Tour de Bretagne" data-color="#3498DB">🔵 Tour de Bretagne</option>
-        <option value="France Terre d’Asile" data-color="#9B59B6">🟣 France Terre d’Asile</option>
+        <option value="Hôtel-Dieu">🟡 Hôtel-Dieu</option>
+        <option value="Gréneraie/Resto du Cœur">🟢 Gréneraie / Resto du Cœur</option>
+        <option value="Préfecture">🔴 Préfecture</option>
+        <option value="Tour de Bretagne">🔵 Tour de Bretagne</option>
+        <option value="France Terre d’Asile">🟣 France Terre d’Asile</option>
       </select>
 
-      <div class="modal-actions">
-        <button id="save-event" class="btn primary">💾 Enregistrer</button>
-        <button id="cancel-event" class="btn secondary">Annuler</button>
+      <div class="modal-buttons">
+        <button id="save-event">💾 Enregistrer</button>
+        <button id="cancel-event">Annuler</button>
       </div>
     </div>
   </div>
 
   <!-- ➕ Bouton flottant d’ajout d’événement -->
-  <button id="add-event-btn" class="floating-btn">＋</button>
+  <button id="add-event-btn">＋</button>
 
   <!-- 📜 FullCalendar JS -->
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js"></script>
