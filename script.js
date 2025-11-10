@@ -1,11 +1,5 @@
 /**************************************************************
- * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline + Modale)
- * ------------------------------------------------------------
- * - Charge les données via ton proxy Cloudflare Workers
- * - Sauvegarde via le même proxy
- * - Stocke localement en cas de déconnexion
- * - Affiche un message doux “🔄 Mise à jour du calendrier…”
- * - Permet d’ajouter des événements depuis mobile/tablette via une modale
+ * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline + Modales)
  **************************************************************/
 
 // 🌐 URLs
@@ -15,6 +9,7 @@ const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeU
 const OFFLINE_BANNER = document.getElementById("offline-banner");
 let isOffline = !navigator.onLine;
 let calendar = null;
+let currentEditingEvent = null;
 
 /**************************************************************
  * 🔌 Gestion de la connexion
@@ -24,25 +19,22 @@ window.addEventListener("online", () => {
   OFFLINE_BANNER?.classList.add("hidden");
   chargerPlanning();
 });
-
 window.addEventListener("offline", () => {
   isOffline = true;
   OFFLINE_BANNER?.classList.remove("hidden");
 });
 
 /**************************************************************
- * 🔁 Chargement du planning (avec message doux)
+ * 🔁 Chargement du planning
  **************************************************************/
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
 
-  // Si le calendrier est déjà affiché → petit message temporaire
   if (calendar && !isOffline) {
     loader.textContent = "🔄 Mise à jour du calendrier…";
     loader.classList.remove("hidden");
     setTimeout(() => loader.classList.add("hidden"), 1500);
   } else {
-    // Affichage normal au tout premier chargement
     loader.textContent = isOffline
       ? "Mode hors ligne — affichage des données locales..."
       : "Chargement du calendrier...";
@@ -52,10 +44,8 @@ async function chargerPlanning() {
   let events = [];
 
   if (isOffline) {
-    // 1️⃣ Mode hors ligne — données locales
     events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
     loader.classList.add("hidden");
-
     if (calendar) {
       calendar.removeAllEvents();
       calendar.addEventSource(events);
@@ -65,15 +55,12 @@ async function chargerPlanning() {
     return;
   }
 
-  // 2️⃣ Mode en ligne — récupération via proxy
   try {
     const res = await fetch(PROXY_URL, { method: "GET", mode: "cors" });
     if (!res.ok) throw new Error(`Erreur HTTP du proxy: ${res.status}`);
-
     const data = await res.json();
     if (data.status === "error")
       throw new Error(`Erreur Apps Script: ${data.message || "Erreur inconnue"}`);
-
     events = data;
     localStorage.setItem("tplEvents", JSON.stringify(events));
   } catch (err) {
@@ -118,25 +105,12 @@ function renderCalendar(events) {
       end: event.end,
       allDay: event.allDay === true,
       backgroundColor: getCategoryColor(event.category),
+      extendedProps: { category: event.category },
     })),
 
-    // ✏️ Clic sur un événement → modification ou suppression
+    // ✏️ Clic sur un événement → modale d’édition
     eventClick(info) {
-      const event = info.event;
-      const newTitle = prompt("Modifier le titre de l'événement:", event.title);
-      if (newTitle === null) return;
-
-      if (newTitle.trim() === "") {
-        if (confirm("Voulez-vous supprimer cet événement ?")) {
-          event.remove();
-          deleteEvent(event.id);
-        }
-        return;
-      }
-
-      event.setProp("title", newTitle);
-      event.setProp("backgroundColor", getCategoryColor(event.extendedProps.category));
-      saveEvent(eventToData(event));
+      openEditModal(info.event);
     },
 
     // ⤴️ Déplacement ou redimensionnement
@@ -158,7 +132,7 @@ function renderCalendar(events) {
 }
 
 /**************************************************************
- * 💾 Sauvegarde des données
+ * 💾 Sauvegarde & suppression
  **************************************************************/
 function eventToData(event) {
   return {
@@ -231,7 +205,7 @@ function getCategoryColor(category) {
 }
 
 /**************************************************************
- * 🪟 Modale tactile d’ajout d’événement
+ * 🪟 Modale tactile d’ajout
  **************************************************************/
 function openEventModal(start, end) {
   const modal = document.getElementById("event-modal");
@@ -239,8 +213,11 @@ function openEventModal(start, end) {
   const startInput = document.getElementById("event-start");
   const endInput = document.getElementById("event-end");
   const categorySelect = document.getElementById("event-category");
+  const modalTitle = document.getElementById("modal-title");
 
-  // Pré-remplissage
+  modalTitle.textContent = "Nouvel événement";
+  currentEditingEvent = null;
+
   titleInput.value = "";
   startInput.value = start.slice(0, 16);
   endInput.value = end.slice(0, 16);
@@ -272,10 +249,59 @@ function openEventModal(start, end) {
 }
 
 /**************************************************************
+ * 🪟 Modale d’édition / suppression
+ **************************************************************/
+function openEditModal(event) {
+  const modal = document.getElementById("event-modal");
+  const titleInput = document.getElementById("event-title");
+  const startInput = document.getElementById("event-start");
+  const endInput = document.getElementById("event-end");
+  const categorySelect = document.getElementById("event-category");
+  const modalTitle = document.getElementById("modal-title");
+  const saveBtn = document.getElementById("save-event");
+  const cancelBtn = document.getElementById("cancel-event");
+
+  currentEditingEvent = event;
+  modalTitle.textContent = "Modifier l'événement";
+
+  titleInput.value = event.title;
+  startInput.value = event.startStr?.slice(0, 16) || "";
+  endInput.value = event.endStr?.slice(0, 16) || "";
+  categorySelect.value = event.extendedProps.category || "Autre";
+
+  modal.classList.remove("hidden");
+
+  saveBtn.textContent = "💾 Enregistrer";
+  cancelBtn.textContent = "🗑️ Supprimer";
+
+  saveBtn.onclick = () => {
+    const title = titleInput.value.trim();
+    if (!title) return;
+
+    event.setProp("title", title);
+    event.setExtendedProp("category", categorySelect.value);
+    event.setStart(startInput.value);
+    event.setEnd(endInput.value);
+    event.setProp("backgroundColor", getCategoryColor(categorySelect.value));
+
+    saveEvent(eventToData(event));
+    modal.classList.add("hidden");
+  };
+
+  cancelBtn.onclick = () => {
+    if (confirm("Supprimer cet événement ?")) {
+      event.remove();
+      deleteEvent(event.id);
+    }
+    modal.classList.add("hidden");
+    cancelBtn.textContent = "Annuler";
+  };
+}
+
+/**************************************************************
  * 🚀 Initialisation
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
   chargerPlanning();
 });
-
 if (isOffline) OFFLINE_BANNER?.classList.remove("hidden");
