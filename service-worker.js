@@ -1,23 +1,23 @@
-/****************************************************
- * 📦 SERVICE WORKER v3.3 — Planning TPL (cache optimisé)
- * ----------------------------------------------------
- * ✅ Correction : "Response body is already used"
- * ✅ Optimisation du cache et fallback réseau
- ****************************************************/
+/**************************************************************
+ * ⚙️ service-worker.js — Planning TPL
+ * ------------------------------------------------------------
+ * - Cache intelligent pour mode offline
+ * - Ignore le proxy Cloudflare et les appels Apps Script
+ * - Gère la mise à jour automatique
+ **************************************************************/
 
-const CACHE_VERSION = "v3.3"; // 🆕 incrémente à chaque mise à jour
-const CACHE_NAME = `tpl-calendar-cache-${CACHE_VERSION}`;
+const CACHE_NAME = "planning-tpl-v4.0";
+const OFFLINE_URL = "offline.html";
 
-const ASSETS = [
-  "./",
-  "./index.html",
-  "./offline.html",
-  "./style.css",
-  "./script.js",
-  "./manifest.json",
-  "./tpl-logo.png",
-
-  // ✅ FullCalendar (JS intégrés)
+// 🗂️ Fichiers à mettre en cache
+const FILES_TO_CACHE = [
+  "/",
+  "index.html",
+  "style.css",
+  "script.js",
+  "manifest.json",
+  "offline.html",
+  "tpl-logo.png",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.js",
@@ -26,102 +26,69 @@ const ASSETS = [
   "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js",
 ];
 
-/****************************************************
- * 🧱 INSTALLATION — Mise en cache initiale
- ****************************************************/
+// 📦 Installation
 self.addEventListener("install", (event) => {
-  console.log("✅ Service Worker installé — version", CACHE_VERSION);
+  console.log("✅ Service Worker installé — version", CACHE_NAME);
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) =>
-        Promise.allSettled(
-          ASSETS.map(async (url) => {
-            try {
-              const res = await fetch(url, { cache: "no-store" });
-              if (res.ok) {
-                await cache.put(url, res.clone());
-                console.log("📦 Cached:", url);
-              } else {
-                console.warn("⚠️ Non mis en cache (HTTP error):", url, res.status);
-              }
-            } catch (err) {
-              console.warn("⚠️ Skip asset (erreur réseau):", url, err.message);
-            }
-          })
-        )
-      )
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
   );
+  self.skipWaiting();
 });
 
-/****************************************************
- * 🚀 ACTIVATION — Nettoyage des anciens caches
- ****************************************************/
+// 🔁 Activation et nettoyage
 self.addEventListener("activate", (event) => {
-  console.log("🚀 Service Worker actif — purge des anciens caches…");
+  console.log("⚙️ Service Worker activé");
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            console.log("🧹 Suppression ancien cache :", key);
-            return caches.delete(key);
-          }
-        })
-      )
-    ).then(() => self.clients.claim())
+      Promise.all(keys.map((key) => key !== CACHE_NAME && caches.delete(key)))
+    )
   );
+  self.clients.claim();
 });
 
-/****************************************************
- * ⚙️ FETCH — Cache d’abord, puis fallback réseau
- ****************************************************/
+// 🌐 Interception des requêtes
 self.addEventListener("fetch", (event) => {
-  const request = event.request;
+  const requestUrl = event.request.url;
 
-  // 🚫 Ignorer les requêtes chrome-extension ou data:
-  if (request.url.startsWith("chrome-extension") || request.url.startsWith("data:")) {
-    return;
+  // 🚫 Ne jamais mettre en cache les appels au proxy ou à Google Apps Script
+  if (
+    requestUrl.includes("script.google.com") ||
+    requestUrl.includes("workers.dev/?url=")
+  ) {
+    return event.respondWith(fetch(event.request));
   }
 
+  // ✅ Pour tout le reste : cache + fallback offline
   event.respondWith(
-    caches.match(request).then((cachedResponse) => {
+    caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
-        console.log("⚙️ Cache hit:", request.url);
+        console.log("⚙️ Cache hit:", requestUrl);
+        // En parallèle, on met à jour le cache
+        fetch(event.request).then((response) => {
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, response.clone()));
+        });
         return cachedResponse;
       }
 
-      // 🔁 Sinon → essai réseau + mise en cache
-      return fetch(request)
-        .then((networkResponse) => {
-          // ⚠️ Certaines requêtes (ex: POST) n’ont pas de body clonable
-          if (!networkResponse || !networkResponse.ok || networkResponse.type === "opaque") {
-            return networkResponse;
+      // Si pas en cache, on essaie le réseau
+      return fetch(event.request)
+        .then((response) => {
+          // Sauvegarde dans le cache
+          if (response && response.status === 200 && response.type === "basic") {
+            caches.open(CACHE_NAME).then((cache) => {
+              cache.put(event.request, response.clone());
+            });
           }
-
-          const responseClone = networkResponse.clone(); // ✅ Correction ici
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
-          });
-
-          return networkResponse;
+          return response;
         })
-        .catch(() => {
-          // 🌐 Si hors ligne → retour vers offline.html
-          if (request.mode === "navigate" || request.destination === "document") {
-            return caches.match("./offline.html");
-          }
-        });
+        .catch(() => caches.match(OFFLINE_URL));
     })
   );
 });
 
-/****************************************************
- * 🧭 Message depuis la page (ex: purge manuelle)
- ****************************************************/
+// 🔄 Mise à jour automatique du SW
 self.addEventListener("message", (event) => {
-  if (event.data === "forceUpdate") {
-    console.log("♻️ Forçage de la mise à jour du Service Worker");
+  if (event.data === "SKIP_WAITING") {
     self.skipWaiting();
   }
 });
