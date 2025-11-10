@@ -1,10 +1,5 @@
 /**************************************************************
  * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline)
- * ------------------------------------------------------------
- * - Charge les données via ton proxy Cloudflare Workers
- * - Sauvegarde via le même proxy
- * - Stocke localement en cas de déconnexion
- * - Gère automatiquement les erreurs CORS et réseau
  **************************************************************/
 
 // 🌐 URLs
@@ -102,6 +97,7 @@ function renderCalendar(events) {
       end: event.end,
       allDay: event.allDay === true,
       backgroundColor: getCategoryColor(event.category),
+      extendedProps: { category: event.category }
     })),
     eventClick: (info) => openEventModal(info.event),
     eventDrop: (info) => saveEvent(eventToData(info.event)),
@@ -127,7 +123,7 @@ function getCategoryColor(category) {
 }
 
 /**************************************************************
- * 💾 Sauvegarde des événements
+ * 💾 Sauvegarde
  **************************************************************/
 function eventToData(event) {
   return {
@@ -170,7 +166,7 @@ async function saveEvent(event) {
 }
 
 /**************************************************************
- * 🗑️ Suppression d’un événement
+ * 🗑️ Suppression
  **************************************************************/
 async function deleteEvent(id) {
   let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
@@ -192,7 +188,7 @@ async function deleteEvent(id) {
 }
 
 /**************************************************************
- * 🪟 MODALE D’ÉVÉNEMENT
+ * 🪟 Modale
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
@@ -234,9 +230,8 @@ function openEventModal(event = null, info = null) {
 
     modal.classList.add("hidden");
 
-    if (event) {
-      event.remove();
-    }
+    if (event) event.remove();
+
     calendar.addEvent({
       id: newEvent.id,
       title: newEvent.title,
@@ -246,6 +241,7 @@ function openEventModal(event = null, info = null) {
       backgroundColor: getCategoryColor(newEvent.category),
       extendedProps: { category: newEvent.category },
     });
+
     saveEvent(newEvent);
   };
 }
@@ -257,7 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
   ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
   chargerPlanning();
 
-  // Vérification réseau après délai (corrige faux “hors ligne”)
+  // Vérification réseau après un court délai
   setTimeout(() => {
     if (navigator.onLine) {
       isOffline = false;
@@ -267,4 +263,15 @@ document.addEventListener("DOMContentLoaded", () => {
       OFFLINE_BANNER?.classList.remove("hidden");
     }
   }, 500);
+
+  // 🌗 Thème clair/sombre
+  const themeToggle = document.getElementById("theme-toggle");
+  themeToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
+  });
+
+  if (localStorage.getItem("theme") === "dark") {
+    document.body.classList.add("dark");
+  }
 });
