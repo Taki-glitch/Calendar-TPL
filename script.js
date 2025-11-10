@@ -8,7 +8,7 @@
  **************************************************************/
 
 // 🌐 URLs
-const GAS_URL = "https://script.google.com/macros/s/AKfycby8W-luAbwbFNcA7p7wP5jIHH7yGAY4gcC0r5qoe2WSPrPVnZmbixgRf5N24Bky7yWQ/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxIwxe5KWhDKZpSfotbpUX8QSjJnVq0cmv11V63uN0TLbFnGc-n23y-biXqa9WIfP01/exec";
 const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 
 const OFFLINE_BANNER = document.getElementById("offline-banner");
