@@ -1,5 +1,5 @@
 /**************************************************************
- * 📅 script.js — Planning TPL (avec bouton flottant + modales)
+ * 📅 script.js — Planning TPL (Responsive vues + Bouton + Modales)
  **************************************************************/
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
@@ -24,7 +24,7 @@ window.addEventListener("offline", () => {
 });
 
 /**************************************************************
- * 🔁 Chargement
+ * 🔁 Chargement du planning
  **************************************************************/
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
@@ -77,25 +77,35 @@ async function chargerPlanning() {
 }
 
 /**************************************************************
- * 📅 Rendu
+ * 📅 Rendu FullCalendar (vue adaptative mobile / desktop)
  **************************************************************/
 function renderCalendar(events) {
   const calendarEl = document.getElementById("planning");
   if (!calendarEl) return;
   if (calendar) calendar.destroy();
 
+  // 📱 Détection mobile
+  const isMobile = window.innerWidth < 768;
+
+  // Vues et barre d’outils adaptées
+  const headerToolbar = {
+    left: "prev,next today",
+    center: "title",
+    right: isMobile
+      ? "timeGridWeek,listWeek" // mobile → semaine + planning
+      : "dayGridMonth,timeGridWeek,listWeek" // ordi/tablette → mois + semaine + planning
+  };
+
+  const initialView = isMobile ? "timeGridWeek" : "dayGridMonth";
+
   calendar = new FullCalendar.Calendar(calendarEl, {
     locale: "fr",
-    initialView: "dayGridMonth",
-    headerToolbar: {
-      left: "prev,next today",
-      center: "title",
-      right: "dayGridMonth,timeGridWeek,listWeek",
-    },
+    initialView: initialView,
+    headerToolbar: headerToolbar,
     editable: true,
     selectable: true,
     height: "auto",
-    aspectRatio: 0.8,
+    aspectRatio: isMobile ? 0.7 : 1.2,
     events: events.map((event) => ({
       id: String(event.id),
       title: event.title,
@@ -122,6 +132,27 @@ function renderCalendar(events) {
   });
 
   calendar.render();
+
+  // 🔄 Mise à jour dynamique si on redimensionne (orientation mobile <-> paysage)
+  window.addEventListener("resize", () => {
+    const nowMobile = window.innerWidth < 768;
+    const currentView = calendar.view.type;
+    if (nowMobile && currentView === "dayGridMonth") {
+      calendar.changeView("timeGridWeek");
+      calendar.setOption("headerToolbar", {
+        left: "prev,next today",
+        center: "title",
+        right: "timeGridWeek,listWeek",
+      });
+    } else if (!nowMobile && currentView !== "dayGridMonth") {
+      calendar.changeView("dayGridMonth");
+      calendar.setOption("headerToolbar", {
+        left: "prev,next today",
+        center: "title",
+        right: "dayGridMonth,timeGridWeek,listWeek",
+      });
+    }
+  });
 }
 
 /**************************************************************
