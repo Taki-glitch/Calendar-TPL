@@ -39,6 +39,7 @@ async function chargerPlanning() {
   loader.textContent = isOffline
     ? "Mode hors ligne — affichage des données locales..."
     : "Chargement du calendrier...";
+  loader.classList.remove("hidden"); // Assurer que le loader est visible au départ
 
   let events = [];
 
@@ -46,7 +47,6 @@ async function chargerPlanning() {
     // 1. Mode hors ligne : charge depuis localStorage
     events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
     loader.classList.add("hidden");
-    // Si le calendrier existe déjà, on le met à jour
     if (calendar) {
         calendar.removeAllEvents();
         calendar.addEventSource(events);
@@ -62,17 +62,18 @@ async function chargerPlanning() {
       method: "GET",
       mode: "cors",
     });
-
+    
+    // Vérification stricte du statut HTTP (le proxy doit retourner 200)
     if (!res.ok) {
-        // Le proxy Cloudflare ou GAS a répondu avec un code d'erreur HTTP
-        throw new Error(`Erreur réseau: ${res.status} ${res.statusText}`);
+        throw new Error(`Erreur HTTP du proxy: ${res.status} ${res.statusText}`);
     }
 
+    // Tenter de lire le JSON
     const data = await res.json();
     
     if (data.status === "error") {
-        // L'erreur vient du Apps Script lui-même (ex: JSON contenant {status: "error", message: "..."})
-        throw new Error(`Erreur Apps Script: ${data.message || 'Erreur inconnue'}`);
+        // Erreur retournée par Google Apps Script (voir le doGet corrigé)
+        throw new Error(`Erreur Apps Script: ${data.message || 'Erreur inconnue de GAS'}`);
     }
 
     events = data;
@@ -81,21 +82,27 @@ async function chargerPlanning() {
     localStorage.setItem("tplEvents", JSON.stringify(events));
 
   } catch (err) {
-    console.error("❌ ERREUR DE CHARGEMENT DU CALENDRIER:", err);
-    loader.textContent = `❌ Échec du chargement. Vérifiez l'URL de votre Apps Script. Détail: ${err.message}`;
-    loader.classList.remove("hidden");
+    // ❌ ERREUR CAPTURÉE : Affichage explicite de l'échec
+    console.error("❌ ERREUR FATALE DE CHARGEMENT DU CALENDRIER:", err);
     
-    // Tente de charger les données locales en cas d'erreur réseau
+    // On vérifie si l'erreur est liée au JSON (souvent un corps de réponse vide ou HTML)
+    const displayMessage = err.message.includes("JSON") 
+        ? `Erreur de données (JSON invalide/vide). Vérifiez la réponse du proxy.` 
+        : err.message;
+        
+    loader.textContent = `❌ ÉCHEC DU CHARGEMENT. Cause : ${displayMessage}`;
+    
+    // Tente de charger les données locales en cas d'erreur
     events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
     if (events.length > 0) {
       loader.textContent += " (Affichage des données locales en dernier recours.)";
     } else {
-      // Si aucune donnée locale, on sort
+      // Si aucune donnée locale, on sort sans afficher le calendrier
       return; 
     }
   }
 
-  // 3. Affichage (en ligne ou après erreur résolue par cache local)
+  // 3. Affichage (si events.length > 0 ou si le chargement a réussi)
   loader.classList.add("hidden");
   renderCalendar(events);
 }
@@ -134,7 +141,7 @@ function renderCalendar(events) {
         title: event.title,
         start: event.start,
         end: event.end,
-        allDay: event.allDay === true, // 💡 Assure que c'est un booléen ici aussi, même si GAS le fait
+        allDay: event.allDay === true, 
         backgroundColor: getCategoryColor(event.category)
     })),
 
@@ -143,10 +150,9 @@ function renderCalendar(events) {
         const event = info.event;
         const newTitle = prompt("Modifier le titre de l'événement:", event.title);
         
-        if (newTitle === null) return; // Annulation
+        if (newTitle === null) return; 
 
         if (newTitle.trim() === "") {
-             // Suppression si le titre est effacé
             if (confirm("Voulez-vous supprimer cet événement ?")) {
                 event.remove();
                 deleteEvent(event.id);
@@ -154,18 +160,15 @@ function renderCalendar(events) {
             return;
         }
 
-        // Mise à jour du titre et de la couleur
         event.setProp("title", newTitle);
         event.setProp("backgroundColor", getCategoryColor(event.extendedProps.category));
         
-        // Sauvegarde
         saveEvent(eventToData(event));
     },
 
     // ➡️ Gestion du déplacement/redimensionnement (drag & drop)
     eventDrop: function (info) {
         const event = info.event;
-        // La confirmation n'est pas nécessaire car l'action est délibérée par drag-and-drop
         saveEvent(eventToData(event));
     },
 
@@ -178,7 +181,7 @@ function renderCalendar(events) {
     select: function (info) {
         const newTitle = prompt("Ajouter un nouvel événement (laisser vide pour annuler):");
         if (newTitle) {
-            const newId = crypto.randomUUID(); // Génère un ID unique
+            const newId = crypto.randomUUID(); 
 
             const newEvent = {
                 id: newId,
@@ -186,13 +189,13 @@ function renderCalendar(events) {
                 start: info.startStr,
                 end: info.endStr,
                 allDay: info.allDay,
-                category: "Autre" // Catégorie par défaut
+                category: "Autre" 
             };
 
             calendar.addEvent(newEvent);
             saveEvent(newEvent);
         }
-        calendar.unselect(); // Désélectionne la zone
+        calendar.unselect(); 
     },
   });
 
