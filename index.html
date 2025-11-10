@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="description" content="Planning TPL — calendrier interactif, consultable hors ligne" />
   <meta name="theme-color" content="#007bff" />
-  
+
   <title>Planning TPL</title>
 
   <!-- 🧩 FullCalendar -->
@@ -35,6 +35,35 @@
     <div id="offline-banner" class="hidden">⚠️ Vous êtes hors ligne — les modifications seront enregistrées localement.</div>
   </main>
 
+  <!-- 📆 Fenêtre modale d’ajout d’événement -->
+  <div id="event-modal" class="modal hidden">
+    <div class="modal-content">
+      <h2 id="modal-title">Nouvel événement</h2>
+
+      <label>Titre :</label>
+      <input type="text" id="event-title" placeholder="Ex : Réunion projet">
+
+      <label>Début :</label>
+      <input type="datetime-local" id="event-start">
+
+      <label>Fin :</label>
+      <input type="datetime-local" id="event-end">
+
+      <label>Catégorie :</label>
+      <select id="event-category">
+        <option value="Réunion">Réunion</option>
+        <option value="Projet">Projet</option>
+        <option value="Formation">Formation</option>
+        <option value="Autre" selected>Autre</option>
+      </select>
+
+      <div class="modal-buttons">
+        <button id="save-event">💾 Enregistrer</button>
+        <button id="cancel-event" class="cancel">Annuler</button>
+      </div>
+    </div>
+  </div>
+
   <!-- 📅 FullCalendar (JS modules) -->
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js"></script>
@@ -46,12 +75,11 @@
   <!-- 🚀 Script principal -->
   <script src="script.js"></script>
 
-  <!-- 🌗 Thème clair/sombre automatique -->
+  <!-- 🌗 Thème clair/sombre -->
   <script>
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const savedTheme = localStorage.getItem('tplTheme');
     document.body.classList.add(savedTheme || (prefersDark ? 'dark' : 'light'));
-
     document.getElementById('theme-toggle').addEventListener('click', () => {
       const current = document.body.classList.contains('dark') ? 'dark' : 'light';
       const next = current === 'dark' ? 'light' : 'dark';
@@ -65,7 +93,7 @@
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js')
         .then(() => console.log('✅ Service Worker enregistré'))
-        .catch(err => console.warn('⚠️ Service Worker non enregistré :', err));
+        .catch(err => console.warn('⚠️ SW non enregistré :', err));
     }
   </script>
 </body>
