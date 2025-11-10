@@ -1,61 +1,33 @@
-/* 🌈 Style global */
+/**************************************************************
+ * 🌈 STYLE GLOBAL
+ **************************************************************/
 body {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   background-color: #f5f7fb;
   margin: 0;
+  padding: 0;
   color: #333;
+  overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* 🧭 Header */
-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #007bff;
-  color: white;
-  padding: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  flex-wrap: wrap;
-  text-align: center;
+body.dark {
+  background-color: #1a1d21;
+  color: #e5e5e5;
 }
 
-header .logo {
-  width: 48px;
-  height: 48px;
-  margin-right: 10px;
-  border-radius: 50%;
+body.dark header {
+  background-color: #121417;
 }
 
-header h1 {
-  font-size: 1.5em;
-  margin: 5px 0;
+body.dark #planning {
+  background-color: #22252b;
+  color: #e5e5e5;
 }
 
-/* ☀️🌙 Bouton thème clair/sombre */
-#theme-toggle {
-  margin-left: auto;
-  background: none;
-  border: none;
-  font-size: 1.4em;
-  cursor: pointer;
-  color: white;
-}
-
-#theme-toggle:hover {
-  opacity: 0.8;
-}
-
-/* 📅 Conteneur calendrier */
-#planning {
-  max-width: 900px;
-  margin: 30px auto;
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-/* ⚠️ Bannière offline */
+/**************************************************************
+ * ⚠️ BANNIÈRE OFFLINE
+ **************************************************************/
 #offline-banner {
   position: fixed;
   bottom: 0;
@@ -66,6 +38,7 @@ header h1 {
   text-align: center;
   padding: 8px;
   font-weight: 600;
+  z-index: 3000;
   transition: transform 0.3s ease-in-out;
 }
 
@@ -73,97 +46,22 @@ header h1 {
   transform: translateY(100%);
 }
 
-/* 🌗 Thème clair/sombre */
-:root {
-  --bg-light: #f5f7fb;
-  --text-light: #333;
-  --bg-dark: #1a1d21;
-  --text-dark: #e5e5e5;
-  --primary: #007bff;
-  --primary-dark: #5ca9ff;
-}
-
-body.light {
-  background-color: var(--bg-light);
-  color: var(--text-light);
-}
-
-body.dark {
-  background-color: var(--bg-dark);
-  color: var(--text-dark);
-}
-
-body.dark header {
-  background-color: #121417;
-  color: var(--text-dark);
-}
-
-body.dark #planning {
-  background-color: #22252b;
-  color: var(--text-dark);
-}
-
-/* 📱 Responsive */
-@media (max-width: 900px) {
-  header {
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 10px 15px;
-  }
-  header h1 { font-size: 1.2em; }
-  #planning { margin: 10px; padding: 10px; }
-}
-
-@media (max-width: 600px) {
-  header .logo { width: 40px; height: 40px; margin-right: 6px; }
-  #theme-toggle { font-size: 1.2em; }
-  .fc-toolbar-title { font-size: 1.1em; }
-  #planning { margin: 5px; padding: 8px; }
-}
-
-/* iPhone safe-area fix */
-@supports (padding: env(safe-area-inset-bottom)) {
-  body { padding-bottom: env(safe-area-inset-bottom); }
-}
-
-/* Compact FullCalendar toolbar */
-.fc-header-toolbar {
-  flex-wrap: wrap !important;
-  gap: 6px !important;
-  justify-content: center !important;
-}
-
-.fc-toolbar-chunk {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px;
-}
-
-.fc-button {
-  padding: 4px 6px !important;
-  font-size: 0.8em !important;
-}
-
-/* 🌀 Notification douce de chargement */
+/**************************************************************
+ * 🔄 INDICATEUR DE CHARGEMENT
+ **************************************************************/
 #loader {
   position: fixed;
-  top: 70px;
+  top: 60px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   color: #007bff;
   padding: 8px 14px;
   border-radius: 8px;
   font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: opacity 0.4s ease;
-  z-index: 2000;
-}
-
-body.dark #loader {
-  background: rgba(30, 30, 30, 0.9);
-  color: #5ca9ff;
+  z-index: 2500;
 }
 
 #loader.hidden {
@@ -171,74 +69,236 @@ body.dark #loader {
   pointer-events: none;
 }
 
-/* 📆 Fenêtre modale tactile */
+/**************************************************************
+ * 📅 CALENDRIER
+ **************************************************************/
+#planning {
+  max-width: 900px;
+  margin: 20px auto 80px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/**************************************************************
+ * 🎨 LÉGENDE DES CATÉGORIES
+ **************************************************************/
+#legend {
+  max-width: 900px;
+  margin: 10px auto 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.9em;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+.legend-item span {
+  display: inline-block;
+}
+
+/**************************************************************
+ * ➕ BOUTON FLOTTANT “+”
+ **************************************************************/
+#add-event-btn {
+  position: fixed;
+  bottom: 1.6rem;
+  right: 1.6rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #007bff;
+  color: white;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  z-index: 5000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease, background 0.3s ease;
+}
+
+#add-event-btn:hover {
+  transform: scale(1.1);
+  background: #0056b3;
+}
+
+/* ✅ Fix mobile (ne plus être recouvert par le calendrier) */
+@media (max-width: 768px) {
+  #add-event-btn {
+    bottom: 1rem;
+    right: 1rem;
+    width: 52px;
+    height: 52px;
+    font-size: 1.8rem;
+    z-index: 6000;
+  }
+}
+
+/**************************************************************
+ * 🪟 MODALE D’AJOUT / MODIFICATION D’ÉVÉNEMENT
+ **************************************************************/
 .modal {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
-  justify-content: center;
   align-items: center;
-  z-index: 3000;
+  justify-content: center;
+  z-index: 7000;
+  animation: fadeIn 0.25s ease;
   backdrop-filter: blur(4px);
 }
 
-.modal.hidden { display: none; }
-
-.modal-content {
-  background: var(--bg-light);
-  color: var(--text-light);
-  padding: 20px;
-  border-radius: 12px;
-  width: 90%;
-  max-width: 400px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.modal.hidden {
+  display: none;
 }
 
-body.dark .modal-content {
-  background: #2a2d33;
-  color: var(--text-dark);
+.modal-content {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: slideUp 0.3s ease;
 }
 
 .modal-content h2 {
   margin-top: 0;
   text-align: center;
-  color: var(--primary);
+  color: #007bff;
+  font-size: 1.4rem;
 }
 
+/**************************************************************
+ * 📝 CHAMPS DE FORMULAIRE
+ **************************************************************/
 .modal-content label {
-  display: block;
-  margin-top: 10px;
   font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .modal-content input,
 .modal-content select {
-  width: 100%;
-  padding: 8px;
-  margin-top: 5px;
+  padding: 10px;
+  border-radius: 8px;
   border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 1em;
+  font-size: 1rem;
   box-sizing: border-box;
+  width: 100%;
 }
 
-.modal-buttons {
-  margin-top: 15px;
+.modal-content select {
+  background: #fff;
+  cursor: pointer;
+}
+
+/**************************************************************
+ * 🔘 BOUTONS DE MODALE
+ **************************************************************/
+.modal-actions {
   display: flex;
   justify-content: space-between;
+  margin-top: 15px;
+  gap: 10px;
 }
 
-.modal-buttons button {
+.modal-actions .btn {
   flex: 1;
-  margin: 0 5px;
-  padding: 10px;
-  font-size: 1em;
-  border: none;
+  padding: 12px;
   border-radius: 8px;
-  cursor: pointer;
   font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
 }
 
-#save-event { background: var(--primary); color: white; }
-#cancel-event { background: #999; color: white; }
+.modal-actions .btn.primary {
+  background: #007bff;
+  color: white;
+}
+
+.modal-actions .btn.secondary {
+  background: #888;
+  color: white;
+}
+
+.modal-actions .btn:hover {
+  opacity: 0.9;
+}
+
+/**************************************************************
+ * 📱 RESPONSIVE
+ **************************************************************/
+@media (max-width: 900px) {
+  #planning {
+    margin: 10px;
+    padding: 10px;
+  }
+
+  .fc-toolbar-title {
+    font-size: 1.1em;
+  }
+}
+
+@media (max-width: 600px) {
+  .modal-content {
+    max-width: 95%;
+    padding: 15px;
+  }
+
+  .modal-actions .btn {
+    padding: 10px;
+    font-size: 1em;
+  }
+
+  #legend {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/**************************************************************
+ * 🌈 ANIMATIONS
+ **************************************************************/
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
