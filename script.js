@@ -1,23 +1,33 @@
 /**************************************************************
- * 📅 script.js — Planning TPL (Catégories colorées + Responsive)
+ * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline)
+ * ------------------------------------------------------------
+ * - Charge les données via ton proxy Cloudflare Workers
+ * - Sauvegarde via le même proxy
+ * - Stocke localement en cas de déconnexion
+ * - Gère les thèmes clair/sombre et le bouton d’ajout mobile
  **************************************************************/
 
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
-const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
+// 🌐 URLs
+const GAS_URL =
+  "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
+const PROXY_URL =
+  "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" +
+  encodeURIComponent(GAS_URL);
 
 const OFFLINE_BANNER = document.getElementById("offline-banner");
+const ADD_EVENT_BTN = document.getElementById("add-event-btn");
 let isOffline = !navigator.onLine;
 let calendar = null;
-let currentEditingEvent = null;
 
 /**************************************************************
- * 🔌 Connexion
+ * 🔌 Gestion de la connexion
  **************************************************************/
 window.addEventListener("online", () => {
   isOffline = false;
   OFFLINE_BANNER?.classList.add("hidden");
   chargerPlanning();
 });
+
 window.addEventListener("offline", () => {
   isOffline = true;
   OFFLINE_BANNER?.classList.remove("hidden");
@@ -28,17 +38,10 @@ window.addEventListener("offline", () => {
  **************************************************************/
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
-
-  if (calendar && !isOffline) {
-    loader.textContent = "🔄 Mise à jour du calendrier…";
-    loader.classList.remove("hidden");
-    setTimeout(() => loader.classList.add("hidden"), 1500);
-  } else {
-    loader.textContent = isOffline
-      ? "Mode hors ligne — affichage des données locales..."
-      : "Chargement du calendrier...";
-    loader.classList.remove("hidden");
-  }
+  loader.textContent = isOffline
+    ? "Mode hors ligne — affichage des données locales..."
+    : "Chargement du calendrier...";
+  loader.classList.remove("hidden");
 
   let events = [];
 
@@ -56,20 +59,15 @@ async function chargerPlanning() {
 
   try {
     const res = await fetch(PROXY_URL, { method: "GET", mode: "cors" });
-    if (!res.ok) throw new Error(`Erreur HTTP du proxy: ${res.status}`);
+    if (!res.ok) throw new Error(`Erreur HTTP: ${res.status} ${res.statusText}`);
     const data = await res.json();
-    if (data.status === "error")
-      throw new Error(`Erreur Apps Script: ${data.message || "Erreur inconnue"}`);
+    if (data.status === "error") throw new Error(`Erreur Apps Script: ${data.message}`);
     events = data;
     localStorage.setItem("tplEvents", JSON.stringify(events));
   } catch (err) {
-    console.error("❌ ERREUR DE CHARGEMENT:", err);
-    const displayMessage = err.message.includes("JSON")
-      ? `Erreur de données (JSON invalide/vide). Vérifiez la réponse du proxy.`
-      : err.message;
-    loader.textContent = `❌ ÉCHEC DU CHARGEMENT. Cause : ${displayMessage}`;
+    console.error("❌ Erreur de chargement:", err);
+    loader.textContent = `❌ Échec du chargement (${err.message})`;
     events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-    if (events.length === 0) return;
   }
 
   loader.classList.add("hidden");
@@ -77,31 +75,27 @@ async function chargerPlanning() {
 }
 
 /**************************************************************
- * 📅 Rendu FullCalendar (vue adaptative mobile/desktop)
+ * 📅 Rendu FullCalendar
  **************************************************************/
 function renderCalendar(events) {
   const calendarEl = document.getElementById("planning");
   if (!calendarEl) return;
+
   if (calendar) calendar.destroy();
 
-  const isMobile = window.innerWidth < 768;
-  const headerToolbar = {
-    left: "prev,next today",
-    center: "title",
-    right: isMobile
-      ? "timeGridWeek,listWeek"
-      : "dayGridMonth,timeGridWeek,listWeek",
-  };
-  const initialView = isMobile ? "timeGridWeek" : "dayGridMonth";
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
   calendar = new FullCalendar.Calendar(calendarEl, {
     locale: "fr",
-    initialView,
-    headerToolbar,
-    editable: true,
-    selectable: true,
+    initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
+    headerToolbar: {
+      left: "prev,next today",
+      center: "title",
+      right: isMobile ? "timeGridWeek,listWeek" : "dayGridMonth,timeGridWeek,listWeek",
+    },
     height: "auto",
-    aspectRatio: isMobile ? 0.7 : 1.2,
+    selectable: true,
+    editable: true,
     events: events.map((event) => {
       const color = getCategoryColor(event.category);
       return {
@@ -117,46 +111,79 @@ function renderCalendar(events) {
       };
     }),
 
-    eventClick(info) {
-      openEditModal(info.event);
+    // Sélection d’un créneau vide
+    select: (info) => openEventModal(null, info.startStr, info.endStr),
+
+    // Clic sur un événement existant
+    eventClick: (info) => {
+      const ev = info.event;
+      openEventModal({
+        id: ev.id,
+        title: ev.title,
+        start: ev.startStr,
+        end: ev.endStr,
+        category: ev.extendedProps.category,
+        allDay: ev.allDay,
+      });
     },
-    eventDrop(info) {
-      saveEvent(eventToData(info.event));
-    },
-    eventResize(info) {
-      saveEvent(eventToData(info.event));
-    },
-    select(info) {
-      openEventModal(info.startStr, info.endStr);
-      calendar.unselect();
-    },
+
+    eventDrop: (info) => saveEvent(eventToData(info.event)),
+    eventResize: (info) => saveEvent(eventToData(info.event)),
   });
 
   calendar.render();
-
-  window.addEventListener("resize", () => {
-    const nowMobile = window.innerWidth < 768;
-    const currentView = calendar.view.type;
-    if (nowMobile && currentView === "dayGridMonth") {
-      calendar.changeView("timeGridWeek");
-      calendar.setOption("headerToolbar", {
-        left: "prev,next today",
-        center: "title",
-        right: "timeGridWeek,listWeek",
-      });
-    } else if (!nowMobile && currentView !== "dayGridMonth") {
-      calendar.changeView("dayGridMonth");
-      calendar.setOption("headerToolbar", {
-        left: "prev,next today",
-        center: "title",
-        right: "dayGridMonth,timeGridWeek,listWeek",
-      });
-    }
-  });
 }
 
 /**************************************************************
- * 💾 Données
+ * 🪟 Modale d’ajout / édition
+ **************************************************************/
+function openEventModal(event = null, start = null, end = null) {
+  const modal = document.getElementById("event-modal");
+  const titleInput = document.getElementById("event-title");
+  const startInput = document.getElementById("event-start");
+  const endInput = document.getElementById("event-end");
+  const categorySelect = document.getElementById("event-category");
+  const saveBtn = document.getElementById("save-event");
+  const cancelBtn = document.getElementById("cancel-event");
+
+  modal.classList.remove("hidden");
+  document.getElementById("modal-title").textContent = event ? "Modifier l’événement" : "Nouvel événement";
+
+  titleInput.value = event?.title || "";
+  startInput.value = event?.start || start || "";
+  endInput.value = event?.end || end || "";
+  categorySelect.value = event?.category || "Hôtel-Dieu";
+
+  saveBtn.onclick = () => {
+    const newEvent = {
+      id: event?.id || crypto.randomUUID(),
+      title: titleInput.value.trim() || "Sans titre",
+      start: startInput.value,
+      end: endInput.value,
+      allDay: false,
+      category: categorySelect.value,
+    };
+
+    if (calendar) {
+      const existing = calendar.getEventById(newEvent.id);
+      if (existing) existing.remove();
+      calendar.addEvent({
+        ...newEvent,
+        backgroundColor: getCategoryColor(newEvent.category),
+        borderColor: getCategoryColor(newEvent.category),
+        textColor: "#fff",
+      });
+    }
+
+    saveEvent(newEvent);
+    modal.classList.add("hidden");
+  };
+
+  cancelBtn.onclick = () => modal.classList.add("hidden");
+}
+
+/**************************************************************
+ * 💾 Sauvegarde / suppression
  **************************************************************/
 function eventToData(event) {
   return {
@@ -171,48 +198,22 @@ function eventToData(event) {
 
 async function saveEvent(event) {
   let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  const index = saved.findIndex((e) => e.id === event.id);
-  if (index >= 0) saved[index] = event;
+  const i = saved.findIndex((e) => e.id === event.id);
+  if (i >= 0) saved[i] = event;
   else saved.push(event);
   localStorage.setItem("tplEvents", JSON.stringify(saved));
 
   if (isOffline) return;
 
   try {
-    const res = await fetch(PROXY_URL, {
+    await fetch(PROXY_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ mode: "patch", data: [event] }),
       mode: "cors",
     });
-    if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
-    const result = await res.json();
-    if (result.status === "error") throw new Error(result.message);
-    console.log("✅ Sauvegardé :", event.title);
   } catch (err) {
-    console.warn("⚠️ Sauvegarde reportée :", err);
-  }
-}
-
-async function deleteEvent(id) {
-  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  saved = saved.filter((e) => e.id !== id);
-  localStorage.setItem("tplEvents", JSON.stringify(saved));
-  if (isOffline) return;
-
-  try {
-    const res = await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "patch", data: [{ id, title: "" }] }),
-      mode: "cors",
-    });
-    if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
-    const result = await res.json();
-    if (result.status === "error") throw new Error(result.message);
-    console.log("✅ Événement supprimé :", id);
-  } catch (err) {
-    console.warn("⚠️ Suppression reportée :", err);
+    console.warn("⚠️ Sauvegarde différée (hors ligne ou erreur proxy)");
   }
 }
 
@@ -221,127 +222,22 @@ async function deleteEvent(id) {
  **************************************************************/
 function getCategoryColor(category) {
   switch (category) {
-    case "Hôtel-Dieu": return "#FFD43B"; // Jaune
-    case "Gréneraie/Resto du Cœur": return "#2ECC71"; // Vert
-    case "Préfecture": return "#E74C3C"; // Rouge
-    case "Tour de Bretagne": return "#3498DB"; // Bleu
-    case "France Terre d’Asile": return "#9B59B6"; // Violet
-    default: return "#7f8c8d"; // Gris neutre
+    case "Hôtel-Dieu": return "#FFD43B";
+    case "Gréneraie/Resto du Cœur": return "#2ECC71";
+    case "Préfecture": return "#E74C3C";
+    case "Tour de Bretagne": return "#3498DB";
+    case "France Terre d’Asile": return "#9B59B6";
+    default: return "#7f8c8d";
   }
 }
 
 /**************************************************************
- * 🪟 Modales
- **************************************************************/
-function openEventModal(start, end) {
-  const modal = document.getElementById("event-modal");
-  const titleInput = document.getElementById("event-title");
-  const startInput = document.getElementById("event-start");
-  const endInput = document.getElementById("event-end");
-  const categorySelect = document.getElementById("event-category");
-  const modalTitle = document.getElementById("modal-title");
-
-  modalTitle.textContent = "Nouvel événement";
-  currentEditingEvent = null;
-
-  titleInput.value = "";
-  startInput.value = start.slice(0, 16);
-  endInput.value = end.slice(0, 16);
-  categorySelect.value = "Hôtel-Dieu";
-
-  modal.classList.remove("hidden");
-
-  document.getElementById("save-event").onclick = () => {
-    const title = titleInput.value.trim();
-    if (!title) return modal.classList.add("hidden");
-
-    const newEvent = {
-      id: crypto.randomUUID(),
-      title,
-      start: startInput.value,
-      end: endInput.value,
-      allDay: false,
-      category: categorySelect.value,
-    };
-
-    const color = getCategoryColor(newEvent.category);
-    newEvent.backgroundColor = color;
-    newEvent.borderColor = color;
-    newEvent.textColor = "#fff";
-
-    calendar.addEvent(newEvent);
-    saveEvent(newEvent);
-    modal.classList.add("hidden");
-  };
-
-  document.getElementById("cancel-event").onclick = () => {
-    modal.classList.add("hidden");
-  };
-}
-
-function openEditModal(event) {
-  const modal = document.getElementById("event-modal");
-  const titleInput = document.getElementById("event-title");
-  const startInput = document.getElementById("event-start");
-  const endInput = document.getElementById("event-end");
-  const categorySelect = document.getElementById("event-category");
-  const modalTitle = document.getElementById("modal-title");
-  const saveBtn = document.getElementById("save-event");
-  const cancelBtn = document.getElementById("cancel-event");
-
-  currentEditingEvent = event;
-  modalTitle.textContent = "Modifier l'événement";
-
-  titleInput.value = event.title;
-  startInput.value = event.startStr?.slice(0, 16) || "";
-  endInput.value = event.endStr?.slice(0, 16) || "";
-  categorySelect.value = event.extendedProps.category || "Hôtel-Dieu";
-
-  modal.classList.remove("hidden");
-
-  saveBtn.textContent = "💾 Enregistrer";
-  cancelBtn.textContent = "🗑️ Supprimer";
-
-  saveBtn.onclick = () => {
-    const title = titleInput.value.trim();
-    if (!title) return;
-    event.setProp("title", title);
-    event.setExtendedProp("category", categorySelect.value);
-
-    const color = getCategoryColor(categorySelect.value);
-    event.setProp("backgroundColor", color);
-    event.setProp("borderColor", color);
-    event.setProp("textColor", "#fff");
-
-    event.setStart(startInput.value);
-    event.setEnd(endInput.value);
-    saveEvent(eventToData(event));
-    modal.classList.add("hidden");
-  };
-
-  cancelBtn.onclick = () => {
-    if (confirm("Supprimer cet événement ?")) {
-      event.remove();
-      deleteEvent(event.id);
-    }
-    modal.classList.add("hidden");
-    cancelBtn.textContent = "Annuler";
-  };
-}
-
-/**************************************************************
- * ➕ Bouton flottant
- **************************************************************/
-document.getElementById("add-event-btn").addEventListener("click", () => {
-  const now = new Date();
-  const later = new Date(now.getTime() + 60 * 60 * 1000);
-  openEventModal(now.toISOString(), later.toISOString());
-});
-
-/**************************************************************
- * 🚀 Init
+ * 🚀 Initialisation
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
   chargerPlanning();
+
+  ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
+
+  if (isOffline) OFFLINE_BANNER?.classList.remove("hidden");
 });
-if (isOffline) OFFLINE_BANNER?.classList.remove("hidden");
