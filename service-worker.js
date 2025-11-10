@@ -20,9 +20,10 @@ const ASSETS = [
   "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css"
+  // ❌ À supprimer — ces fichiers n’existent plus :
+  // "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css",
+  // "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css",
+  // "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css"
 ];
 
 /****************************************************
