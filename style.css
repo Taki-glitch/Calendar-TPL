@@ -23,6 +23,19 @@ header .logo {
   border-radius: 50%;
 }
 
+/* Bouton thème clair/sombre */
+#theme-toggle {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 1.4em;
+  cursor: pointer;
+  color: white;
+}
+#theme-toggle:hover {
+  opacity: 0.8;
+}
+
 /* Calendar container */
 #planning {
   max-width: 900px;
@@ -53,7 +66,6 @@ header .logo {
   font-weight: 600;
   transition: transform 0.3s ease-in-out;
 }
-
 .hidden {
   transform: translateY(100%);
 }
@@ -77,10 +89,62 @@ header .logo {
   background-color: #0056b3 !important;
 }
 
-/* Responsive */
-@media (max-width: 600px) {
+/* 🌗 Thème clair/sombre */
+:root {
+  --bg-light: #f5f7fb;
+  --text-light: #333;
+  --bg-dark: #1a1d21;
+  --text-dark: #e5e5e5;
+  --primary: #007bff;
+  --primary-dark: #5ca9ff;
+}
+
+body.light {
+  background-color: var(--bg-light);
+  color: var(--text-light);
+}
+
+body.dark {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
+}
+
+body.dark header {
+  background-color: #121417;
+  color: var(--text-dark);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.1);
+}
+
+body.dark #planning {
+  background-color: #22252b;
+  color: var(--text-dark);
+}
+
+/* 📱 Responsive amélioré */
+@media (max-width: 900px) {
+  header {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 15px;
+  }
+  header h1 {
+    font-size: 1.2em;
+  }
   #planning {
-    width: 95%;
-    margin: 15px auto;
+    margin: 10px;
+    padding: 10px;
+  }
+}
+
+@media (max-width: 600px) {
+  header {
+    flex-direction: row;
+    align-items: center;
+  }
+  #theme-toggle {
+    font-size: 1.2em;
+  }
+  .fc-toolbar-title {
+    font-size: 1.1em;
   }
 }
