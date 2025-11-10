@@ -330,3 +330,57 @@ body.dark .modal-content {
     right: 1rem;
   }
 }
+/**************************************************************
+ * 🎨 LÉGENDE DES CATÉGORIES
+ **************************************************************/
+#legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  max-width: 900px;
+  margin: 15px auto 30px;
+  background: var(--card-bg, #fff);
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  padding: 10px 15px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-color, #333);
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  margin-right: 6px;
+  box-shadow: 0 0 2px rgba(0,0,0,0.3);
+}
+
+/* 🌙 Mode sombre */
+body.dark #legend {
+  background: #2a2d33;
+  color: var(--text-dark);
+}
+body.dark .legend-color {
+  box-shadow: 0 0 2px rgba(255,255,255,0.3);
+}
+
+/* 📱 Version mobile */
+@media (max-width: 600px) {
+  #legend {
+    gap: 8px 14px;
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+  .legend-color {
+    width: 12px;
+    height: 12px;
+  }
+}
