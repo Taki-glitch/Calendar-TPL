@@ -3,9 +3,10 @@
  **************************************************************/
 body {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
-  background-color: #f5f7fb;
   margin: 0;
   color: #333;
+  background-color: #f5f7fb;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /**************************************************************
@@ -21,6 +22,7 @@ header {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   flex-wrap: wrap;
   text-align: center;
+  transition: background-color 0.4s ease;
 }
 
 header .logo {
@@ -35,9 +37,6 @@ header h1 {
   margin: 5px 0;
 }
 
-/**************************************************************
- * ☀️🌙 BOUTON THÈME CLAIR/SOMBRE
- **************************************************************/
 #theme-toggle {
   margin-left: auto;
   background: none;
@@ -47,14 +46,13 @@ header h1 {
   color: white;
   transition: transform 0.2s ease, opacity 0.3s ease;
 }
-
 #theme-toggle:hover {
   opacity: 0.8;
   transform: rotate(15deg);
 }
 
 /**************************************************************
- * 📅 CONTENEUR CALENDRIER
+ * 📅 CALENDRIER
  **************************************************************/
 #planning {
   max-width: 900px;
@@ -63,38 +61,18 @@ header h1 {
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.4s ease;
 }
 
 /**************************************************************
- * ⚠️ BANNIÈRE OFFLINE
- **************************************************************/
-#offline-banner {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #dc3545;
-  color: white;
-  text-align: center;
-  padding: 8px;
-  font-weight: 600;
-  transition: transform 0.3s ease-in-out;
-  z-index: 10000;
-}
-.hidden {
-  transform: translateY(100%);
-}
-
-/**************************************************************
- * 🌗 THÈMES CLAIR & SOMBRE
+ * 🌗 THEMES
  **************************************************************/
 :root {
   --bg-light: #f5f7fb;
-  --text-light: #333;
   --bg-dark: #1a1d21;
+  --text-light: #333;
   --text-dark: #e5e5e5;
   --primary: #007bff;
-  --primary-dark: #5ca9ff;
 }
 
 body.light {
@@ -107,102 +85,13 @@ body.dark {
 }
 body.dark header {
   background-color: #121417;
-  color: var(--text-dark);
 }
 body.dark #planning {
   background-color: #22252b;
-  color: var(--text-dark);
 }
 
 /**************************************************************
- * 📱 RESPONSIVE
- **************************************************************/
-@media (max-width: 900px) {
-  header {
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 10px 15px;
-  }
-  header h1 {
-    font-size: 1.2em;
-  }
-  #planning {
-    margin: 10px;
-    padding: 10px;
-  }
-}
-@media (max-width: 600px) {
-  header .logo {
-    width: 40px;
-    height: 40px;
-    margin-right: 6px;
-  }
-  #theme-toggle {
-    font-size: 1.2em;
-  }
-  .fc-toolbar-title {
-    font-size: 1.1em;
-  }
-  #planning {
-    margin: 5px;
-    padding: 8px;
-  }
-}
-
-/* iPhone safe-area fix */
-@supports (padding: env(safe-area-inset-bottom)) {
-  body {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
-}
-
-/**************************************************************
- * 🧭 TOOLBAR FULLCALENDAR
- **************************************************************/
-.fc-header-toolbar {
-  flex-wrap: wrap !important;
-  gap: 6px !important;
-  justify-content: center !important;
-}
-.fc-toolbar-chunk {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 4px;
-}
-.fc-button {
-  padding: 4px 6px !important;
-  font-size: 0.8em !important;
-}
-
-/**************************************************************
- * 🌀 INDICATEUR DE CHARGEMENT
- **************************************************************/
-#loader {
-  position: fixed;
-  top: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.9);
-  color: #007bff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: opacity 0.4s ease;
-  z-index: 2000;
-}
-body.dark #loader {
-  background: rgba(30, 30, 30, 0.9);
-  color: #5ca9ff;
-}
-#loader.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/**************************************************************
- * 🪟 MODALE D’ÉVÉNEMENT
+ * 🪟 MODALE
  **************************************************************/
 .modal {
   position: fixed;
@@ -214,9 +103,7 @@ body.dark #loader {
   z-index: 9999;
   backdrop-filter: blur(4px);
 }
-.modal.hidden {
-  display: none;
-}
+.modal.hidden { display: none; }
 
 .modal-content {
   background: var(--bg-light);
@@ -228,6 +115,7 @@ body.dark #loader {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
+  transition: background 0.4s ease, color 0.4s ease;
 }
 body.dark .modal-content {
   background: #2a2d33;
@@ -237,25 +125,7 @@ body.dark .modal-content {
   margin-top: 0;
   text-align: center;
   color: var(--primary);
-  font-size: 1.3rem;
 }
-.modal-content label {
-  display: block;
-  margin-top: 12px;
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-.modal-content input,
-.modal-content select {
-  width: 100%;
-  padding: 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
 .modal-buttons {
   margin-top: 18px;
   display: flex;
@@ -271,20 +141,15 @@ body.dark .modal-content {
   border-radius: 10px;
   cursor: pointer;
   font-weight: 600;
+  transition: transform 0.2s ease, background 0.3s ease;
 }
-#save-event {
-  background: var(--primary);
-  color: white;
+.modal-buttons button:hover {
+  transform: scale(1.05);
 }
-#cancel-event {
-  background: #999;
-  color: white;
-}
+#save-event { background: var(--primary); color: white; }
+#cancel-event { background: #999; color: white; }
+
 @media (max-width: 600px) {
-  .modal-content {
-    width: 95%;
-    padding: 16px;
-  }
   .modal-buttons button {
     flex: 1 1 100%;
     font-size: 1.1rem;
@@ -292,32 +157,13 @@ body.dark .modal-content {
 }
 
 /**************************************************************
- * 🎨 SÉLECTEUR DE CATÉGORIE
- **************************************************************/
-.category-select {
-  width: 100%;
-  padding: 8px;
-  font-size: 15px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  background: var(--card-bg, #fff);
-  color: var(--text-color, #333);
-  cursor: pointer;
-}
-.category-select option[value="Hôtel-Dieu"] { color: #ffd43b; }
-.category-select option[value="Gréneraie/Resto du Cœur"] { color: #2ecc71; }
-.category-select option[value="Préfecture"] { color: #e74c3c; }
-.category-select option[value="Tour de Bretagne"] { color: #3498db; }
-.category-select option[value="France Terre d’Asile"] { color: #9b59b6; }
-
-/**************************************************************
- * ➕ BOUTON FLOTTANT “+” (avec animation)
+ * ➕ BOUTON FLOTTANT
  **************************************************************/
 #add-event-btn {
   position: fixed;
   bottom: 1.5rem;
   right: 1.5rem;
-  background: var(--accent-color, #007bff);
+  background: var(--primary);
   color: white;
   border: none;
   border-radius: 50%;
@@ -325,41 +171,25 @@ body.dark .modal-content {
   height: 56px;
   font-size: 2rem;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform 0.2s ease, background 0.3s ease, opacity 0.4s ease;
-  animation: fadeZoomIn 0.5s ease forwards;
-  opacity: 0;
   z-index: 99999;
+  opacity: 0;
+  animation: fadeZoomIn 0.5s ease forwards;
+  transition: transform 0.3s ease;
 }
 #add-event-btn:hover {
   transform: scale(1.1);
-  background: var(--accent-hover, #0056b3);
 }
 @keyframes fadeZoomIn {
-  from {
-    opacity: 0;
-    transform: scale(0.8);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-@media (max-width: 768px) {
-  #add-event-btn {
-    width: 48px;
-    height: 48px;
-    font-size: 1.6rem;
-    bottom: 1rem;
-    right: 1rem;
-  }
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /**************************************************************
- * 🗂️ LÉGENDE DES CATÉGORIES
+ * 🗂️ LÉGENDE
  **************************************************************/
 #legend {
   max-width: 900px;
@@ -374,7 +204,7 @@ body.dark .modal-content {
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(255,255,255,0.8);
+  background: rgba(255, 255, 255, 0.8);
   padding: 6px 10px;
   border-radius: 8px;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
@@ -389,11 +219,11 @@ body.dark .modal-content {
 .legend-color.pref { background: #E74C3C; }
 .legend-color.tour { background: #3498DB; }
 .legend-color.fta { background: #9B59B6; }
+
 @media (max-width: 600px) {
   #legend {
     gap: 6px;
     font-size: 0.8rem;
-    margin: 5px;
   }
   .legend-item {
     padding: 4px 8px;
