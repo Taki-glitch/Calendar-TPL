@@ -26,6 +26,40 @@ body.dark #planning {
 }
 
 /**************************************************************
+ * 🖼️ HEADER + LOGO
+ **************************************************************/
+header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 0;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+header .logo {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: contain;
+}
+
+header h1 {
+  font-size: 1.6rem;
+  color: #007bff;
+  margin: 0;
+}
+
+#theme-toggle {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+/**************************************************************
  * ⚠️ BANNIÈRE OFFLINE
  **************************************************************/
 #offline-banner {
@@ -107,9 +141,14 @@ body.dark #planning {
   border-radius: 50%;
 }
 
-.legend-item span {
-  display: inline-block;
-}
+/**************************************************************
+ * 🎨 COULEURS DES CATÉGORIES
+ **************************************************************/
+.legend-color.hotel { background: #FFD43B; }
+.legend-color.greneraie { background: #2ECC71; }
+.legend-color.pref { background: #E74C3C; }
+.legend-color.tour { background: #3498DB; }
+.legend-color.fta { background: #9B59B6; }
 
 /**************************************************************
  * ➕ BOUTON FLOTTANT “+”
@@ -139,7 +178,7 @@ body.dark #planning {
   background: #0056b3;
 }
 
-/* ✅ Fix mobile (ne plus être recouvert par le calendrier) */
+/* ✅ Fix mobile */
 @media (max-width: 768px) {
   #add-event-btn {
     bottom: 1rem;
@@ -152,7 +191,7 @@ body.dark #planning {
 }
 
 /**************************************************************
- * 🪟 MODALE D’AJOUT / MODIFICATION D’ÉVÉNEMENT
+ * 🪟 MODALE
  **************************************************************/
 .modal {
   position: fixed;
@@ -191,7 +230,7 @@ body.dark #planning {
 }
 
 /**************************************************************
- * 📝 CHAMPS DE FORMULAIRE
+ * 📝 CHAMPS
  **************************************************************/
 .modal-content label {
   font-weight: 600;
@@ -216,14 +255,15 @@ body.dark #planning {
 /**************************************************************
  * 🔘 BOUTONS DE MODALE
  **************************************************************/
-.modal-actions {
+.modal-actions,
+.modal-buttons {
   display: flex;
   justify-content: space-between;
   margin-top: 15px;
   gap: 10px;
 }
 
-.modal-actions .btn {
+.modal-buttons button {
   flex: 1;
   padding: 12px;
   border-radius: 8px;
@@ -233,72 +273,29 @@ body.dark #planning {
   font-size: 1rem;
 }
 
-.modal-actions .btn.primary {
+#save-event {
   background: #007bff;
   color: white;
 }
 
-.modal-actions .btn.secondary {
+#cancel-event {
   background: #888;
   color: white;
 }
 
-.modal-actions .btn:hover {
+.modal-buttons button:hover {
   opacity: 0.9;
-}
-
-/**************************************************************
- * 📱 RESPONSIVE
- **************************************************************/
-@media (max-width: 900px) {
-  #planning {
-    margin: 10px;
-    padding: 10px;
-  }
-
-  .fc-toolbar-title {
-    font-size: 1.1em;
-  }
-}
-
-@media (max-width: 600px) {
-  .modal-content {
-    max-width: 95%;
-    padding: 15px;
-  }
-
-  .modal-actions .btn {
-    padding: 10px;
-    font-size: 1em;
-  }
-
-  #legend {
-    flex-direction: column;
-    align-items: center;
-  }
 }
 
 /**************************************************************
  * 🌈 ANIMATIONS
  **************************************************************/
 @keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
