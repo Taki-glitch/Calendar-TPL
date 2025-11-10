@@ -1,187 +1,243 @@
-/******************************************************************
- * 📅 PLANNING TPL — Script principal
- * - Gère l'affichage du calendrier
- * - Synchronise avec Google Apps Script via proxy Cloudflare
- * - Supporte le mode hors ligne et les ajouts d’événements
- ******************************************************************/
+/**************************************************************
+ * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline)
+ * ------------------------------------------------------------
+ * - Charge les données via ton proxy Cloudflare Workers
+ * - Sauvegarde via le même proxy
+ * - Stocke localement en cas de déconnexion
+ * - Gère les thèmes clair/sombre et le bouton d’ajout mobile
+ **************************************************************/
 
-const API_URL =
-  "https://fancy-band-a66d.tsqdevin.workers.dev/?url=https://script.google.com/macros/s/AKfycbySRUailaKz0w_hRizFPOyUV79h5OUsLjdmb8S2WENKfAKm1rcfCq7Jn_W5uLGp2Jck/exec";
+// 🌐 URLs
+const GAS_URL =
+  "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
+const PROXY_URL =
+  "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" +
+  encodeURIComponent(GAS_URL);
 
-const planningEl = document.getElementById("planning");
-const loader = document.getElementById("loader");
-const offlineBanner = document.getElementById("offline-banner");
-const addEventBtn = document.getElementById("add-event-btn");
-const eventModal = document.getElementById("event-modal");
-const modalTitle = document.getElementById("modal-title");
-const eventTitle = document.getElementById("event-title");
-const eventStart = document.getElementById("event-start");
-const eventEnd = document.getElementById("event-end");
-const eventCategory = document.getElementById("event-category");
-const saveEventBtn = document.getElementById("save-event");
-const cancelEventBtn = document.getElementById("cancel-event");
-
-let calendar;
+const OFFLINE_BANNER = document.getElementById("offline-banner");
+const ADD_EVENT_BTN = document.getElementById("add-event-btn");
 let isOffline = !navigator.onLine;
+let calendar = null;
 
-/******************************************************************
- * 🌐 GESTION DU MODE HORS LIGNE
- ******************************************************************/
-function updateOnlineStatus() {
-  if (navigator.onLine) {
-    isOffline = false;
-    offlineBanner.classList.add("hidden");
-  } else {
-    isOffline = true;
-    offlineBanner.classList.remove("hidden");
-  }
-}
+/**************************************************************
+ * 🔌 Gestion de la connexion
+ **************************************************************/
+window.addEventListener("online", () => {
+  isOffline = false;
+  OFFLINE_BANNER?.classList.add("hidden");
+  chargerPlanning();
+});
 
-// Détection immédiate + vérification retardée (pour iPhone/Safari)
-window.addEventListener("online", updateOnlineStatus);
-window.addEventListener("offline", updateOnlineStatus);
-setTimeout(updateOnlineStatus, 800);
+window.addEventListener("offline", () => {
+  isOffline = true;
+  OFFLINE_BANNER?.classList.remove("hidden");
+});
 
-/******************************************************************
- * 🔄 CHARGEMENT DES ÉVÉNEMENTS
- ******************************************************************/
+/**************************************************************
+ * 🔁 Chargement du planning
+ **************************************************************/
 async function chargerPlanning() {
+  const loader = document.getElementById("loader");
+  loader.textContent = isOffline
+    ? "Mode hors ligne — affichage des données locales..."
+    : "Chargement du calendrier...";
   loader.classList.remove("hidden");
 
-  try {
-    const response = await fetch(API_URL);
-    if (!response.ok) throw new Error("Erreur réseau");
-    const data = await response.json();
+  let events = [];
 
-    afficherPlanning(data);
+  if (isOffline) {
+    events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
     loader.classList.add("hidden");
-  } catch (err) {
-    console.error("❌ Échec du chargement du planning :", err);
-    loader.classList.add("hidden");
-    if (!isOffline) {
-      alert("Erreur de chargement du planning. Vérifie ta connexion.");
+    if (calendar) {
+      calendar.removeAllEvents();
+      calendar.addEventSource(events);
+    } else {
+      renderCalendar(events);
     }
+    return;
   }
+
+  try {
+    const res = await fetch(PROXY_URL, { method: "GET", mode: "cors" });
+    if (!res.ok) throw new Error(`Erreur HTTP: ${res.status} ${res.statusText}`);
+    const data = await res.json();
+    if (data.status === "error") throw new Error(`Erreur Apps Script: ${data.message}`);
+    events = data;
+    localStorage.setItem("tplEvents", JSON.stringify(events));
+  } catch (err) {
+    console.error("❌ Erreur de chargement:", err);
+    loader.textContent = `❌ Échec du chargement (${err.message})`;
+    events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  }
+
+  loader.classList.add("hidden");
+  renderCalendar(events);
 }
 
-/******************************************************************
- * 🗓️ AFFICHAGE DU CALENDRIER
- ******************************************************************/
-function afficherPlanning(data) {
+/**************************************************************
+ * 📅 Rendu FullCalendar
+ **************************************************************/
+function renderCalendar(events) {
+  const calendarEl = document.getElementById("planning");
+  if (!calendarEl) return;
+
   if (calendar) calendar.destroy();
 
-  const isMobile = window.innerWidth < 768;
-  const views = isMobile
-    ? { default: "timeGridWeek", fallback: "listWeek" }
-    : { default: "dayGridMonth", fallback: "timeGridWeek" };
+  const isMobile = window.matchMedia("(max-width: 768px)").matches;
 
-  calendar = new FullCalendar.Calendar(planningEl, {
+  calendar = new FullCalendar.Calendar(calendarEl, {
     locale: "fr",
-    height: "auto",
-    initialView: views.default,
+    initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
     headerToolbar: {
       left: "prev,next today",
       center: "title",
-      right: isMobile
-        ? "timeGridWeek,listWeek"
-        : "dayGridMonth,timeGridWeek,listWeek",
+      right: isMobile ? "timeGridWeek,listWeek" : "dayGridMonth,timeGridWeek,listWeek",
     },
-    buttonText: {
-      today: "Aujourd’hui",
-      month: "Mois",
-      week: "Semaine",
-      list: "Planning",
+    height: "auto",
+    selectable: true,
+    editable: true,
+    events: events.map((event) => {
+      const color = getCategoryColor(event.category);
+      return {
+        id: String(event.id),
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        allDay: event.allDay === true,
+        backgroundColor: color,
+        borderColor: color,
+        textColor: "#fff",
+        extendedProps: { category: event.category },
+      };
+    }),
+
+    // Sélection d’un créneau vide
+    select: (info) => openEventModal(null, info.startStr, info.endStr),
+
+    // Clic sur un événement existant
+    eventClick: (info) => {
+      const ev = info.event;
+      openEventModal({
+        id: ev.id,
+        title: ev.title,
+        start: ev.startStr,
+        end: ev.endStr,
+        category: ev.extendedProps.category,
+        allDay: ev.allDay,
+      });
     },
-    events: data.map((evt) => ({
-      title: evt.title,
-      start: evt.start,
-      end: evt.end,
-      backgroundColor: getCategoryColor(evt.category),
-      borderColor: getCategoryColor(evt.category),
-    })),
-    dateClick(info) {
-      openEventModal(info.dateStr);
-    },
+
+    eventDrop: (info) => saveEvent(eventToData(info.event)),
+    eventResize: (info) => saveEvent(eventToData(info.event)),
   });
 
   calendar.render();
 }
 
-/******************************************************************
- * 🎨 COULEURS DES CATÉGORIES
- ******************************************************************/
-function getCategoryColor(category) {
-  const colors = {
-    "Hôtel-Dieu": "#FFD43B",
-    "Gréneraie/Resto du Cœur": "#2ECC71",
-    Préfecture: "#E74C3C",
-    "Tour de Bretagne": "#3498DB",
-    "France Terre d’Asile": "#9B59B6",
-  };
-  return colors[category] || "#7f8c8d";
-}
+/**************************************************************
+ * 🪟 Modale d’ajout / édition
+ **************************************************************/
+function openEventModal(event = null, start = null, end = null) {
+  const modal = document.getElementById("event-modal");
+  const titleInput = document.getElementById("event-title");
+  const startInput = document.getElementById("event-start");
+  const endInput = document.getElementById("event-end");
+  const categorySelect = document.getElementById("event-category");
+  const saveBtn = document.getElementById("save-event");
+  const cancelBtn = document.getElementById("cancel-event");
 
-/******************************************************************
- * 🪟 MODALE D’AJOUT D’ÉVÉNEMENT
- ******************************************************************/
-function openEventModal(dateStr) {
-  modalTitle.textContent = "Nouvel événement";
-  eventTitle.value = "";
-  eventStart.value = dateStr ? dateStr.slice(0, 16) : "";
-  eventEnd.value = "";
-  eventCategory.value = "Hôtel-Dieu";
-  eventModal.classList.remove("hidden");
-}
+  modal.classList.remove("hidden");
+  document.getElementById("modal-title").textContent = event ? "Modifier l’événement" : "Nouvel événement";
 
-function closeEventModal() {
-  eventModal.classList.add("hidden");
-}
+  titleInput.value = event?.title || "";
+  startInput.value = event?.start || start || "";
+  endInput.value = event?.end || end || "";
+  categorySelect.value = event?.category || "Hôtel-Dieu";
 
-saveEventBtn.addEventListener("click", async () => {
-  const title = eventTitle.value.trim();
-  const start = eventStart.value;
-  const end = eventEnd.value;
-  const category = eventCategory.value;
+  saveBtn.onclick = () => {
+    const newEvent = {
+      id: event?.id || crypto.randomUUID(),
+      title: titleInput.value.trim() || "Sans titre",
+      start: startInput.value,
+      end: endInput.value,
+      allDay: false,
+      category: categorySelect.value,
+    };
 
-  if (!title || !start) {
-    alert("Veuillez remplir au moins le titre et la date de début.");
-    return;
-  }
-
-  const newEvent = {
-    title,
-    start,
-    end,
-    category,
-    backgroundColor: getCategoryColor(category),
-  };
-
-  calendar.addEvent(newEvent);
-  closeEventModal();
-
-  if (!isOffline) {
-    try {
-      await fetch(API_URL, {
-        method: "POST",
-        body: JSON.stringify(newEvent),
-        headers: { "Content-Type": "application/json" },
+    if (calendar) {
+      const existing = calendar.getEventById(newEvent.id);
+      if (existing) existing.remove();
+      calendar.addEvent({
+        ...newEvent,
+        backgroundColor: getCategoryColor(newEvent.category),
+        borderColor: getCategoryColor(newEvent.category),
+        textColor: "#fff",
       });
-      console.log("✅ Événement enregistré sur le serveur");
-    } catch (e) {
-      console.warn("⚠️ Échec de l’envoi au serveur, stocké localement");
     }
-  } else {
-    console.log("📦 Événement enregistré localement (offline)");
+
+    saveEvent(newEvent);
+    modal.classList.add("hidden");
+  };
+
+  cancelBtn.onclick = () => modal.classList.add("hidden");
+}
+
+/**************************************************************
+ * 💾 Sauvegarde / suppression
+ **************************************************************/
+function eventToData(event) {
+  return {
+    id: event.id,
+    title: event.title,
+    start: event.startStr,
+    end: event.end ? event.end.toISOString().substring(0, 10) : event.endStr,
+    allDay: event.allDay,
+    category: event.extendedProps.category || "Hôtel-Dieu",
+  };
+}
+
+async function saveEvent(event) {
+  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  const i = saved.findIndex((e) => e.id === event.id);
+  if (i >= 0) saved[i] = event;
+  else saved.push(event);
+  localStorage.setItem("tplEvents", JSON.stringify(saved));
+
+  if (isOffline) return;
+
+  try {
+    await fetch(PROXY_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ mode: "patch", data: [event] }),
+      mode: "cors",
+    });
+  } catch (err) {
+    console.warn("⚠️ Sauvegarde différée (hors ligne ou erreur proxy)");
   }
-});
+}
 
-cancelEventBtn.addEventListener("click", closeEventModal);
+/**************************************************************
+ * 🎨 Couleurs par catégorie
+ **************************************************************/
+function getCategoryColor(category) {
+  switch (category) {
+    case "Hôtel-Dieu": return "#FFD43B";
+    case "Gréneraie/Resto du Cœur": return "#2ECC71";
+    case "Préfecture": return "#E74C3C";
+    case "Tour de Bretagne": return "#3498DB";
+    case "France Terre d’Asile": return "#9B59B6";
+    default: return "#7f8c8d";
+  }
+}
 
-/******************************************************************
- * ⚡ INITIALISATION
- ******************************************************************/
+/**************************************************************
+ * 🚀 Initialisation
+ **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
   chargerPlanning();
-  addEventBtn.addEventListener("click", () => openEventModal());
-  updateOnlineStatus();
+
+  ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
+
+  if (isOffline) OFFLINE_BANNER?.classList.remove("hidden");
 });
