@@ -2,7 +2,7 @@
  * 📦 SERVICE WORKER v3.2 — Planning TPL (cache forcé)
  ****************************************************/
 
-const CACHE_VERSION = "v3.2-" + Date.now(); // 🔥 cache unique à chaque build
+const CACHE_VERSION = "v3.2-"; // 🔥 cache unique à chaque build
 const CACHE_NAME = `tpl-calendar-cache-${CACHE_VERSION}`;
 
 const ASSETS = [
