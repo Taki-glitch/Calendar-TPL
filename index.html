@@ -10,16 +10,6 @@
   <link rel="apple-touch-icon" sizes="180x180" href="tpl-logo.png" />
   <meta name="theme-color" content="#007bff" />
 
-  <!-- ⚠️ FullCalendar CSS supprimés (inutiles depuis v6.1.10)
-       Les fichiers .css séparés n'existent plus sur le CDN,
-       les styles sont désormais intégrés directement dans les JS globaux.
-       
-       Exemple des anciens liens (génèrent des 404) :
-       <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css" rel="stylesheet" />
-       <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css" rel="stylesheet" />
-       <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css" rel="stylesheet" />
-  -->
-
   <!-- ✅ FullCalendar JS (avec styles intégrés) -->
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js"></script>
@@ -42,6 +32,7 @@
   <header>
     <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
     <h1>Planning TPL</h1>
+    <button id="theme-toggle" aria-label="Changer de thème">🌙</button>
   </header>
 
   <!-- ⚠️ Bannière mode hors ligne -->
