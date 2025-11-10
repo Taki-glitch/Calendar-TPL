@@ -278,3 +278,138 @@ body.dark .modal-content {
     right: 1rem;
   }
 }
+
+/**************************************************************
+ * 🪟 MODALE D’ÉVÉNEMENT
+ **************************************************************/
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+.modal.hidden {
+  display: none;
+}
+.modal-content {
+  background: var(--card-bg, #fff);
+  color: var(--text-color, #333);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  padding: 20px;
+  width: 90%;
+  max-width: 380px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.modal-content h2 {
+  margin-top: 0;
+  text-align: center;
+  font-size: 1.4rem;
+}
+.modal-content label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+.modal-content input,
+.modal-content select {
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 0.95rem;
+}
+.modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+.btn {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn.primary {
+  background: var(--accent, #007bff);
+  color: #fff;
+}
+.btn.secondary {
+  background: #ccc;
+  color: #333;
+}
+
+/**************************************************************
+ * 🎨 SÉLECTEUR DE CATÉGORIE
+ **************************************************************/
+.category-select {
+  width: 100%;
+  padding: 8px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: var(--card-bg, #fff);
+  color: var(--text-color, #333);
+  cursor: pointer;
+}
+.category-select option {
+  padding-left: 28px;
+  position: relative;
+}
+.category-select option::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--option-color, #888);
+}
+.category-select option[value="Hôtel-Dieu"]::before { background-color: #FFD43B; }
+.category-select option[value="Gréneraie/Resto du Cœur"]::before { background-color: #2ECC71; }
+.category-select option[value="Préfecture"]::before { background-color: #E74C3C; }
+.category-select option[value="Tour de Bretagne"]::before { background-color: #3498DB; }
+.category-select option[value="France Terre d’Asile"]::before { background-color: #9B59B6; }
+
+/**************************************************************
+ * ➕ BOUTON FLOTTANT
+ **************************************************************/
+.floating-btn {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent, #007bff);
+  color: #fff;
+  font-size: 2rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+.floating-btn:hover {
+  transform: scale(1.1);
+}
+
+/**************************************************************
+ * ⚠️ BANNIÈRE OFFLINE
+ **************************************************************/
+#offline-banner {
+  background: #ffc107;
+  color: #333;
+  text-align: center;
+  padding: 8px;
+  font-weight: 600;
+}
+.hidden {
+  display: none !important;
+}
