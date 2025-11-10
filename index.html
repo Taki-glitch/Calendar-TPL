@@ -29,7 +29,7 @@
   </div>
 
   <!-- 🔄 Indicateur de chargement -->
-  <div id="loader" class="loader">Chargement du calendrier...</div>
+  <div id="loader" class="loader hidden">Chargement du calendrier...</div>
 
   <!-- 📅 Conteneur du calendrier -->
   <div id="planning"></div>
@@ -49,23 +49,23 @@
       <input type="datetime-local" id="event-end" />
 
       <label for="event-category">Catégorie :</label>
-      <select id="event-category">
-        <option>Hôtel-Dieu</option>
-        <option>Gréneraie/Resto du Cœur</option>
-        <option>Préfecture</option>
-        <option>Tour de Bretagne</option>
-        <option>France Terre d’Asile</option>
+      <select id="event-category" class="category-select">
+        <option value="Hôtel-Dieu" data-color="#FFD43B">🟡 Hôtel-Dieu</option>
+        <option value="Gréneraie/Resto du Cœur" data-color="#2ECC71">🟢 Gréneraie / Resto du Cœur</option>
+        <option value="Préfecture" data-color="#E74C3C">🔴 Préfecture</option>
+        <option value="Tour de Bretagne" data-color="#3498DB">🔵 Tour de Bretagne</option>
+        <option value="France Terre d’Asile" data-color="#9B59B6">🟣 France Terre d’Asile</option>
       </select>
 
-      <div class="modal-buttons">
-        <button id="save-event" class="btn-primary">💾 Enregistrer</button>
-        <button id="cancel-event" class="btn-secondary">Annuler</button>
+      <div class="modal-actions">
+        <button id="save-event" class="btn primary">💾 Enregistrer</button>
+        <button id="cancel-event" class="btn secondary">Annuler</button>
       </div>
     </div>
   </div>
 
   <!-- ➕ Bouton flottant d’ajout d’événement -->
-  <button id="add-event-btn">＋</button>
+  <button id="add-event-btn" class="floating-btn">＋</button>
 
   <!-- 📜 FullCalendar JS -->
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js"></script>
