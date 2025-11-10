@@ -5,154 +5,196 @@ body {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   background-color: #f5f7fb;
   margin: 0;
-  padding: 0;
   color: #333;
-  overflow-x: hidden;
-  transition: background-color 0.5s ease, color 0.5s ease;
-}
-
-body.dark {
-  background-color: #1a1d21;
-  color: #e5e5e5;
-}
-
-body.dark header {
-  background-color: #121417;
-}
-
-body.dark #planning {
-  background-color: #22252b;
-  color: #e5e5e5;
 }
 
 /**************************************************************
- * ⚠️ BANNIÈRE OFFLINE
+ * 🧭 EN-TÊTE
+ **************************************************************/
+header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #007bff;
+  color: white;
+  padding: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  text-align: center;
+}
+header .logo {
+  width: 48px;
+  height: 48px;
+  margin-right: 10px;
+  border-radius: 50%;
+}
+header h1 {
+  font-size: 1.5em;
+  margin: 5px 0;
+}
+
+/**************************************************************
+ * ☀️🌙 BOUTON THÈME CLAIR/SOMBRE
+ **************************************************************/
+#theme-toggle {
+  margin-left: auto;
+  background: none;
+  border: none;
+  font-size: 1.4em;
+  cursor: pointer;
+  color: white;
+  transition: opacity 0.3s ease;
+}
+#theme-toggle:hover {
+  opacity: 0.8;
+}
+
+/**************************************************************
+ * 📅 CONTENEUR CALENDRIER
+ **************************************************************/
+#planning {
+  max-width: 900px;
+  margin: 30px auto;
+  background: white;
+  padding: 15px;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/**************************************************************
+ * ⚠️ BANNIÈRE HORS LIGNE
  **************************************************************/
 #offline-banner {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  background-color: #dc3545;
-  color: white;
+  background: #ffc107;
+  color: #333;
   text-align: center;
   padding: 8px;
   font-weight: 600;
-  z-index: 3000;
-  transition: transform 0.3s ease-in-out;
+  z-index: 2000;
 }
-
 .hidden {
-  transform: translateY(100%);
+  display: none !important;
 }
 
 /**************************************************************
- * 🔄 INDICATEUR DE CHARGEMENT
+ * 🌗 THÈMES CLAIR / SOMBRE
+ **************************************************************/
+:root {
+  --bg-light: #f5f7fb;
+  --text-light: #333;
+  --bg-dark: #1a1d21;
+  --text-dark: #e5e5e5;
+  --primary: #007bff;
+  --accent: #007bff;
+}
+body.light {
+  background-color: var(--bg-light);
+  color: var(--text-light);
+}
+body.dark {
+  background-color: var(--bg-dark);
+  color: var(--text-dark);
+}
+body.dark header {
+  background-color: #121417;
+  color: var(--text-dark);
+}
+body.dark #planning {
+  background-color: #22252b;
+  color: var(--text-dark);
+}
+
+/**************************************************************
+ * 📱 RESPONSIVE DESIGN
+ **************************************************************/
+@media (max-width: 900px) {
+  header {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 10px 15px;
+  }
+  header h1 {
+    font-size: 1.2em;
+  }
+  #planning {
+    margin: 10px;
+    padding: 10px;
+  }
+}
+@media (max-width: 600px) {
+  header .logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 6px;
+  }
+  #theme-toggle {
+    font-size: 1.2em;
+  }
+  .fc-toolbar-title {
+    font-size: 1.1em;
+  }
+  #planning {
+    margin: 5px;
+    padding: 8px;
+  }
+}
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/**************************************************************
+ * 🌀 TOOLBAR COMPACTE FULLCALENDAR
+ **************************************************************/
+.fc-header-toolbar {
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  justify-content: center !important;
+}
+.fc-toolbar-chunk {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+.fc-button {
+  padding: 4px 6px !important;
+  font-size: 0.8em !important;
+}
+
+/**************************************************************
+ * 🌀 INDICATEUR DE CHARGEMENT
  **************************************************************/
 #loader {
   position: fixed;
-  top: 60px;
+  top: 70px;
   left: 50%;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.9);
   color: #007bff;
   padding: 8px 14px;
   border-radius: 8px;
   font-weight: 500;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   transition: opacity 0.4s ease;
-  z-index: 2500;
+  z-index: 2000;
 }
-
+body.dark #loader {
+  background: rgba(30, 30, 30, 0.9);
+  color: #5ca9ff;
+}
 #loader.hidden {
   opacity: 0;
   pointer-events: none;
 }
 
 /**************************************************************
- * 📅 CALENDRIER
- **************************************************************/
-#planning {
-  max-width: 900px;
-  margin: 20px auto 80px auto;
-  background: white;
-  border-radius: 12px;
-  padding: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-/**************************************************************
- * 🎨 LÉGENDE DES CATÉGORIES
- **************************************************************/
-#legend {
-  max-width: 900px;
-  margin: 10px auto 20px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  font-size: 0.9em;
-}
-
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.legend-color {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-}
-
-.legend-item span {
-  display: inline-block;
-}
-
-/**************************************************************
- * ➕ BOUTON FLOTTANT “+”
- **************************************************************/
-#add-event-btn {
-  position: fixed;
-  bottom: 1.6rem;
-  right: 1.6rem;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #007bff;
-  color: white;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-  z-index: 5000;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.25s ease, background 0.3s ease;
-}
-
-#add-event-btn:hover {
-  transform: scale(1.1);
-  background: #0056b3;
-}
-
-/* ✅ Fix mobile (ne plus être recouvert par le calendrier) */
-@media (max-width: 768px) {
-  #add-event-btn {
-    bottom: 1rem;
-    right: 1rem;
-    width: 52px;
-    height: 52px;
-    font-size: 1.8rem;
-    z-index: 6000;
-  }
-}
-
-/**************************************************************
- * 🪟 MODALE D’AJOUT / MODIFICATION D’ÉVÉNEMENT
+ * 🪟 MODALE D’ÉVÉNEMENT
  **************************************************************/
 .modal {
   position: fixed;
@@ -161,144 +203,130 @@ body.dark #planning {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 7000;
-  animation: fadeIn 0.25s ease;
+  z-index: 9999;
   backdrop-filter: blur(4px);
 }
-
 .modal.hidden {
   display: none;
 }
-
 .modal-content {
-  background: white;
-  border-radius: 14px;
+  background: var(--card-bg, #fff);
+  color: var(--text-color, #333);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
   padding: 20px;
   width: 90%;
-  max-width: 400px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+  max-width: 380px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  animation: slideUp 0.3s ease;
 }
-
+body.dark .modal-content {
+  background: #2a2d33;
+  color: var(--text-dark);
+}
 .modal-content h2 {
   margin-top: 0;
   text-align: center;
-  color: #007bff;
   font-size: 1.4rem;
+  color: var(--primary);
 }
-
-/**************************************************************
- * 📝 CHAMPS DE FORMULAIRE
- **************************************************************/
 .modal-content label {
   font-weight: 600;
   font-size: 0.95rem;
 }
-
 .modal-content input,
 .modal-content select {
-  padding: 10px;
+  padding: 8px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  font-size: 1rem;
-  box-sizing: border-box;
-  width: 100%;
+  font-size: 0.95rem;
 }
-
-.modal-content select {
-  background: #fff;
-  cursor: pointer;
-}
-
-/**************************************************************
- * 🔘 BOUTONS DE MODALE
- **************************************************************/
 .modal-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
-  gap: 10px;
+  margin-top: 12px;
 }
-
-.modal-actions .btn {
-  flex: 1;
-  padding: 12px;
+.btn {
+  padding: 8px 14px;
+  border: none;
   border-radius: 8px;
   font-weight: 600;
+  cursor: pointer;
+}
+.btn.primary {
+  background: var(--accent);
+  color: #fff;
+}
+.btn.secondary {
+  background: #ccc;
+  color: #333;
+}
+
+/**************************************************************
+ * 🎨 SÉLECTEUR DE CATÉGORIE COLORÉ
+ **************************************************************/
+.category-select {
+  width: 100%;
+  padding: 8px;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: var(--card-bg, #fff);
+  color: var(--text-color, #333);
+  cursor: pointer;
+}
+.category-select option {
+  padding-left: 28px;
+  position: relative;
+}
+.category-select option::before {
+  content: "";
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background-color: var(--option-color, #888);
+}
+.category-select option[value="Hôtel-Dieu"]::before { background-color: #FFD43B; }
+.category-select option[value="Gréneraie/Resto du Cœur"]::before { background-color: #2ECC71; }
+.category-select option[value="Préfecture"]::before { background-color: #E74C3C; }
+.category-select option[value="Tour de Bretagne"]::before { background-color: #3498DB; }
+.category-select option[value="France Terre d’Asile"]::before { background-color: #9B59B6; }
+
+/**************************************************************
+ * ➕ BOUTON FLOTTANT
+ **************************************************************/
+.floating-btn {
+  position: fixed;
+  bottom: 22px;
+  right: 22px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  font-size: 2rem;
   border: none;
   cursor: pointer;
-  font-size: 1rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
-.modal-actions .btn.primary {
-  background: #007bff;
-  color: white;
+.floating-btn:hover {
+  transform: scale(1.1);
 }
-
-.modal-actions .btn.secondary {
-  background: #888;
-  color: white;
-}
-
-.modal-actions .btn:hover {
-  opacity: 0.9;
-}
-
-/**************************************************************
- * 📱 RESPONSIVE
- **************************************************************/
-@media (max-width: 900px) {
-  #planning {
-    margin: 10px;
-    padding: 10px;
-  }
-
-  .fc-toolbar-title {
-    font-size: 1.1em;
-  }
-}
-
-@media (max-width: 600px) {
-  .modal-content {
-    max-width: 95%;
-    padding: 15px;
-  }
-
-  .modal-actions .btn {
-    padding: 10px;
-    font-size: 1em;
-  }
-
-  #legend {
-    flex-direction: column;
-    align-items: center;
-  }
-}
-
-/**************************************************************
- * 🌈 ANIMATIONS
- **************************************************************/
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-
-  to {
-    opacity: 1;
-  }
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateY(0);
-    opacity: 1;
+@media (max-width: 768px) {
+  .floating-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.6rem;
+    bottom: 1rem;
+    right: 1rem;
   }
 }
