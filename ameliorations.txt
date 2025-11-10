@@ -1,0 +1,22 @@
+🎨 Améliorations visuelles
+Thème clair/sombre
+Affichage plus compact ou en mode semaine/jour
+Indicateurs de catégories colorés
+
+⚙️ Améliorations fonctionnelles
+Ajout/modification/suppression d’événements directement depuis l’interface
+Tri ou recherche dans le planning
+Filtrage par catégorie ou par période
+
+☁️ Optimisations backend
+Meilleure gestion des erreurs (proxy + Apps Script)
+Caching du planning côté navigateur
+Optimisation des requêtes fetch()
+
+📱 Compatibilité
+Responsive sur mobile/tablette
+Icône d’application / PWA complète
+
+🔒 Sécurité et stabilité
+Limiter les accès (clé API)
+Vérification de données côté GAS
