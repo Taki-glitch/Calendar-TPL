@@ -1,8 +1,7 @@
 /**************************************************************
- * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline + Modales)
+ * 📅 script.js — Planning TPL (avec bouton flottant + modales)
  **************************************************************/
 
-// 🌐 URLs
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
 const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 
@@ -12,7 +11,7 @@ let calendar = null;
 let currentEditingEvent = null;
 
 /**************************************************************
- * 🔌 Gestion de la connexion
+ * 🔌 Connexion
  **************************************************************/
 window.addEventListener("online", () => {
   isOffline = false;
@@ -25,7 +24,7 @@ window.addEventListener("offline", () => {
 });
 
 /**************************************************************
- * 🔁 Chargement du planning
+ * 🔁 Chargement
  **************************************************************/
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
@@ -78,12 +77,11 @@ async function chargerPlanning() {
 }
 
 /**************************************************************
- * 📅 Rendu FullCalendar
+ * 📅 Rendu
  **************************************************************/
 function renderCalendar(events) {
   const calendarEl = document.getElementById("planning");
   if (!calendarEl) return;
-
   if (calendar) calendar.destroy();
 
   calendar = new FullCalendar.Calendar(calendarEl, {
@@ -108,20 +106,15 @@ function renderCalendar(events) {
       extendedProps: { category: event.category },
     })),
 
-    // ✏️ Clic sur un événement → modale d’édition
     eventClick(info) {
       openEditModal(info.event);
     },
-
-    // ⤴️ Déplacement ou redimensionnement
     eventDrop(info) {
       saveEvent(eventToData(info.event));
     },
     eventResize(info) {
       saveEvent(eventToData(info.event));
     },
-
-    // ➕ Sélection pour créer un nouvel événement
     select(info) {
       openEventModal(info.startStr, info.endStr);
       calendar.unselect();
@@ -132,7 +125,7 @@ function renderCalendar(events) {
 }
 
 /**************************************************************
- * 💾 Sauvegarde & suppression
+ * 💾 Données
  **************************************************************/
 function eventToData(event) {
   return {
@@ -193,7 +186,7 @@ async function deleteEvent(id) {
 }
 
 /**************************************************************
- * 🎨 Couleurs par catégorie
+ * 🎨 Couleurs
  **************************************************************/
 function getCategoryColor(category) {
   switch (category) {
@@ -205,7 +198,7 @@ function getCategoryColor(category) {
 }
 
 /**************************************************************
- * 🪟 Modale tactile d’ajout
+ * 🪟 Modales
  **************************************************************/
 function openEventModal(start, end) {
   const modal = document.getElementById("event-modal");
@@ -248,9 +241,6 @@ function openEventModal(start, end) {
   };
 }
 
-/**************************************************************
- * 🪟 Modale d’édition / suppression
- **************************************************************/
 function openEditModal(event) {
   const modal = document.getElementById("event-modal");
   const titleInput = document.getElementById("event-title");
@@ -277,13 +267,11 @@ function openEditModal(event) {
   saveBtn.onclick = () => {
     const title = titleInput.value.trim();
     if (!title) return;
-
     event.setProp("title", title);
     event.setExtendedProp("category", categorySelect.value);
     event.setStart(startInput.value);
     event.setEnd(endInput.value);
     event.setProp("backgroundColor", getCategoryColor(categorySelect.value));
-
     saveEvent(eventToData(event));
     modal.classList.add("hidden");
   };
@@ -299,7 +287,16 @@ function openEditModal(event) {
 }
 
 /**************************************************************
- * 🚀 Initialisation
+ * ➕ Bouton flottant
+ **************************************************************/
+document.getElementById("add-event-btn").addEventListener("click", () => {
+  const now = new Date();
+  const later = new Date(now.getTime() + 60 * 60 * 1000);
+  openEventModal(now.toISOString(), later.toISOString());
+});
+
+/**************************************************************
+ * 🚀 Init
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
   chargerPlanning();
