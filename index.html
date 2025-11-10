@@ -3,14 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="description" content="Planning TPL — calendrier interactif, consultable hors ligne" />
+  <meta name="theme-color" content="#007bff" />
+  
   <title>Planning TPL</title>
 
-  <!-- 🔹 Icônes et thème -->
-  <link rel="icon" href="tpl-logo.png" />
-  <link rel="apple-touch-icon" sizes="180x180" href="tpl-logo.png" />
-  <meta name="theme-color" content="#007bff" />
+  <!-- 🧩 FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.css" rel="stylesheet">
 
-  <!-- ✅ FullCalendar JS (avec styles intégrés) -->
+  <!-- 🎨 Style principal -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- 🧭 Manifest PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="tpl-logo.png" type="image/png" />
+</head>
+
+<body>
+  <header>
+    <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
+    <h1>Planning TPL</h1>
+    <button id="theme-toggle" title="Changer le thème">🌓</button>
+  </header>
+
+  <main>
+    <div id="loader" class="hidden">Chargement du calendrier...</div>
+    <div id="planning"></div>
+    <div id="offline-banner" class="hidden">⚠️ Vous êtes hors ligne — les modifications seront enregistrées localement.</div>
+  </main>
+
+  <!-- 📅 FullCalendar (JS modules) -->
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.js"></script>
@@ -18,41 +43,29 @@
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/index.global.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js"></script>
 
-  <!-- ✅ Ton style personnalisé -->
-  <link rel="stylesheet" href="./style.css" />
+  <!-- 🚀 Script principal -->
+  <script src="script.js"></script>
 
-  <!-- 🧩 Manifest pour PWA -->
-  <link rel="manifest" href="./manifest.json" />
+  <!-- 🌗 Thème clair/sombre automatique -->
+  <script>
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('tplTheme');
+    document.body.classList.add(savedTheme || (prefersDark ? 'dark' : 'light'));
 
-  <!-- 🧠 Meta SEO -->
-  <meta name="description" content="Application de gestion de planning TPL connectée à Google Sheets." />
-</head>
+    document.getElementById('theme-toggle').addEventListener('click', () => {
+      const current = document.body.classList.contains('dark') ? 'dark' : 'light';
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.body.classList.replace(current, next);
+      localStorage.setItem('tplTheme', next);
+    });
+  </script>
 
-<body>
-  <header>
-    <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
-    <h1>Planning TPL</h1>
-    <button id="theme-toggle" aria-label="Changer de thème">🌙</button>
-  </header>
-
-  <!-- ⚠️ Bannière mode hors ligne -->
-  <div id="offline-banner" class="hidden">
-    ⚠️ Mode hors ligne activé — vos modifications seront synchronisées dès le retour de la connexion.
-  </div>
-
-  <!-- 📅 Zone principale -->
-  <div id="loader">Chargement du calendrier...</div>
-  <div id="planning"></div>
-
-  <!-- ✅ Script principal -->
-  <script src="./script.js"></script>
-
-  <!-- ✅ Enregistrement du Service Worker -->
+  <!-- 🧱 Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./service-worker.js')
-        .then(() => console.log("✅ Service Worker enregistré"))
-        .catch(err => console.warn("⚠️ Service Worker non enregistré :", err));
+        .then(() => console.log('✅ Service Worker enregistré'))
+        .catch(err => console.warn('⚠️ Service Worker non enregistré :', err));
     }
   </script>
 </body>
