@@ -14,6 +14,9 @@ const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeU
 const OFFLINE_BANNER = document.getElementById("offline-banner");
 let isOffline = !navigator.onLine;
 
+// Variable globale pour le calendrier
+let calendar = null; 
+
 /**************************************************************
  * 🔌 Gestion de la connexion
  **************************************************************/
@@ -34,99 +37,162 @@ window.addEventListener("offline", () => {
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
   loader.textContent = isOffline
-    ? "Mode hors ligne — affichage du cache local"
-    : "Chargement du planning...";
+    ? "Mode hors ligne — affichage des données locales..."
+    : "Chargement du calendrier...";
 
-  try {
-    let data = [];
+  let events = [];
 
-    if (isOffline) {
-      const cached = localStorage.getItem("tplEvents");
-      data = cached ? JSON.parse(cached) : [];
+  if (isOffline) {
+    // 1. Mode hors ligne : charge depuis localStorage
+    events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+    loader.classList.add("hidden");
+    // Si le calendrier existe déjà, on le met à jour
+    if (calendar) {
+        calendar.removeAllEvents();
+        calendar.addEventSource(events);
     } else {
-      const res = await fetch(PROXY_URL, { mode: "cors" });
-      if (!res.ok) throw new Error("Réponse invalide du serveur");
-
-      const text = await res.text();
-      try {
-        data = JSON.parse(text || "[]");
-      } catch {
-        console.warn("⚠️ JSON invalide, réponse brute :", text);
-        data = [];
-      }
-
-      // Sauvegarde locale
-      localStorage.setItem("tplEvents", JSON.stringify(data));
+        renderCalendar(events);
     }
-
-    afficherPlanning(data);
-    loader.textContent = "Planning prêt ✅";
-  } catch (err) {
-    console.error("Erreur de chargement :", err);
-    loader.textContent = "⚠️ Erreur de connexion — affichage local";
-    const cached = localStorage.getItem("tplEvents");
-    if (cached) afficherPlanning(JSON.parse(cached));
-  }
-}
-
-/**************************************************************
- * 🗓️ FullCalendar
- **************************************************************/
-let calendar;
-
-function afficherPlanning(events) {
-  const el = document.getElementById("planning");
-
-  if (typeof FullCalendar === "undefined") {
-    document.getElementById("loader").textContent =
-      "Erreur : FullCalendar non chargé.";
     return;
   }
 
-  if (calendar) calendar.destroy();
+  // 2. Mode en ligne : charge via Cloudflare Proxy
+  try {
+    const res = await fetch(PROXY_URL, {
+      method: "GET",
+      mode: "cors",
+    });
 
-  calendar = new FullCalendar.Calendar(el, {
-    initialView: "dayGridMonth",
+    if (!res.ok) {
+        // Le proxy Cloudflare ou GAS a répondu avec un code d'erreur HTTP
+        throw new Error(`Erreur réseau: ${res.status} ${res.statusText}`);
+    }
+
+    const data = await res.json();
+    
+    if (data.status === "error") {
+        // L'erreur vient du Apps Script lui-même (ex: JSON contenant {status: "error", message: "..."})
+        throw new Error(`Erreur Apps Script: ${data.message || 'Erreur inconnue'}`);
+    }
+
+    events = data;
+
+    // Sauvegarde en cache local
+    localStorage.setItem("tplEvents", JSON.stringify(events));
+
+  } catch (err) {
+    console.error("❌ ERREUR DE CHARGEMENT DU CALENDRIER:", err);
+    loader.textContent = `❌ Échec du chargement. Vérifiez l'URL de votre Apps Script. Détail: ${err.message}`;
+    loader.classList.remove("hidden");
+    
+    // Tente de charger les données locales en cas d'erreur réseau
+    events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+    if (events.length > 0) {
+      loader.textContent += " (Affichage des données locales en dernier recours.)";
+    } else {
+      // Si aucune donnée locale, on sort
+      return; 
+    }
+  }
+
+  // 3. Affichage (en ligne ou après erreur résolue par cache local)
+  loader.classList.add("hidden");
+  renderCalendar(events);
+}
+
+/**************************************************************
+ * 📅 Rendu FullCalendar
+ **************************************************************/
+function renderCalendar(events) {
+  const calendarEl = document.getElementById("planning");
+  const loaderEl = document.getElementById("loader");
+
+  if (!calendarEl) {
+    console.error("Erreur: Élément #planning introuvable.");
+    return;
+  }
+
+  // S'assurer que le calendrier n'est pas déjà initialisé
+  if (calendar) {
+      calendar.destroy();
+  }
+
+  calendar = new FullCalendar.Calendar(calendarEl, {
     locale: "fr",
+    initialView: "dayGridMonth",
     headerToolbar: {
       left: "prev,next today",
       center: "title",
       right: "dayGridMonth,timeGridWeek,listWeek",
     },
-    selectable: true,
     editable: true,
-    events: events,
-    select: info => {
-      const title = prompt("Nom de l'événement :");
-      if (title) {
-        const event = {
-          id: crypto.randomUUID(),
-          title,
-          start: info.startStr,
-          end: info.endStr,
-          allDay: info.allDay,
-          category: "Autre",
-        };
-        calendar.addEvent(event);
-        saveEvent(event);
-      }
-      calendar.unselect();
+    selectable: true,
+    height: "auto", 
+    events: events.map(event => ({
+        // Assure que les clés FullCalendar sont bien typées
+        id: String(event.id),
+        title: event.title,
+        start: event.start,
+        end: event.end,
+        allDay: event.allDay === true, // 💡 Assure que c'est un booléen ici aussi, même si GAS le fait
+        backgroundColor: getCategoryColor(event.category)
+    })),
+
+    // ➡️ Gestion du clic sur un événement
+    eventClick: function (info) {
+        const event = info.event;
+        const newTitle = prompt("Modifier le titre de l'événement:", event.title);
+        
+        if (newTitle === null) return; // Annulation
+
+        if (newTitle.trim() === "") {
+             // Suppression si le titre est effacé
+            if (confirm("Voulez-vous supprimer cet événement ?")) {
+                event.remove();
+                deleteEvent(event.id);
+            }
+            return;
+        }
+
+        // Mise à jour du titre et de la couleur
+        event.setProp("title", newTitle);
+        event.setProp("backgroundColor", getCategoryColor(event.extendedProps.category));
+        
+        // Sauvegarde
+        saveEvent(eventToData(event));
     },
-    eventChange: info => {
-      saveEvent({
-        id: info.event.id,
-        title: info.event.title,
-        start: info.event.startStr,
-        end: info.event.endStr,
-        allDay: info.event.allDay,
-        category: info.event.extendedProps.category,
-      });
+
+    // ➡️ Gestion du déplacement/redimensionnement (drag & drop)
+    eventDrop: function (info) {
+        const event = info.event;
+        // La confirmation n'est pas nécessaire car l'action est délibérée par drag-and-drop
+        saveEvent(eventToData(event));
     },
-    eventClick: info => {
-      if (confirm(`Supprimer "${info.event.title}" ?`)) {
-        info.event.remove();
-        deleteEvent(info.event.id);
-      }
+
+    eventResize: function (info) {
+        const event = info.event;
+        saveEvent(eventToData(event));
+    },
+
+    // ➡️ Gestion de la sélection de date (ajout d'un nouvel événement)
+    select: function (info) {
+        const newTitle = prompt("Ajouter un nouvel événement (laisser vide pour annuler):");
+        if (newTitle) {
+            const newId = crypto.randomUUID(); // Génère un ID unique
+
+            const newEvent = {
+                id: newId,
+                title: newTitle,
+                start: info.startStr,
+                end: info.endStr,
+                allDay: info.allDay,
+                category: "Autre" // Catégorie par défaut
+            };
+
+            calendar.addEvent(newEvent);
+            saveEvent(newEvent);
+        }
+        calendar.unselect(); // Désélectionne la zone
     },
   });
 
@@ -134,10 +200,32 @@ function afficherPlanning(events) {
 }
 
 /**************************************************************
- * 💾 Sauvegarde et suppression
+ * 💾 Sauvegarde des données
  **************************************************************/
+
+function eventToData(event) {
+    const data = {
+        id: event.id,
+        title: event.title,
+        start: event.startStr,
+        // FullCalendar ne fournit pas event.endStr si c'est allDay, donc on utilise event.end
+        end: event.end ? event.end.toISOString().substring(0, 10) : event.endStr, 
+        allDay: event.allDay,
+        category: event.extendedProps.category || "Autre"
+    };
+    
+    // Gérer le cas où end est null/undefined
+    if (!data.end) {
+        delete data.end;
+    }
+
+    return data;
+}
+
+
 async function saveEvent(event) {
-  const saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  // Sauvegarde toujours la nouvelle version dans le cache local
+  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
   const index = saved.findIndex(e => e.id === event.id);
 
   if (index >= 0) saved[index] = event;
@@ -156,10 +244,16 @@ async function saveEvent(event) {
       body: JSON.stringify({ mode: "patch", data: [event] }),
       mode: "cors",
     });
-    if (!res.ok) throw new Error("Erreur HTTP " + res.status);
+    
+    // Vérification stricte de la réponse du serveur
+    if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+    const result = await res.json();
+    if (result.status === "error") throw new Error(`Erreur Apps Script: ${result.message}`);
+
     console.log("✅ Sauvegardé :", event.title);
   } catch (err) {
-    console.warn("⚠️ Sauvegarde reportée (erreur proxy) :", err);
+    console.warn("⚠️ Sauvegarde reportée (erreur proxy/API) :", err);
+    // Notification utilisateur pour la sauvegarde reportée (si possible)
   }
 }
 
@@ -177,13 +271,47 @@ async function deleteEvent(id) {
       body: JSON.stringify({ mode: "patch", data: [{ id, title: "" }] }),
       mode: "cors",
     });
-    if (!res.ok) throw new Error("Erreur HTTP " + res.status);
-    console.log("🗑️ Supprimé :", id);
+    
+    // Vérification stricte de la réponse du serveur
+    if (!res.ok) throw new Error(`Erreur HTTP ${res.status}`);
+    const result = await res.json();
+    if (result.status === "error") throw new Error(`Erreur Apps Script: ${result.message}`);
+
+    console.log("✅ Événement supprimé à distance :", id);
   } catch (err) {
-    console.warn("⚠️ Suppression locale seulement :", err);
+    console.warn("⚠️ Suppression reportée (erreur proxy/API) :", err);
   }
 }
 
+
 /**************************************************************
- * 🚀 Démarrage
+ * 🎨 Styles & Couleurs
  **************************************************************/
+function getCategoryColor(category) {
+    switch(category) {
+        case 'Réunion': return '#007bff'; 
+        case 'Projet': return '#28a745'; 
+        case 'Formation': return '#ffc107'; // Jaune (attention au contraste)
+        default: return '#6c757d'; // Autre
+    }
+}
+
+/**************************************************************
+ * 🚀 Initialisation
+ **************************************************************/
+document.addEventListener("DOMContentLoaded", () => {
+  // Démarre le chargement (qui inclut le rendu ou l'affichage de l'erreur)
+  chargerPlanning(); 
+});
+
+// Gérer la bannière au chargement initial
+if (isOffline) {
+    OFFLINE_BANNER?.classList.remove("hidden");
+}
+
+// Nettoyage de la variable globale au cas où
+window.eventToData = eventToData;
+window.saveEvent = saveEvent;
+window.deleteEvent = deleteEvent;
+window.chargerPlanning = chargerPlanning;
+window.getCategoryColor = getCategoryColor;
