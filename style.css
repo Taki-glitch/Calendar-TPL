@@ -8,6 +8,7 @@ body {
   padding: 0;
   color: #333;
   overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
 /**************************************************************
@@ -26,6 +27,7 @@ body {
   z-index: 3000;
   transition: transform 0.3s ease-in-out;
 }
+
 .hidden {
   transform: translateY(100%);
 }
@@ -47,6 +49,7 @@ body {
   transition: opacity 0.4s ease;
   z-index: 2500;
 }
+
 #loader.hidden {
   opacity: 0;
   pointer-events: none;
@@ -77,11 +80,13 @@ body {
   gap: 10px;
   font-size: 0.9em;
 }
+
 .legend-item {
   display: flex;
   align-items: center;
   gap: 6px;
 }
+
 .legend-color {
   width: 14px;
   height: 14px;
@@ -110,6 +115,7 @@ body {
   justify-content: center;
   transition: transform 0.25s ease, background 0.3s ease;
 }
+
 #add-event-btn:hover {
   transform: scale(1.1);
   background: #0056b3;
@@ -141,6 +147,7 @@ body {
   animation: fadeIn 0.25s ease;
   backdrop-filter: blur(4px);
 }
+
 .modal.hidden {
   display: none;
 }
@@ -157,6 +164,7 @@ body {
   gap: 10px;
   animation: slideUp 0.3s ease;
 }
+
 .modal-content h2 {
   margin-top: 0;
   text-align: center;
@@ -171,6 +179,7 @@ body {
   font-weight: 600;
   font-size: 0.95rem;
 }
+
 .modal-content input,
 .modal-content select {
   padding: 10px;
@@ -180,6 +189,7 @@ body {
   box-sizing: border-box;
   width: 100%;
 }
+
 .modal-content select {
   background: #fff;
   cursor: pointer;
@@ -194,6 +204,7 @@ body {
   margin-top: 15px;
   gap: 10px;
 }
+
 .modal-actions .btn {
   flex: 1;
   padding: 12px;
@@ -203,14 +214,17 @@ body {
   cursor: pointer;
   font-size: 1rem;
 }
+
 .modal-actions .btn.primary {
   background: #007bff;
   color: white;
 }
+
 .modal-actions .btn.secondary {
   background: #888;
   color: white;
 }
+
 .modal-actions .btn:hover {
   opacity: 0.9;
 }
@@ -223,19 +237,23 @@ body {
     margin: 10px;
     padding: 10px;
   }
+
   .fc-toolbar-title {
     font-size: 1.1em;
   }
 }
+
 @media (max-width: 600px) {
   .modal-content {
     max-width: 95%;
     padding: 15px;
   }
+
   .modal-actions .btn {
     padding: 10px;
     font-size: 1em;
   }
+
   #legend {
     flex-direction: column;
     align-items: center;
@@ -246,10 +264,23 @@ body {
  * 🌈 ANIMATIONS
  **************************************************************/
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
+
 @keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
