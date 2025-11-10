@@ -1,3 +1,4 @@
+/* 🌈 Style global */
 body {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   background-color: #f5f7fb;
@@ -5,7 +6,7 @@ body {
   color: #333;
 }
 
-/* Header */
+/* 🧭 Header */
 header {
   display: flex;
   align-items: center;
@@ -14,6 +15,8 @@ header {
   color: white;
   padding: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  text-align: center;
 }
 
 header .logo {
@@ -23,7 +26,12 @@ header .logo {
   border-radius: 50%;
 }
 
-/* Bouton thème clair/sombre */
+header h1 {
+  font-size: 1.5em;
+  margin: 5px 0;
+}
+
+/* ☀️🌙 Bouton thème clair/sombre */
 #theme-toggle {
   margin-left: auto;
   background: none;
@@ -32,11 +40,12 @@ header .logo {
   cursor: pointer;
   color: white;
 }
+
 #theme-toggle:hover {
   opacity: 0.8;
 }
 
-/* Calendar container */
+/* 📅 Conteneur calendrier */
 #planning {
   max-width: 900px;
   margin: 30px auto;
@@ -53,7 +62,7 @@ header .logo {
   color: #555;
 }
 
-/* Offline banner */
+/* ⚠️ Bannière offline */
 #offline-banner {
   position: fixed;
   bottom: 0;
@@ -66,11 +75,12 @@ header .logo {
   font-weight: 600;
   transition: transform 0.3s ease-in-out;
 }
+
 .hidden {
   transform: translateY(100%);
 }
 
-/* FullCalendar */
+/* 🎨 FullCalendar */
 .fc-toolbar-title {
   font-size: 1.5em;
   color: #007bff;
@@ -120,16 +130,18 @@ body.dark #planning {
   color: var(--text-dark);
 }
 
-/* 📱 Responsive amélioré */
+/* 📱 Responsive général */
 @media (max-width: 900px) {
   header {
     flex-direction: row;
     justify-content: space-between;
     padding: 10px 15px;
   }
+
   header h1 {
     font-size: 1.2em;
   }
+
   #planning {
     margin: 10px;
     padding: 10px;
@@ -141,10 +153,49 @@ body.dark #planning {
     flex-direction: row;
     align-items: center;
   }
+
+  header .logo {
+    width: 40px;
+    height: 40px;
+    margin-right: 6px;
+  }
+
   #theme-toggle {
     font-size: 1.2em;
   }
+
   .fc-toolbar-title {
     font-size: 1.1em;
   }
+
+  #planning {
+    margin: 5px;
+    padding: 8px;
+  }
+}
+
+/* 📱 Correction spéciale iPhone (safe area + boutons compactes) */
+@supports (padding: env(safe-area-inset-bottom)) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* ✅ Ajustements FullCalendar sur petit écran */
+.fc-header-toolbar {
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+  justify-content: center !important;
+}
+
+.fc-toolbar-chunk {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+}
+
+.fc-button {
+  padding: 4px 6px !important;
+  font-size: 0.8em !important;
 }
