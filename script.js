@@ -90,6 +90,15 @@ function renderCalendar(events) {
     height: "auto",
     editable: true,
     selectable: true,
+
+    // 🕗 Limite d’affichage des heures visibles
+    slotMinTime: "08:00:00",
+    slotMaxTime: "18:00:00",
+
+    // 🚫 Empêche la création ou le déplacement en dehors des heures autorisées
+    selectAllow: (selectionInfo) => isInAllowedHours(selectionInfo.start, selectionInfo.end),
+    eventAllow: (dropInfo) => isInAllowedHours(dropInfo.start, dropInfo.end),
+
     events: events.map(event => ({
       id: String(event.id),
       title: event.title,
@@ -106,6 +115,17 @@ function renderCalendar(events) {
   });
 
   calendar.render();
+}
+
+/**************************************************************
+ * ⏰ Validation des heures autorisées
+ **************************************************************/
+function isInAllowedHours(start, end) {
+  const startHour = start.getHours();
+  const endHour = end.getHours();
+
+  // Plage autorisée : 8h à 18h inclus
+  return startHour >= 8 && endHour <= 18;
 }
 
 /**************************************************************
@@ -227,6 +247,14 @@ function openEventModal(event = null, info = null) {
       allDay: false,
       category: categorySelect.value,
     };
+
+    // 🚫 Vérifie que les heures sont dans la plage autorisée
+    const startDate = new Date(newEvent.start);
+    const endDate = new Date(newEvent.end);
+    if (!isInAllowedHours(startDate, endDate)) {
+      alert("❌ Les événements doivent être entre 8h00 et 18h00.");
+      return;
+    }
 
     modal.classList.add("hidden");
 
