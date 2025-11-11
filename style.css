@@ -1,317 +1,262 @@
 /**************************************************************
- * 🌈 STYLE GLOBAL
+ * 🌈 Style global — Planning TPL
  **************************************************************/
+
 body {
   font-family: "Inter", "Segoe UI", Arial, sans-serif;
   background-color: #f5f7fb;
   margin: 0;
   padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
   color: #333;
-  overflow-x: hidden;
-  transition: background-color 0.5s ease, color 0.5s ease;
-}
-
-body.dark {
-  background-color: #1a1d21;
-  color: #e5e5e5;
-}
-
-body.dark header {
-  background-color: #121417;
-}
-
-body.dark #planning {
-  background-color: #22252b;
-  color: #e5e5e5;
 }
 
 /**************************************************************
- * 🖼️ HEADER + LOGO
+ * 🧭 Barre du haut
  **************************************************************/
-header {
+
+.top-bar {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 10px 0;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  justify-content: space-between;
+  background: #1976d2;
+  color: white;
+  padding: 10px 16px;
+  width: 100%;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-header .logo {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  object-fit: contain;
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
-header h1 {
-  font-size: 1.6rem;
-  color: #007bff;
+.logo {
+  height: 32px;
+  width: 32px;
+  border-radius: 4px;
+}
+
+.top-bar h1 {
+  font-size: 20px;
+  font-weight: 600;
   margin: 0;
 }
 
-#theme-toggle {
-  margin-left: 10px;
-  background: none;
+/**************************************************************
+ * ➕ Bouton principal (+)
+ **************************************************************/
+
+.btn-plus {
+  font-size: 24px;
+  font-weight: bold;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: white;
+  color: #1976d2;
   border: none;
-  font-size: 1.3rem;
   cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-plus:hover {
+  transform: rotate(90deg);
+  background-color: #e3f2fd;
 }
 
 /**************************************************************
- * ⚠️ BANNIÈRE OFFLINE
+ * 📅 Conteneur du calendrier
  **************************************************************/
-#offline-banner {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background-color: #dc3545;
-  color: white;
-  text-align: center;
-  padding: 8px;
-  font-weight: 600;
-  z-index: 3000;
-  transition: transform 0.3s ease-in-out;
-}
 
-.hidden {
-  transform: translateY(100%);
-}
-
-/**************************************************************
- * 🔄 INDICATEUR DE CHARGEMENT
- **************************************************************/
-#loader {
-  position: fixed;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
-  color: #007bff;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: opacity 0.4s ease;
-  z-index: 2500;
-}
-
-#loader.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/**************************************************************
- * 📅 CALENDRIER
- **************************************************************/
-#planning {
-  max-width: 900px;
-  margin: 20px auto 80px auto;
+#calendar {
+  width: 100%;
+  max-width: 1200px;
   background: white;
-  border-radius: 12px;
+  border-radius: 8px;
+  margin-top: 20px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   padding: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+}
+
+.fc-toolbar-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #333;
 }
 
 /**************************************************************
- * 🎨 LÉGENDE DES CATÉGORIES
+ * 📆 FullCalendar personnalisations
  **************************************************************/
-#legend {
-  max-width: 900px;
-  margin: 10px auto 20px;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-  font-size: 0.9em;
+
+.fc-daygrid-day-number,
+.fc-col-header-cell-cushion {
+  color: #1976d2 !important;
 }
 
-.legend-item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
+.fc-button-primary {
+  background-color: #1976d2 !important;
+  border: none !important;
+  font-weight: 500;
 }
 
-.legend-color {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
+.fc-button-primary:hover {
+  background-color: #1565c0 !important;
 }
 
 /**************************************************************
- * 🎨 COULEURS DES CATÉGORIES
+ * 🪟 Modale d’événement
  **************************************************************/
-.legend-color.hotel { background: #FFD43B; }
-.legend-color.greneraie { background: #2ECC71; }
-.legend-color.pref { background: #E74C3C; }
-.legend-color.tour { background: #3498DB; }
-.legend-color.fta { background: #9B59B6; }
 
-/**************************************************************
- * ➕ BOUTON FLOTTANT “+”
- **************************************************************/
-#add-event-btn {
+#event-modal {
   position: fixed;
-  bottom: 1.6rem;
-  right: 1.6rem;
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: #007bff;
-  color: white;
-  border: none;
-  font-size: 2rem;
-  cursor: pointer;
-  z-index: 5000;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.25s ease, background 0.3s ease;
-}
-
-#add-event-btn:hover {
-  transform: scale(1.1);
-  background: #0056b3;
-}
-
-@media (max-width: 768px) {
-  #add-event-btn {
-    bottom: 1rem;
-    right: 1rem;
-    width: 52px;
-    height: 52px;
-    font-size: 1.8rem;
-    z-index: 6000;
-  }
-}
-
-/**************************************************************
- * 🪟 MODALE — corrigée mobile/tablette
- **************************************************************/
-.modal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.45);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 7000;
-  animation: fadeIn 0.25s ease;
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-}
-
-.modal.hidden {
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
   display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  backdrop-filter: blur(2px);
+}
+
+#event-modal.visible {
+  display: flex;
 }
 
 .modal-content {
-  background: white;
-  border-radius: 14px;
-  padding: 20px;
+  background-color: #fff;
+  padding: 20px 24px;
+  border-radius: 8px;
   width: 90%;
   max-width: 400px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  animation: slideUp 0.3s ease;
-  position: relative;
-  z-index: 7100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  animation: slideDown 0.25s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .modal-content h2 {
   margin-top: 0;
-  text-align: center;
-  color: #007bff;
-  font-size: 1.4rem;
+  color: #1976d2;
+  font-size: 18px;
 }
 
 /**************************************************************
- * 📝 CHAMPS
+ * ✍️ Formulaire de la modale
  **************************************************************/
+
 .modal-content label {
-  font-weight: 600;
-  font-size: 0.95rem;
+  display: block;
+  margin-top: 10px;
+  font-weight: 500;
 }
 
-.modal-content input,
-.modal-content select {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
-  box-sizing: border-box;
+.modal-content input {
   width: 100%;
-}
-
-.modal-content select {
-  background: #fff;
-  cursor: pointer;
+  padding: 8px 10px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
 }
 
 /**************************************************************
- * 🔘 BOUTONS DE MODALE
+ * 🧩 Boutons modale
  **************************************************************/
+
 .modal-buttons {
+  margin-top: 20px;
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
   gap: 10px;
 }
 
 .modal-buttons button {
   flex: 1;
-  padding: 12px;
-  border-radius: 8px;
-  font-weight: 600;
+  padding: 10px 0;
   border: none;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
   cursor: pointer;
-  font-size: 1rem;
-  transition: transform 0.15s ease, opacity 0.15s ease;
+  transition: background-color 0.2s, transform 0.1s;
 }
 
-#save-event {
-  background: #007bff;
+#btn-enregistrer {
+  background-color: #4caf50;
   color: white;
 }
 
-#cancel-event {
-  background: #888;
+#btn-enregistrer:hover {
+  background-color: #43a047;
+}
+
+#btn-annuler {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+#btn-annuler:hover {
+  background-color: #d6d6d6;
+}
+
+#btn-supprimer {
+  background-color: #f44336;
   color: white;
+}
+
+#btn-supprimer:hover {
+  background-color: #e53935;
 }
 
 .modal-buttons button:active {
-  transform: scale(0.96);
-  opacity: 0.8;
-}
-
-.modal-buttons button:hover {
-  opacity: 0.9;
+  transform: scale(0.97);
 }
 
 /**************************************************************
- * 🌈 ANIMATIONS
+ * 📱 Responsive
  **************************************************************/
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
 
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
-}
+@media (max-width: 768px) {
+  body {
+    align-items: stretch;
+  }
 
-#delete-event {
-  background: #dc3545;
-  color: white;
-}
+  #calendar {
+    margin-top: 10px;
+    border-radius: 0;
+    box-shadow: none;
+  }
 
-#delete-event.hidden {
-  display: none;
+  .modal-content {
+    width: 95%;
+  }
+
+  .btn-plus {
+    width: 36px;
+    height: 36px;
+    font-size: 22px;
+  }
 }
