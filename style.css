@@ -87,20 +87,19 @@ header h1 {
   transform: rotate(20deg);
 }
 
-/* Sélecteur de langue */
-#language-toggle {
+/* 🌍 Bouton drapeau langue */
+#lang-toggle {
   background: none;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  padding: 5px 8px;
-  font-size: 0.9rem;
+  border: none;
+  font-size: 1.6rem;
   cursor: pointer;
-  transition: background 0.3s ease, border-color 0.3s ease;
+  color: inherit;
+  transition: transform 0.2s ease;
+  flex-shrink: 0;
 }
 
-#language-toggle:hover {
-  background: #f0f0f0;
-  border-color: #007bff;
+#lang-toggle:hover {
+  transform: scale(1.1);
 }
 
 body.dark #language-toggle {
