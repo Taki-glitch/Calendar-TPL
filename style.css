@@ -31,20 +31,27 @@ body.dark #planning {
 header {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 12px;
-  padding: 10px 0;
+  justify-content: space-between; /* ✅ corrige la disposition */
+  padding: 10px 16px;
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 2000;
-  flex-direction: column;
+  flex-wrap: nowrap; /* ✅ empêche le passage à la ligne */
+}
+
+/* Conteneur gauche : logo + titre */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 1;
 }
 
 header .logo {
-  width: 60px;
-  height: 60px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   object-fit: contain;
 }
@@ -53,20 +60,42 @@ header h1 {
   font-size: 1.6rem;
   color: #007bff;
   margin: 0;
+  white-space: nowrap; /* ✅ empêche le titre de passer à la ligne */
 }
 
+/* Bouton de thème */
 #theme-toggle {
-  margin-left: 10px;
   background: none;
   border: none;
-  font-size: 1.3rem;
+  font-size: 1.5rem;
   cursor: pointer;
   color: inherit;
   transition: transform 0.2s ease;
+  flex-shrink: 0;
 }
 
 #theme-toggle:hover {
   transform: rotate(20deg);
+}
+
+/* 📱 Adaptation mobile */
+@media (max-width: 600px) {
+  header {
+    padding: 8px 12px;
+  }
+
+  .header-left img {
+    width: 40px;
+    height: 40px;
+  }
+
+  header h1 {
+    font-size: 1.2rem;
+  }
+
+  #theme-toggle {
+    font-size: 1.3rem;
+  }
 }
 
 /**************************************************************
