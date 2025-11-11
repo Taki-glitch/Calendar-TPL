@@ -58,14 +58,19 @@ function renderCalendar(events) {
   const calendarEl = document.getElementById("planning");
   if (calendar) calendar.destroy();
 
+  const isMobile = window.innerWidth <= 900;
+
   calendar = new FullCalendar.Calendar(calendarEl, {
     locale: "fr",
-    initialView: "dayGridMonth",
-    headerToolbar: {
-      left: "prev,next today",
-      center: "title",
-      right: "dayGridMonth,timeGridWeek,listWeek",
-    },
+    firstDay: 1,
+    nowIndicator: true,
+    initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
+    headerToolbar: isMobile
+      ? { left: "prev,next", center: "title", right: "" }
+      : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
+    slotMinTime: "08:00:00",
+    slotMaxTime: "18:00:00",
+    allDaySlot: false,
     selectable: true,
     editable: true,
     height: "auto",
@@ -79,8 +84,8 @@ function renderCalendar(events) {
       extendedProps: { category: e.category },
     })),
 
-    select: (info) => openEventModal(null, info), // Création
-    eventClick: (info) => openEventModal(info.event), // Modification
+    select: (info) => openEventModal(null, info),
+    eventClick: (info) => openEventModal(info.event),
     eventDrop: (info) => saveEvent(eventToData(info.event)),
     eventResize: (info) => saveEvent(eventToData(info.event)),
   });
@@ -160,7 +165,7 @@ async function deleteEvent(event) {
 }
 
 /**************************************************************
- * 🪟 Modale améliorée (création / modification)
+ * 🪟 Modale (création / modification)
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
@@ -180,12 +185,12 @@ function openEventModal(event = null, info = null) {
   if (!event) {
     modalTitle.textContent = "Nouvel événement";
     titleInput.value = "";
-    startInput.value = info?.startStr.slice(0, 16);
+    startInput.value = info?.startStr?.slice(0, 16) || "";
     endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
     categorySelect.value = "Hôtel-Dieu";
 
     cancelBtn.classList.remove("hidden"); // visible
-    deleteBtn.classList.add("hidden");    // caché
+    deleteBtn.classList.add("hidden"); // caché
   }
   // --- Modification ---
   else {
@@ -195,18 +200,16 @@ function openEventModal(event = null, info = null) {
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
     categorySelect.value = event.extendedProps.category || "Autre";
 
-    cancelBtn.classList.add("hidden");   // 🔹 caché maintenant
-    deleteBtn.classList.remove("hidden");
+    cancelBtn.classList.add("hidden"); // ❌ on cache le bouton Annuler
+    deleteBtn.classList.remove("hidden"); // ✅ on montre Supprimer
   }
 
   const closeModal = () => modal.classList.add("hidden");
 
-  // Fermeture par clic extérieur
   modal.onclick = (e) => {
     if (!modalContent.contains(e.target)) closeModal();
   };
 
-  // Bouton "Enregistrer"
   saveBtn.onclick = () => {
     const newEvent = {
       id: event ? event.id : crypto.randomUUID(),
@@ -228,10 +231,7 @@ function openEventModal(event = null, info = null) {
     closeModal();
   };
 
-  // Bouton "Annuler"
   cancelBtn.onclick = closeModal;
-
-  // Bouton "Supprimer"
   deleteBtn.onclick = () => {
     deleteEvent(event);
     closeModal();
