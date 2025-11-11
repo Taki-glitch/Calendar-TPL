@@ -107,7 +107,7 @@ function renderCalendar(events) {
   const isMobile = window.innerWidth <= 900;
 
   calendar = new FullCalendar.Calendar(calendarEl, {
-    locale: currentLang, // <-- FR ou RU
+    locale: currentLang,
     firstDay: 1,
     nowIndicator: true,
     initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
@@ -219,7 +219,7 @@ async function deleteEvent(event) {
 }
 
 /**************************************************************
- * 🪟 MODALE D’ÉVÉNEMENT
+ * 🪟 MODALE D’ÉVÉNEMENT (avec traduction des boutons)
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
@@ -232,6 +232,11 @@ function openEventModal(event = null, info = null) {
   const cancelBtn = document.getElementById("cancel-event");
   const deleteBtn = document.getElementById("delete-event");
   const modalTitle = document.getElementById("modal-title");
+
+  // Traduction dynamique des boutons
+  saveBtn.textContent = traduireTexte("💾 Enregistrer", "💾 Сохранить");
+  cancelBtn.textContent = traduireTexte("Annuler", "Отмена");
+  deleteBtn.textContent = traduireTexte("🗑️ Supprimer", "🗑️ Удалить");
 
   modal.classList.remove("hidden");
 
@@ -306,4 +311,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
   chargerPlanning();
 });
-
