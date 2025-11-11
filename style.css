@@ -178,6 +178,7 @@ header h1 {
   background: #0056b3;
 }
 
+/* ✅ Fix mobile */
 @media (max-width: 768px) {
   #add-event-btn {
     bottom: 1rem;
@@ -273,7 +274,6 @@ header h1 {
   border: none;
   cursor: pointer;
   font-size: 1rem;
-  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 #save-event {
@@ -284,11 +284,6 @@ header h1 {
 #cancel-event {
   background: #888;
   color: white;
-}
-
-.modal-buttons button:active {
-  transform: scale(0.96);
-  opacity: 0.8;
 }
 
 .modal-buttons button:hover {
