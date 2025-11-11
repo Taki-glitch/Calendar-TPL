@@ -34,11 +34,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     currentLang = currentLang === "fr" ? "ru" : "fr";
     localStorage.setItem("lang", currentLang);
     langToggle.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
-    location.reload(); // Recharge la page pour appliquer la nouvelle langue
+    location.reload(); // Recharge pour appliquer la nouvelle langue
   });
 
   /**************************************************************
-   * ⚡️ GESTION DU MODE HORS LIGNE
+   * ⚠️ BANNIÈRE HORS LIGNE
    **************************************************************/
   function updateOnlineStatus() {
     if (navigator.onLine) {
@@ -52,13 +52,13 @@ document.addEventListener("DOMContentLoaded", async () => {
   updateOnlineStatus();
 
   /**************************************************************
-   * ⏳ CHARGEMENT DU CALENDRIER
+   * 🗓️ CALENDRIER FULLCALENDAR
    **************************************************************/
   loader.classList.remove("hidden");
 
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: "dayGridMonth",
-    locale: currentLang, // ✅ applique automatiquement FR ou RU
+    locale: currentLang,
     buttonText: {
       today: currentLang === "fr" ? "Aujourd’hui" : "Сегодня",
       month: currentLang === "fr" ? "Mois" : "Месяц",
@@ -92,7 +92,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   calendar.render();
 
   /**************************************************************
-   * ➕ BOUTON D’AJOUT D’ÉVÉNEMENT
+   * ➕ BOUTON ET MODALE D’AJOUT D’ÉVÉNEMENT
    **************************************************************/
   const addBtn = document.getElementById("add-event-btn");
   const modal = document.getElementById("event-modal");
@@ -107,9 +107,51 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   let selectedEvent = null;
 
+  /**************************************************************
+   * 🗣️ Traduction du texte de la modale
+   **************************************************************/
+  const translations = {
+    fr: {
+      newEvent: "Nouvel événement",
+      editEvent: "Modifier l’événement",
+      title: "Titre",
+      start: "Début",
+      end: "Fin",
+      category: "Catégorie",
+      save: "💾 Enregistrer",
+      cancel: "Annuler",
+      delete: "🗑️ Supprimer",
+      required: "Veuillez remplir au moins le titre et la date de début."
+    },
+    ru: {
+      newEvent: "Новое событие",
+      editEvent: "Редактировать событие",
+      title: "Название",
+      start: "Начало",
+      end: "Конец",
+      category: "Категория",
+      save: "💾 Сохранить",
+      cancel: "Отмена",
+      delete: "🗑️ Удалить",
+      required: "Пожалуйста, заполните название и дату начала."
+    }
+  };
+
+  // Applique les traductions aux labels et boutons
+  document.querySelector("label[for='event-title']").textContent = translations[currentLang].title;
+  document.querySelector("label[for='event-start']").textContent = translations[currentLang].start;
+  document.querySelector("label[for='event-end']").textContent = translations[currentLang].end;
+  document.querySelector("label[for='event-category']").textContent = translations[currentLang].category;
+  saveBtn.textContent = translations[currentLang].save;
+  cancelBtn.textContent = translations[currentLang].cancel;
+  deleteBtn.textContent = translations[currentLang].delete;
+
+  /**************************************************************
+   * ➕ Gestion des interactions modale
+   **************************************************************/
   addBtn.addEventListener("click", () => {
     selectedEvent = null;
-    modalTitle.textContent = currentLang === "fr" ? "Nouvel événement" : "Новое событие";
+    modalTitle.textContent = translations[currentLang].newEvent;
     titleInput.value = "";
     startInput.value = "";
     endInput.value = "";
@@ -129,10 +171,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     const category = categorySelect.value;
 
     if (!title || !start) {
-      alert(currentLang === "fr"
-        ? "Veuillez remplir au moins le titre et la date de début."
-        : "Пожалуйста, заполните название и дату начала."
-      );
+      alert(translations[currentLang].required);
       return;
     }
 
