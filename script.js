@@ -5,8 +5,33 @@ const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeU
 
 const OFFLINE_BANNER = document.getElementById("offline-banner");
 const ADD_EVENT_BTN = document.getElementById("add-event-btn");
+const THEME_TOGGLE = document.getElementById("theme-toggle");
 let isOffline = !navigator.onLine;
 let calendar = null;
+
+/**************************************************************
+ * 🌗 Thème sombre / clair
+ **************************************************************/
+function appliquerTheme(theme) {
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+    THEME_TOGGLE.textContent = "☀️";
+  } else {
+    document.body.classList.remove("dark");
+    THEME_TOGGLE.textContent = "🌙";
+  }
+  localStorage.setItem("theme", theme);
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("theme") || "light";
+  appliquerTheme(savedTheme);
+
+  THEME_TOGGLE.addEventListener("click", () => {
+    const nouveauTheme = document.body.classList.contains("dark") ? "light" : "dark";
+    appliquerTheme(nouveauTheme);
+  });
+});
 
 /**************************************************************
  * 🔌 Connexion réseau
@@ -61,14 +86,14 @@ function renderCalendar(events) {
   const isMobile = window.innerWidth <= 900;
 
   calendar = new FullCalendar.Calendar(calendarEl, {
-    locale: "fr", // ✅ Affiche tout en français
-    firstDay: 1, // Commence le lundi
+    locale: "fr",
+    firstDay: 1,
     nowIndicator: true,
     initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
     headerToolbar: isMobile
       ? { left: "prev,next", center: "title", right: "" }
       : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
-    buttonText: { // ✅ Traduction forcée au cas où
+    buttonText: {
       today: "Aujourd’hui",
       month: "Mois",
       week: "Semaine",
@@ -188,31 +213,25 @@ function openEventModal(event = null, info = null) {
 
   modal.classList.remove("hidden");
 
-  // --- Création ---
   if (!event) {
     modalTitle.textContent = "Nouvel événement";
     titleInput.value = "";
     startInput.value = info?.startStr?.slice(0, 16) || "";
     endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
     categorySelect.value = "Hôtel-Dieu";
-
     cancelBtn.classList.remove("hidden");
     deleteBtn.classList.add("hidden");
-  }
-  // --- Modification ---
-  else {
+  } else {
     modalTitle.textContent = "Modifier l’événement";
     titleInput.value = event.title;
     startInput.value = event.startStr.slice(0, 16);
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
     categorySelect.value = event.extendedProps.category || "Autre";
-
     cancelBtn.classList.add("hidden");
     deleteBtn.classList.remove("hidden");
   }
 
   const closeModal = () => modal.classList.add("hidden");
-
   modal.onclick = (e) => {
     if (!modalContent.contains(e.target)) closeModal();
   };
