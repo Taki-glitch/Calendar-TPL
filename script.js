@@ -1,6 +1,7 @@
 /**************************************************************
  * 📅 script.js — Planning TPL (robust touches + horaires 8h–18h)
  **************************************************************/
+console.log("✅ script.js chargé correctement !");
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
 const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
