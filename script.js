@@ -291,5 +291,19 @@ function openEventModal(event = null, info = null) {
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
   ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
+
+  // 🌍 Gestion du changement de langue
+  const langToggle = document.getElementById("lang-toggle");
+  if (langToggle) {
+    langToggle.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
+
+    langToggle.addEventListener("click", () => {
+      const newLang = currentLang === "fr" ? "ru" : "fr";
+      changerLangue(newLang);
+      langToggle.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
+    });
+  }
+
   chargerPlanning();
 });
+
