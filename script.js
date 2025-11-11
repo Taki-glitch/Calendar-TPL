@@ -61,13 +61,20 @@ function renderCalendar(events) {
   const isMobile = window.innerWidth <= 900;
 
   calendar = new FullCalendar.Calendar(calendarEl, {
-    locale: "fr",
-    firstDay: 1,
+    locale: "fr", // ✅ Affiche tout en français
+    firstDay: 1, // Commence le lundi
     nowIndicator: true,
     initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
     headerToolbar: isMobile
       ? { left: "prev,next", center: "title", right: "" }
       : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
+    buttonText: { // ✅ Traduction forcée au cas où
+      today: "Aujourd’hui",
+      month: "Mois",
+      week: "Semaine",
+      day: "Jour",
+      list: "Liste"
+    },
     slotMinTime: "08:00:00",
     slotMaxTime: "18:00:00",
     allDaySlot: false,
@@ -189,8 +196,8 @@ function openEventModal(event = null, info = null) {
     endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
     categorySelect.value = "Hôtel-Dieu";
 
-    cancelBtn.classList.remove("hidden"); // visible
-    deleteBtn.classList.add("hidden"); // caché
+    cancelBtn.classList.remove("hidden");
+    deleteBtn.classList.add("hidden");
   }
   // --- Modification ---
   else {
@@ -200,8 +207,8 @@ function openEventModal(event = null, info = null) {
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
     categorySelect.value = event.extendedProps.category || "Autre";
 
-    cancelBtn.classList.add("hidden"); // ❌ on cache le bouton Annuler
-    deleteBtn.classList.remove("hidden"); // ✅ on montre Supprimer
+    cancelBtn.classList.add("hidden");
+    deleteBtn.classList.remove("hidden");
   }
 
   const closeModal = () => modal.classList.add("hidden");
