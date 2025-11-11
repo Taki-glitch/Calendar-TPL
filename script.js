@@ -1,5 +1,5 @@
 /**************************************************************
- * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline)
+ * 📅 script.js — Planning TPL (robust touches + horaires 8h–18h)
  **************************************************************/
 
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
@@ -184,7 +184,7 @@ async function saveEvent(event) {
 }
 
 /**************************************************************
- * 🪟 Modale (corrigée mobile/tablette)
+ * 🪟 Modale (robuste touch handlers)
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
@@ -195,6 +195,10 @@ function openEventModal(event = null, info = null) {
   const saveBtn = document.getElementById("save-event");
   const cancelBtn = document.getElementById("cancel-event");
   const modalTitle = document.getElementById("modal-title");
+
+  // safety: ensure buttons behave as buttons (no accidental submit)
+  if (saveBtn) saveBtn.setAttribute("type", "button");
+  if (cancelBtn) cancelBtn.setAttribute("type", "button");
 
   modal.classList.remove("hidden");
 
@@ -212,17 +216,34 @@ function openEventModal(event = null, info = null) {
     categorySelect.value = "Hôtel-Dieu";
   }
 
-  // ✅ Annuler
-  cancelBtn.onclick = () => {
-    document.activeElement.blur(); // ferme le clavier mobile
-    modal.classList.add("hidden");
-    setTimeout(() => modal.classList.add("hidden"), 100);
+  // Remove any previous listeners we may have added earlier to avoid duplicates.
+  // We store these on the element so we can remove them safely.
+  const cleanHandler = (el) => {
+    if (!el) return;
+    const prev = el.__tpl_listeners;
+    if (prev && Array.isArray(prev)) {
+      prev.forEach(({ evt, fn, opts }) => el.removeEventListener(evt, fn, opts));
+    }
+    el.__tpl_listeners = [];
   };
 
-  // ✅ Enregistrer
-  saveBtn.onclick = () => {
-    document.activeElement.blur(); // ferme le clavier mobile
+  const addOnceListener = (el, evt, fn, opts) => {
+    if (!el) return;
+    el.addEventListener(evt, fn, opts);
+    el.__tpl_listeners = el.__tpl_listeners || [];
+    el.__tpl_listeners.push({ evt, fn, opts });
+  };
 
+  cleanHandler(saveBtn);
+  cleanHandler(cancelBtn);
+
+  // Handler logic wrapped to allow delayed execution after blur
+  const doCancel = () => {
+    modal.classList.add("hidden");
+    setTimeout(() => modal.classList.add("hidden"), 120);
+  };
+
+  const doSave = () => {
     const newEvent = {
       id: event ? event.id : crypto.randomUUID(),
       title: titleInput.value.trim() || "(Sans titre)",
@@ -256,10 +277,53 @@ function openEventModal(event = null, info = null) {
 
     saveEvent(newEvent);
   };
+
+  // Universal wrapper that blurs activeElement (close keyboard) then runs the action.
+  const guarded = (action) => {
+    try {
+      // blur active element to hide keyboard (mobile)
+      if (document.activeElement && typeof document.activeElement.blur === "function") {
+        document.activeElement.blur();
+      }
+    } catch (e) { /* ignore */ }
+
+    // small delay to allow the keyboard to hide and focus changes to settle
+    setTimeout(() => {
+      action();
+    }, 120);
+  };
+
+  // Add click listener (desktop & fallback)
+  addOnceListener(cancelBtn, "click", (e) => { e.stopPropagation(); guarded(doCancel); }, false);
+  addOnceListener(saveBtn, "click", (e) => { e.stopPropagation(); guarded(doSave); }, false);
+
+  // Add pointerup for pointer-based devices (some stylus / tablets)
+  addOnceListener(cancelBtn, "pointerup", (e) => { e.stopPropagation(); guarded(doCancel); }, false);
+  addOnceListener(saveBtn, "pointerup", (e) => { e.stopPropagation(); guarded(doSave); }, false);
+
+  // Add touchend for mobile; passive:false so preventDefault can be used if needed
+  addOnceListener(cancelBtn, "touchend", (e) => { e.preventDefault(); e.stopPropagation(); guarded(doCancel); }, { passive: false });
+  addOnceListener(saveBtn, "touchend", (e) => { e.preventDefault(); e.stopPropagation(); guarded(doSave); }, { passive: false });
+
+  // Accessibility: allow Escape key to cancel
+  const onKey = (e) => {
+    if (e.key === "Escape") {
+      guarded(doCancel);
+    }
+  };
+  addOnceListener(document, "keydown", onKey, false);
+
+  // also allow clicking outside modal-content to close (optional UX)
+  const onOutside = (ev) => {
+    if (!ev.target.closest(".modal-content")) {
+      guarded(doCancel);
+    }
+  };
+  addOnceListener(modal, "click", onOutside, false);
 }
 
 /**************************************************************
- * 🚀 Initialisation + fix tactile universel
+ * 🚀 Initialisation
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
   ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
@@ -271,21 +335,11 @@ document.addEventListener("DOMContentLoaded", () => {
   }, 500);
 
   const themeToggle = document.getElementById("theme-toggle");
-  themeToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-    localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
-  });
-  if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
-
-  /* ✅ Fix tactile universel (iOS / Android) */
-  const modal = document.getElementById("event-modal");
-  if (modal) {
-    modal.addEventListener("touchstart", (e) => {
-      const target = e.target.closest("button");
-      if (target && (target.id === "save-event" || target.id === "cancel-event")) {
-        e.preventDefault();
-        target.click();
-      }
+  if (themeToggle) {
+    themeToggle.addEventListener("click", () => {
+      document.body.classList.toggle("dark");
+      localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
     });
   }
+  if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 });
