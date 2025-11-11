@@ -2,7 +2,6 @@
  * 📅 script.js — Planning TPL (Cloudflare Proxy + Offline)
  **************************************************************/
 
-// 🌐 URLs
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
 const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 
@@ -91,25 +90,16 @@ function renderCalendar(events) {
     editable: true,
     selectable: true,
 
-    // 🕗 Limite stricte de la plage horaire visible
     slotMinTime: "08:00:00",
     slotMaxTime: "18:00:00",
-    scrollTime: "08:00:00", // 🔥 Fait défiler automatiquement jusqu’à 8h
+    scrollTime: "08:00:00",
 
-    // 🚫 Interdiction de créer/déplacer hors plage
-    selectAllow: (selectionInfo) => isInAllowedHours(selectionInfo.start, selectionInfo.end),
-    eventAllow: (dropInfo) => isInAllowedHours(dropInfo.start, dropInfo.end),
+    selectAllow: (sel) => isInAllowedHours(sel.start, sel.end),
+    eventAllow: (drop) => isInAllowedHours(drop.start, drop.end),
 
-    // ⚙️ Configuration des vues
     views: {
-      timeGridWeek: {
-        slotMinTime: "08:00:00",
-        slotMaxTime: "18:00:00",
-      },
-      timeGridDay: {
-        slotMinTime: "08:00:00",
-        slotMaxTime: "18:00:00",
-      },
+      timeGridWeek: { slotMinTime: "08:00:00", slotMaxTime: "18:00:00" },
+      timeGridDay: { slotMinTime: "08:00:00", slotMaxTime: "18:00:00" },
     },
 
     events: events.map(event => ({
@@ -132,12 +122,11 @@ function renderCalendar(events) {
 }
 
 /**************************************************************
- * ⏰ Validation des heures autorisées
+ * ⏰ Vérification des heures autorisées
  **************************************************************/
 function isInAllowedHours(start, end) {
-  const startHour = start.getHours();
-  const endHour = end.getHours();
-  return startHour >= 8 && endHour <= 18;
+  const s = start.getHours(), e = end.getHours();
+  return s >= 8 && e <= 18;
 }
 
 /**************************************************************
@@ -170,9 +159,8 @@ function eventToData(event) {
 
 async function saveEvent(event) {
   let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  const index = saved.findIndex(e => e.id === event.id);
-  if (index >= 0) saved[index] = event;
-  else saved.push(event);
+  const idx = saved.findIndex(e => e.id === event.id);
+  if (idx >= 0) saved[idx] = event; else saved.push(event);
   localStorage.setItem("tplEvents", JSON.stringify(saved));
 
   if (isOffline) return console.log("📦 Événement stocké localement :", event.title);
@@ -184,38 +172,12 @@ async function saveEvent(event) {
       body: JSON.stringify({ mode: "patch", data: [event] }),
       mode: "cors",
     });
-
     const text = await res.text();
-    let result;
-    try { result = JSON.parse(text); }
-    catch { throw new Error("Réponse non JSON (sauvegarde)"); }
-
+    const result = JSON.parse(text);
     if (result.status === "error") throw new Error(result.message);
     console.log("✅ Événement sauvegardé :", event.title);
   } catch (err) {
     console.warn("⚠️ Sauvegarde reportée :", err.message);
-  }
-}
-
-/**************************************************************
- * 🗑️ Suppression
- **************************************************************/
-async function deleteEvent(id) {
-  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  saved = saved.filter(e => e.id !== id);
-  localStorage.setItem("tplEvents", JSON.stringify(saved));
-  if (isOffline) return;
-
-  try {
-    await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "patch", data: [{ id, title: "" }] }),
-      mode: "cors",
-    });
-    console.log("✅ Événement supprimé :", id);
-  } catch (err) {
-    console.warn("⚠️ Suppression reportée :", err.message);
   }
 }
 
@@ -248,7 +210,10 @@ function openEventModal(event = null, info = null) {
     categorySelect.value = "Hôtel-Dieu";
   }
 
-  cancelBtn.onclick = () => modal.classList.add("hidden");
+  cancelBtn.onclick = () => {
+    modal.classList.add("hidden");
+    setTimeout(() => modal.classList.add("hidden"), 100); // ✅ Fix mobile tactile
+  };
 
   saveBtn.onclick = () => {
     const newEvent = {
@@ -260,15 +225,14 @@ function openEventModal(event = null, info = null) {
       category: categorySelect.value,
     };
 
-    // 🚫 Vérifie les heures autorisées
-    const startDate = new Date(newEvent.start);
-    const endDate = new Date(newEvent.end);
-    if (!isInAllowedHours(startDate, endDate)) {
+    const s = new Date(newEvent.start), e = new Date(newEvent.end);
+    if (!isInAllowedHours(s, e)) {
       alert("❌ Les événements doivent être entre 8h00 et 18h00.");
       return;
     }
 
     modal.classList.add("hidden");
+    setTimeout(() => modal.classList.add("hidden"), 100);
 
     if (event) event.remove();
 
@@ -294,23 +258,14 @@ document.addEventListener("DOMContentLoaded", () => {
   chargerPlanning();
 
   setTimeout(() => {
-    if (navigator.onLine) {
-      isOffline = false;
-      OFFLINE_BANNER?.classList.add("hidden");
-    } else {
-      isOffline = true;
-      OFFLINE_BANNER?.classList.remove("hidden");
-    }
+    if (navigator.onLine) OFFLINE_BANNER?.classList.add("hidden");
+    else OFFLINE_BANNER?.classList.remove("hidden");
   }, 500);
 
-  // 🌗 Thème clair/sombre
   const themeToggle = document.getElementById("theme-toggle");
   themeToggle.addEventListener("click", () => {
     document.body.classList.toggle("dark");
     localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
   });
-
-  if (localStorage.getItem("theme") === "dark") {
-    document.body.classList.add("dark");
-  }
+  if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
 });
