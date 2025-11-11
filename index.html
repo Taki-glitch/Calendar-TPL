@@ -6,38 +6,23 @@
   <meta name="theme-color" content="#007bff" />
   <title>Planning TPL</title>
 
-  <!-- ✅ PWA -->
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/png" href="logo.png" />
-
   <!-- ✅ FullCalendar -->
-  <link
-    href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css"
-    rel="stylesheet"
-  />
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
-  <!-- ✅ Styles -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- 🧭 En-tête -->
   <header>
     <img src="logo.png" alt="Logo TPL" class="logo" />
     <h1>Planning TPL</h1>
     <button id="theme-toggle" aria-label="Changer le thème">🌙</button>
   </header>
 
-  <!-- ⚠️ Bannière hors ligne -->
   <div id="offline-banner" class="hidden">⚠️ Vous êtes hors ligne</div>
-
-  <!-- 🔄 Indicateur de chargement -->
   <div id="loader" class="hidden">Chargement du calendrier...</div>
-
-  <!-- 📅 Calendrier -->
   <div id="planning"></div>
 
-  <!-- 🎨 Légende -->
   <div id="legend">
     <div class="legend-item"><span class="legend-color hotel"></span> Hôtel-Dieu</div>
     <div class="legend-item"><span class="legend-color greneraie"></span> Gréneraie / Resto du Cœur</div>
@@ -46,10 +31,9 @@
     <div class="legend-item"><span class="legend-color fta"></span> France Terre d’Asile</div>
   </div>
 
-  <!-- ➕ Bouton flottant -->
   <button id="add-event-btn" aria-label="Ajouter un événement">+</button>
 
-  <!-- 🪟 Modale (corrigée) -->
+  <!-- 🪟 Modale -->
   <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2 id="modal-title">Nouvel événement</h2>
@@ -74,24 +58,13 @@
       </select>
 
       <div class="modal-buttons">
-        <!-- ✅ Types explicites pour corriger le bug tactile -->
         <button id="save-event" type="button">💾 Enregistrer</button>
         <button id="cancel-event" type="button">Annuler</button>
+        <button id="delete-event" type="button" class="danger hidden">🗑️ Supprimer</button>
       </div>
     </div>
   </div>
 
-  <!-- ✅ Script principal placé APRÈS le HTML -->
   <script src="script.js"></script>
-
-  <!-- ✅ Service Worker -->
-  <script>
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker
-        .register("service-worker.js")
-        .then(() => console.log("✅ Service Worker enregistré"))
-        .catch(err => console.warn("❌ Erreur SW :", err));
-    }
-  </script>
 </body>
 </html>
