@@ -1,177 +1,201 @@
-document.addEventListener("DOMContentLoaded", async () => {
-  const calendarEl = document.getElementById("planning");
-  const modal = document.getElementById("event-modal");
-  const modalTitle = document.getElementById("modal-title");
-  const saveBtn = document.getElementById("save-event");
-  const cancelBtn = document.getElementById("cancel-event");
-  const deleteBtn = document.getElementById("delete-event");
-  const addBtn = document.getElementById("add-event-btn");
-  const loader = document.getElementById("loader");
-  const offlineBanner = document.getElementById("offline-banner");
+// =========================
+// 📅 PLANNING TPL - script.js
+// =========================
 
-  const titleInput = document.getElementById("event-title");
-  const startInput = document.getElementById("event-start");
-  const endInput = document.getElementById("event-end");
-  const categoryInput = document.getElementById("event-category");
+// 🔗 URL de ton API Google Apps Script (via ton proxy Cloudflare)
+const API_URL = "https://tpl-proxy.tsqdevin.workers.dev/?url=" +
+  encodeURIComponent("https://script.google.com/macros/s/AKfycbySRUailaKz0w_hRizFPOyUV79h5OUsLjdmb8S2WENKfAKm1rcfCq7Jn_W5uLGp2Jck/exec");
 
-  let isEditing = false;
-  let currentEvent = null;
+// =========================
+// ⚙️ Initialisation du calendrier
+// =========================
+let calendar;
+let selectedEvent = null;
 
-  // 🌐 URL de ton API Google Apps Script (à personnaliser)
-  const API_URL = "https://tpl-proxy.tsqdevin.workers.dev/?url=https%3A%2F%2Fscript.google.com%2Fmacros%2Fs%2FAKfycbySRUailaKz0w_hRizFPOyUV79h5OUsLjdmb8S2WENKfAKm1rcfCq7Jn_W5uLGp2Jck%2Fexec";
+document.addEventListener("DOMContentLoaded", async function () {
+  const calendarEl = document.getElementById("calendar");
 
-  // 🌙 Thème clair/sombre
-  const themeToggle = document.getElementById("theme-toggle");
-  themeToggle.addEventListener("click", () => {
-    document.body.classList.toggle("dark");
-    themeToggle.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
-  });
-
-  // 📱 Vue par défaut selon appareil
-  const isMobile = window.innerWidth <= 900;
-  const initialView = isMobile ? "timeGridWeek" : "dayGridMonth";
-
-  // 📅 Initialisation du calendrier
-  const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView,
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    initialView: window.innerWidth < 768 ? "timeGridWeek" : "dayGridMonth",
     locale: "fr",
     firstDay: 1,
+    allDaySlot: false,
     slotMinTime: "08:00:00",
     slotMaxTime: "18:00:00",
-    allDaySlot: false,
-    nowIndicator: true,
+    headerToolbar: {
+      left: "prev,next today",
+      center: "title",
+      right: "dayGridMonth,timeGridWeek,timeGridDay"
+    },
+    buttonText: {
+      today: "Aujourd’hui",
+      month: "Mois",
+      week: "Semaine",
+      day: "Jour"
+    },
+    events: await chargerEvenements(),
     editable: true,
     selectable: true,
-    headerToolbar: isMobile
-      ? { left: "prev,next", center: "title", right: "" }
-      : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
-
-    // 🎨 Couleurs selon catégorie
-    eventDidMount: (info) => {
-      const cat = info.event.extendedProps.category;
-      if (cat) info.el.classList.add(cat.toLowerCase().replace(/\s+/g, "-"));
-    },
-
-    // 📤 Clic sur un créneau libre → nouvelle entrée
-    select: (info) => {
-      isEditing = false;
-      currentEvent = null;
-      modalTitle.textContent = "Nouvel événement";
-      deleteBtn.classList.add("hidden");
-      cancelBtn.classList.remove("hidden");
-      saveBtn.textContent = "💾 Enregistrer";
-
-      titleInput.value = "";
-      startInput.value = info.startStr.slice(0, 16);
-      endInput.value = info.endStr ? info.endStr.slice(0, 16) : "";
-      categoryInput.value = "Hôtel-Dieu";
-
-      modal.classList.remove("hidden");
-    },
-
-    // ✏️ Clic sur un événement → édition
-    eventClick: (info) => {
-      isEditing = true;
-      currentEvent = info.event;
-
-      modalTitle.textContent = "Modifier l’événement";
-      titleInput.value = currentEvent.title;
-      startInput.value = currentEvent.start.toISOString().slice(0, 16);
-      endInput.value = currentEvent.end ? currentEvent.end.toISOString().slice(0, 16) : "";
-      categoryInput.value = currentEvent.extendedProps.category || "Autre";
-
-      // Masquer "Annuler", montrer "Supprimer"
-      cancelBtn.classList.add("hidden");
-      deleteBtn.classList.remove("hidden");
-      saveBtn.textContent = "💾 Enregistrer";
-
-      modal.classList.remove("hidden");
-    },
-
-    // 🔁 Charger les événements
-    events: async (fetchInfo, successCallback, failureCallback) => {
-      try {
-        loader.classList.remove("hidden");
-        const res = await fetch(API_URL);
-        const data = await res.json();
-        successCallback(data);
-      } catch (err) {
-        console.error("Erreur de chargement :", err);
-        failureCallback(err);
-        offlineBanner.classList.remove("hidden");
-      } finally {
-        loader.classList.add("hidden");
-      }
-    },
+    eventClick: handleEventClick,
+    select: handleSelect,
   });
 
   calendar.render();
 
-  // ➕ Bouton "Ajouter"
-  addBtn.addEventListener("click", () => {
-    isEditing = false;
-    currentEvent = null;
-    modalTitle.textContent = "Nouvel événement";
-
-    titleInput.value = "";
-    startInput.value = "";
-    endInput.value = "";
-    categoryInput.value = "Hôtel-Dieu";
-
-    deleteBtn.classList.add("hidden");
-    cancelBtn.classList.remove("hidden");
-    saveBtn.textContent = "💾 Enregistrer";
-    modal.classList.remove("hidden");
+  // 🔄 Adapter la vue si on change de taille d’écran
+  window.addEventListener("resize", () => {
+    const view = window.innerWidth < 768 ? "timeGridWeek" : "dayGridMonth";
+    if (calendar.view.type !== view) calendar.changeView(view);
   });
 
-  // 💾 Enregistrer
-  saveBtn.addEventListener("click", async () => {
-    const title = titleInput.value.trim();
-    const start = startInput.value;
-    const end = endInput.value;
-    const category = categoryInput.value;
-
-    if (!title || !start || !end) {
-      alert("Veuillez remplir tous les champs obligatoires.");
-      return;
-    }
-
-    const newEvent = {
-      title,
-      start,
-      end,
-      category,
-    };
-
-    try {
-      if (isEditing && currentEvent) {
-        currentEvent.setProp("title", title);
-        currentEvent.setStart(start);
-        currentEvent.setEnd(end);
-        currentEvent.setExtendedProp("category", category);
-      } else {
-        calendar.addEvent(newEvent);
-      }
-      modal.classList.add("hidden");
-    } catch (err) {
-      console.error("Erreur lors de la sauvegarde :", err);
-    }
-  });
-
-  // ❌ Annuler (création uniquement)
-  cancelBtn.addEventListener("click", () => {
-    modal.classList.add("hidden");
-  });
-
-  // 🗑️ Supprimer (modification uniquement)
-  deleteBtn.addEventListener("click", () => {
-    if (currentEvent && confirm("Voulez-vous vraiment supprimer cet événement ?")) {
-      currentEvent.remove();
-      modal.classList.add("hidden");
-    }
-  });
-
-  // 🧭 Gestion hors ligne
-  window.addEventListener("online", () => offlineBanner.classList.add("hidden"));
-  window.addEventListener("offline", () => offlineBanner.classList.remove("hidden"));
+  // 🖱️ Gestion des boutons
+  document.getElementById("btn-enregistrer").addEventListener("click", enregistrerEvenement);
+  document.getElementById("btn-annuler").addEventListener("click", annulerAction);
+  document.getElementById("btn-supprimer").addEventListener("click", supprimerEvenement);
+  document.getElementById("btn-ajouter").addEventListener("click", nouveauEvenement);
 });
+
+// =========================
+// 📡 Chargement des événements
+// =========================
+async function chargerEvenements() {
+  try {
+    const res = await fetch(API_URL);
+    const data = await res.json();
+    return data.map(e => ({
+      id: e.id,
+      title: e.titre,
+      start: e.debut,
+      end: e.fin,
+      color: e.couleur || "#2196F3"
+    }));
+  } catch (err) {
+    console.error("Erreur de chargement :", err);
+    return [];
+  }
+}
+
+// =========================
+// 🆕 Création d’un nouvel événement
+// =========================
+function nouveauEvenement() {
+  selectedEvent = null;
+  document.getElementById("btn-enregistrer").style.display = "inline-block";
+  document.getElementById("btn-annuler").style.display = "inline-block";
+  document.getElementById("btn-supprimer").style.display = "none";
+  document.getElementById("event-modal").classList.add("visible");
+}
+
+// =========================
+// ✏️ Sélection ou clic sur un événement existant
+// =========================
+function handleEventClick(info) {
+  selectedEvent = info.event;
+  document.getElementById("titre").value = selectedEvent.title;
+  document.getElementById("debut").value = selectedEvent.startStr.slice(0, 16);
+  document.getElementById("fin").value = selectedEvent.endStr.slice(0, 16);
+  document.getElementById("event-modal").classList.add("visible");
+
+  // Afficher uniquement Enregistrer + Supprimer
+  document.getElementById("btn-enregistrer").style.display = "inline-block";
+  document.getElementById("btn-supprimer").style.display = "inline-block";
+  document.getElementById("btn-annuler").style.display = "none";
+}
+
+// =========================
+// 📅 Sélection d’un créneau libre
+// =========================
+function handleSelect(info) {
+  selectedEvent = null;
+  document.getElementById("titre").value = "";
+  document.getElementById("debut").value = info.startStr.slice(0, 16);
+  document.getElementById("fin").value = info.endStr.slice(0, 16);
+  document.getElementById("event-modal").classList.add("visible");
+
+  // Afficher Enregistrer + Annuler uniquement
+  document.getElementById("btn-enregistrer").style.display = "inline-block";
+  document.getElementById("btn-annuler").style.display = "inline-block";
+  document.getElementById("btn-supprimer").style.display = "none";
+}
+
+// =========================
+// 💾 Enregistrer un événement
+// =========================
+async function enregistrerEvenement() {
+  const titre = document.getElementById("titre").value;
+  const debut = document.getElementById("debut").value;
+  const fin = document.getElementById("fin").value;
+
+  if (!titre || !debut || !fin) {
+    alert("Merci de remplir tous les champs.");
+    return;
+  }
+
+  const payload = {
+    action: selectedEvent ? "modifier" : "ajouter",
+    id: selectedEvent ? selectedEvent.id : null,
+    titre,
+    debut,
+    fin
+  };
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      alert("✅ Événement enregistré !");
+      calendar.refetchEvents();
+      fermerModal();
+    } else {
+      alert("❌ Erreur lors de l’enregistrement.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Erreur réseau.");
+  }
+}
+
+// =========================
+// 🗑️ Supprimer un événement
+// =========================
+async function supprimerEvenement() {
+  if (!selectedEvent) return;
+  if (!confirm("Supprimer cet événement ?")) return;
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "supprimer", id: selectedEvent.id })
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      alert("🗑️ Événement supprimé !");
+      selectedEvent.remove();
+      fermerModal();
+    } else {
+      alert("❌ Erreur lors de la suppression.");
+    }
+  } catch (err) {
+    console.error(err);
+    alert("Erreur réseau.");
+  }
+}
+
+// =========================
+// ❌ Annuler et fermer la modale
+// =========================
+function annulerAction() {
+  fermerModal();
+}
+
+function fermerModal() {
+  document.getElementById("event-modal").classList.remove("visible");
+  selectedEvent = null;
+}
