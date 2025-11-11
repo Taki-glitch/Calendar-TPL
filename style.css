@@ -1,82 +1,308 @@
-/* 🧱 Structure générale */
+/**************************************************************
+ * 🌈 STYLE GLOBAL
+ **************************************************************/
 body {
-  font-family: "Inter", sans-serif;
-  background: #f7f8fc;
+  font-family: "Inter", "Segoe UI", Arial, sans-serif;
+  background-color: #f5f7fb;
   margin: 0;
   padding: 0;
+  color: #333;
+  overflow-x: hidden;
+  transition: background-color 0.5s ease, color 0.5s ease;
 }
 
+body.dark {
+  background-color: #1a1d21;
+  color: #e5e5e5;
+}
+
+body.dark header {
+  background-color: #121417;
+}
+
+body.dark #planning {
+  background-color: #22252b;
+  color: #e5e5e5;
+}
+
+/**************************************************************
+ * 🖼️ HEADER + LOGO
+ **************************************************************/
 header {
-  background: #2d6cdf;
-  color: white;
-  padding: 1rem;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 10px 0;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-.btn-plus {
-  font-size: 2rem;
-  background: white;
-  border: none;
+header .logo {
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-.btn-plus:hover {
-  background: #e5e8ff;
+  object-fit: contain;
 }
 
-/* 🗓️ Planning */
-.planning {
-  padding: 1rem;
+header h1 {
+  font-size: 1.6rem;
+  color: #007bff;
+  margin: 0;
 }
-.slot {
-  background: white;
+
+#theme-toggle {
+  margin-left: 10px;
+  background: none;
+  border: none;
+  font-size: 1.3rem;
+  cursor: pointer;
+}
+
+/**************************************************************
+ * ⚠️ BANNIÈRE OFFLINE
+ **************************************************************/
+#offline-banner {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: #dc3545;
+  color: white;
+  text-align: center;
+  padding: 8px;
+  font-weight: 600;
+  z-index: 3000;
+  transition: transform 0.3s ease-in-out;
+}
+
+.hidden {
+  transform: translateY(100%);
+}
+
+/**************************************************************
+ * 🔄 INDICATEUR DE CHARGEMENT
+ **************************************************************/
+#loader {
+  position: fixed;
+  top: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  color: #007bff;
+  padding: 8px 14px;
   border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  margin-bottom: 1rem;
-  padding: 1rem;
+  font-weight: 500;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: opacity 0.4s ease;
+  z-index: 2500;
 }
-.btn-supprimer {
-  background: #ff4d4d;
+
+#loader.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/**************************************************************
+ * 📅 CALENDRIER
+ **************************************************************/
+#planning {
+  max-width: 900px;
+  margin: 20px auto 80px auto;
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/**************************************************************
+ * 🎨 LÉGENDE DES CATÉGORIES
+ **************************************************************/
+#legend {
+  max-width: 900px;
+  margin: 10px auto 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  font-size: 0.9em;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+}
+
+/**************************************************************
+ * 🎨 COULEURS DES CATÉGORIES
+ **************************************************************/
+.legend-color.hotel { background: #FFD43B; }
+.legend-color.greneraie { background: #2ECC71; }
+.legend-color.pref { background: #E74C3C; }
+.legend-color.tour { background: #3498DB; }
+.legend-color.fta { background: #9B59B6; }
+
+/**************************************************************
+ * ➕ BOUTON FLOTTANT “+”
+ **************************************************************/
+#add-event-btn {
+  position: fixed;
+  bottom: 1.6rem;
+  right: 1.6rem;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #007bff;
   color: white;
   border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 4px;
+  font-size: 2rem;
   cursor: pointer;
+  z-index: 5000;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease, background 0.3s ease;
 }
 
-/* 🧾 Formulaire flottant */
-.overlay {
-  display: none;
+#add-event-btn:hover {
+  transform: scale(1.1);
+  background: #0056b3;
+}
+
+@media (max-width: 768px) {
+  #add-event-btn {
+    bottom: 1rem;
+    right: 1rem;
+    width: 52px;
+    height: 52px;
+    font-size: 1.8rem;
+    z-index: 6000;
+  }
+}
+
+/**************************************************************
+ * 🪟 MODALE — corrigée mobile/tablette
+ **************************************************************/
+.modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
-  justify-content: center;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
   align-items: center;
+  justify-content: center;
+  z-index: 7000;
+  animation: fadeIn 0.25s ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
-.formulaire {
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
   background: white;
-  padding: 1.5rem;
-  border-radius: 8px;
+  border-radius: 14px;
+  padding: 20px;
   width: 90%;
   max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
+  gap: 10px;
+  animation: slideUp 0.3s ease;
+  position: relative;
+  z-index: 7100;
 }
-.formulaire input {
-  margin-bottom: 1rem;
-  padding: 0.5rem;
+
+.modal-content h2 {
+  margin-top: 0;
+  text-align: center;
+  color: #007bff;
+  font-size: 1.4rem;
+}
+
+/**************************************************************
+ * 📝 CHAMPS
+ **************************************************************/
+.modal-content label {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.modal-content input,
+.modal-content select {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
   font-size: 1rem;
+  box-sizing: border-box;
+  width: 100%;
 }
-.actions {
+
+.modal-content select {
+  background: #fff;
+  cursor: pointer;
+}
+
+/**************************************************************
+ * 🔘 BOUTONS DE MODALE
+ **************************************************************/
+.modal-buttons {
   display: flex;
   justify-content: space-between;
+  margin-top: 15px;
+  gap: 10px;
 }
-button.danger {
-  background: #ff4d4d;
+
+.modal-buttons button {
+  flex: 1;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+#save-event {
+  background: #007bff;
   color: white;
+}
+
+#cancel-event {
+  background: #888;
+  color: white;
+}
+
+.modal-buttons button:active {
+  transform: scale(0.96);
+  opacity: 0.8;
+}
+
+.modal-buttons button:hover {
+  opacity: 0.9;
+}
+
+/**************************************************************
+ * 🌈 ANIMATIONS
+ **************************************************************/
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
 }
