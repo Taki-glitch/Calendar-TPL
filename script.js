@@ -9,16 +9,16 @@ let isOffline = !navigator.onLine;
 let calendar = null;
 
 /**************************************************************
- * 🔌 Connexion
+ * 🔌 Connexion réseau
  **************************************************************/
 window.addEventListener("online", () => {
   isOffline = false;
-  OFFLINE_BANNER?.classList.add("hidden");
+  OFFLINE_BANNER.classList.add("hidden");
   chargerPlanning();
 });
 window.addEventListener("offline", () => {
   isOffline = true;
-  OFFLINE_BANNER?.classList.remove("hidden");
+  OFFLINE_BANNER.classList.remove("hidden");
 });
 
 /**************************************************************
@@ -26,29 +26,24 @@ window.addEventListener("offline", () => {
  **************************************************************/
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
-  loader.textContent = isOffline
-    ? "Mode hors ligne — données locales..."
-    : "Chargement du calendrier...";
   loader.classList.remove("hidden");
+  loader.textContent = isOffline ? "Mode hors ligne — données locales..." : "Chargement du calendrier...";
 
   let events = [];
 
   if (isOffline) {
     events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
     loader.classList.add("hidden");
-    renderCalendar(events);
-    return;
+    return renderCalendar(events);
   }
 
   try {
     const res = await fetch(PROXY_URL, { method: "GET", mode: "cors" });
     const text = await res.text();
-    let data = JSON.parse(text);
-    events = data;
+    events = JSON.parse(text);
     localStorage.setItem("tplEvents", JSON.stringify(events));
   } catch (err) {
-    console.error("❌ Échec du chargement :", err);
-    loader.textContent = "⚠️ Erreur, affichage local";
+    console.warn("⚠️ Erreur de chargement, mode local :", err);
     events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
   }
 
@@ -57,7 +52,7 @@ async function chargerPlanning() {
 }
 
 /**************************************************************
- * 📅 Rendu du calendrier
+ * 📅 Affichage du calendrier
  **************************************************************/
 function renderCalendar(events) {
   const calendarEl = document.getElementById("planning");
@@ -71,56 +66,45 @@ function renderCalendar(events) {
       center: "title",
       right: "dayGridMonth,timeGridWeek,listWeek",
     },
-    height: "auto",
-    editable: true,
     selectable: true,
-    slotMinTime: "08:00:00",
-    slotMaxTime: "18:00:00",
-    selectAllow: (sel) => isInAllowedHours(sel.start, sel.end),
-    eventAllow: (drop) => isInAllowedHours(drop.start, drop.end),
+    editable: true,
+    height: "auto",
 
-    events: events.map(event => ({
-      id: String(event.id),
-      title: event.title,
-      start: event.start,
-      end: event.end,
-      allDay: false,
-      backgroundColor: getCategoryColor(event.category),
-      extendedProps: { category: event.category }
+    events: events.map((e) => ({
+      id: e.id,
+      title: e.title,
+      start: e.start,
+      end: e.end,
+      backgroundColor: getCategoryColor(e.category),
+      extendedProps: { category: e.category },
     })),
 
-    eventClick: (info) => openEventModal(info.event),
+    select: (info) => openEventModal(null, info), // Création
+    eventClick: (info) => openEventModal(info.event), // Modification
     eventDrop: (info) => saveEvent(eventToData(info.event)),
     eventResize: (info) => saveEvent(eventToData(info.event)),
-    select: (info) => openEventModal(null, info),
   });
 
   calendar.render();
 }
 
 /**************************************************************
- * ⏰ Vérif heures autorisées
- **************************************************************/
-function isInAllowedHours(start, end) {
-  return start.getHours() >= 8 && end.getHours() <= 18;
-}
-
-/**************************************************************
- * 🎨 Couleurs catégories
+ * 🎨 Couleurs des catégories
  **************************************************************/
 function getCategoryColor(category) {
-  switch (category) {
-    case "Hôtel-Dieu": return "#FFD43B";
-    case "Gréneraie/Resto du Cœur": return "#2ECC71";
-    case "Préfecture": return "#E74C3C";
-    case "Tour de Bretagne": return "#3498DB";
-    case "France Terre d’Asile": return "#9B59B6";
-    default: return "#6c757d";
-  }
+  const colors = {
+    "Hôtel-Dieu": "#FFD43B",
+    "Gréneraie/Resto du Cœur": "#2ECC71",
+    "Préfecture": "#E74C3C",
+    "Tour de Bretagne": "#3498DB",
+    "France Terre d’Asile": "#9B59B6",
+    "Autre": "#6c757d",
+  };
+  return colors[category] || "#6c757d";
 }
 
 /**************************************************************
- * 💾 Sauvegarde
+ * 💾 Sauvegarde locale + serveur
  **************************************************************/
 function eventToData(event) {
   return {
@@ -134,31 +118,32 @@ function eventToData(event) {
 
 async function saveEvent(event) {
   let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  const idx = saved.findIndex(e => e.id === event.id);
-  if (idx >= 0) saved[idx] = event; else saved.push(event);
+  const i = saved.findIndex((e) => e.id === event.id);
+  if (i >= 0) saved[i] = event; else saved.push(event);
   localStorage.setItem("tplEvents", JSON.stringify(saved));
-  if (isOffline) return;
 
-  try {
-    await fetch(PROXY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ mode: "patch", data: [event] }),
-    });
-  } catch (err) {
-    console.warn("⚠️ Sauvegarde offline :", err);
+  if (!isOffline) {
+    try {
+      await fetch(PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "patch", data: [event] }),
+      });
+    } catch (err) {
+      console.warn("⚠️ Erreur réseau, enregistrement local uniquement :", err);
+    }
   }
 }
 
 /**************************************************************
- * 🗑️ Suppression
+ * 🗑️ Suppression d’un événement
  **************************************************************/
 async function deleteEvent(event) {
   if (!confirm("Supprimer cet événement ?")) return;
   event.remove();
 
   let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  saved = saved.filter(e => e.id !== event.id);
+  saved = saved.filter((e) => e.id !== event.id);
   localStorage.setItem("tplEvents", JSON.stringify(saved));
 
   if (!isOffline) {
@@ -169,16 +154,17 @@ async function deleteEvent(event) {
         body: JSON.stringify({ mode: "delete", data: [event.id] }),
       });
     } catch (err) {
-      console.warn("⚠️ Erreur suppression :", err);
+      console.warn("⚠️ Erreur de suppression :", err);
     }
   }
 }
 
 /**************************************************************
- * 🪟 Modale corrigée
+ * 🪟 Modale améliorée (création / modification)
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
+  const modalContent = document.querySelector(".modal-content");
   const titleInput = document.getElementById("event-title");
   const startInput = document.getElementById("event-start");
   const endInput = document.getElementById("event-end");
@@ -190,24 +176,35 @@ function openEventModal(event = null, info = null) {
 
   modal.classList.remove("hidden");
 
-  if (event) {
+  // --- Création ---
+  if (!event) {
+    modalTitle.textContent = "Nouvel événement";
+    titleInput.value = "";
+    startInput.value = info?.startStr.slice(0, 16);
+    endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
+    categorySelect.value = "Hôtel-Dieu";
+    cancelBtn.classList.remove("hidden");
+    deleteBtn.classList.add("hidden");
+  }
+  // --- Modification ---
+  else {
     modalTitle.textContent = "Modifier l’événement";
     titleInput.value = event.title;
     startInput.value = event.startStr.slice(0, 16);
-    endInput.value = event.endStr ? event.endStr.slice(0, 16) : startInput.value;
+    endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
     categorySelect.value = event.extendedProps.category || "Autre";
+    cancelBtn.classList.add("hidden");
     deleteBtn.classList.remove("hidden");
-  } else {
-    modalTitle.textContent = "Nouvel événement";
-    titleInput.value = "";
-    startInput.value = info.startStr.slice(0, 16);
-    endInput.value = info.endStr ? info.endStr.slice(0, 16) : "";
-    categorySelect.value = "Hôtel-Dieu";
-    deleteBtn.classList.add("hidden");
   }
 
   const closeModal = () => modal.classList.add("hidden");
 
+  // Fermeture par clic extérieur
+  modal.onclick = (e) => {
+    if (!modalContent.contains(e.target)) closeModal();
+  };
+
+  // Bouton "Enregistrer"
   saveBtn.onclick = () => {
     const newEvent = {
       id: event ? event.id : crypto.randomUUID(),
@@ -218,17 +215,25 @@ function openEventModal(event = null, info = null) {
     };
 
     if (event) event.remove();
+
     calendar.addEvent({
       ...newEvent,
       backgroundColor: getCategoryColor(newEvent.category),
       extendedProps: { category: newEvent.category },
     });
+
     saveEvent(newEvent);
     closeModal();
   };
 
+  // Bouton "Annuler"
   cancelBtn.onclick = closeModal;
-  deleteBtn.onclick = () => { deleteEvent(event); closeModal(); };
+
+  // Bouton "Supprimer"
+  deleteBtn.onclick = () => {
+    deleteEvent(event);
+    closeModal();
+  };
 }
 
 /**************************************************************
