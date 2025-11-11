@@ -4,10 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="theme-color" content="#007bff" />
-
   <title>Planning TPL</title>
 
-  <!-- ✅ Favicon & Manifest -->
+  <!-- ✅ PWA -->
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" type="image/png" href="logo.png" />
 
@@ -18,14 +17,9 @@
   />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
-  <!-- ✅ Style principal -->
+  <!-- ✅ Styles -->
   <link rel="stylesheet" href="style.css" />
-
-  <!-- ✅ Meta PWA -->
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
 </head>
-
 <body>
   <!-- 🧭 En-tête -->
   <header>
@@ -55,7 +49,7 @@
   <!-- ➕ Bouton flottant -->
   <button id="add-event-btn" aria-label="Ajouter un événement">+</button>
 
-  <!-- 🪟 Modale événement -->
+  <!-- 🪟 Modale (corrigée) -->
   <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2 id="modal-title">Nouvel événement</h2>
@@ -80,13 +74,14 @@
       </select>
 
       <div class="modal-buttons">
+        <!-- ✅ Types explicites pour corriger le bug tactile -->
         <button id="save-event" type="button">💾 Enregistrer</button>
         <button id="cancel-event" type="button">Annuler</button>
       </div>
     </div>
   </div>
 
-  <!-- ✅ Script principal -->
+  <!-- ✅ Script principal placé APRÈS le HTML -->
   <script src="script.js"></script>
 
   <!-- ✅ Service Worker -->
@@ -95,7 +90,7 @@
       navigator.serviceWorker
         .register("service-worker.js")
         .then(() => console.log("✅ Service Worker enregistré"))
-        .catch((err) => console.warn("❌ Erreur SW :", err));
+        .catch(err => console.warn("❌ Erreur SW :", err));
     }
   </script>
 </body>
