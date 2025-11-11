@@ -183,9 +183,8 @@ function openEventModal(event = null, info = null) {
     startInput.value = info?.startStr.slice(0, 16);
     endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
     categorySelect.value = "Hôtel-Dieu";
-
-    cancelBtn.classList.remove("hidden"); // visible
-    deleteBtn.classList.add("hidden");    // caché
+    cancelBtn.classList.remove("hidden");
+    deleteBtn.classList.add("hidden");
   }
   // --- Modification ---
   else {
@@ -194,8 +193,7 @@ function openEventModal(event = null, info = null) {
     startInput.value = event.startStr.slice(0, 16);
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
     categorySelect.value = event.extendedProps.category || "Autre";
-
-    cancelBtn.classList.add("hidden");   // 🔹 caché maintenant
+    cancelBtn.classList.add("hidden");
     deleteBtn.classList.remove("hidden");
   }
 
