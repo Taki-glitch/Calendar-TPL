@@ -90,10 +90,12 @@ function renderCalendar(events) {
     editable: true,
     selectable: true,
 
+    // 🕗 Affiche seulement 8h–18h
     slotMinTime: "08:00:00",
     slotMaxTime: "18:00:00",
     scrollTime: "08:00:00",
 
+    // Bloque la création/déplacement d’événements hors des heures autorisées
     selectAllow: (sel) => isInAllowedHours(sel.start, sel.end),
     eventAllow: (drop) => isInAllowedHours(drop.start, drop.end),
 
@@ -182,7 +184,7 @@ async function saveEvent(event) {
 }
 
 /**************************************************************
- * 🪟 Modale
+ * 🪟 Modale (corrigée mobile/tablette)
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
@@ -210,12 +212,17 @@ function openEventModal(event = null, info = null) {
     categorySelect.value = "Hôtel-Dieu";
   }
 
+  // ✅ Annuler
   cancelBtn.onclick = () => {
+    document.activeElement.blur(); // ferme le clavier mobile
     modal.classList.add("hidden");
-    setTimeout(() => modal.classList.add("hidden"), 100); // ✅ Fix mobile tactile
+    setTimeout(() => modal.classList.add("hidden"), 100);
   };
 
+  // ✅ Enregistrer
   saveBtn.onclick = () => {
+    document.activeElement.blur(); // ferme le clavier mobile
+
     const newEvent = {
       id: event ? event.id : crypto.randomUUID(),
       title: titleInput.value.trim() || "(Sans titre)",
@@ -225,14 +232,15 @@ function openEventModal(event = null, info = null) {
       category: categorySelect.value,
     };
 
-    const s = new Date(newEvent.start), e = new Date(newEvent.end);
+    const s = new Date(newEvent.start);
+    const e = new Date(newEvent.end);
     if (!isInAllowedHours(s, e)) {
       alert("❌ Les événements doivent être entre 8h00 et 18h00.");
       return;
     }
 
     modal.classList.add("hidden");
-    setTimeout(() => modal.classList.add("hidden"), 100);
+    setTimeout(() => modal.classList.add("hidden"), 150);
 
     if (event) event.remove();
 
@@ -251,7 +259,7 @@ function openEventModal(event = null, info = null) {
 }
 
 /**************************************************************
- * 🚀 Initialisation
+ * 🚀 Initialisation + fix tactile universel
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
   ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
@@ -268,4 +276,16 @@ document.addEventListener("DOMContentLoaded", () => {
     localStorage.setItem("theme", document.body.classList.contains("dark") ? "dark" : "light");
   });
   if (localStorage.getItem("theme") === "dark") document.body.classList.add("dark");
+
+  /* ✅ Fix tactile universel (iOS / Android) */
+  const modal = document.getElementById("event-modal");
+  if (modal) {
+    modal.addEventListener("touchstart", (e) => {
+      const target = e.target.closest("button");
+      if (target && (target.id === "save-event" || target.id === "cancel-event")) {
+        e.preventDefault();
+        target.click();
+      }
+    });
+  }
 });
