@@ -9,6 +9,8 @@ const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeU
 const OFFLINE_BANNER = document.getElementById("offline-banner");
 const ADD_EVENT_BTN = document.getElementById("add-event-btn");
 const THEME_TOGGLE = document.getElementById("theme-toggle");
+const LANG_TOGGLE = document.getElementById("lang-toggle");
+
 let isOffline = !navigator.onLine;
 let calendar = null;
 
@@ -26,30 +28,83 @@ function appliquerTheme(theme) {
   localStorage.setItem("theme", theme);
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-  const savedTheme = localStorage.getItem("theme") || "light";
-  appliquerTheme(savedTheme);
-
-  THEME_TOGGLE.addEventListener("click", () => {
-    const nouveauTheme = document.body.classList.contains("dark") ? "light" : "dark";
-    appliquerTheme(nouveauTheme);
-  });
-});
-
 /**************************************************************
  * 🌐 GESTION MULTILINGUE (FR / RU)
  **************************************************************/
 let currentLang = localStorage.getItem("lang") || "fr";
 
-function traduireTexte(fr, ru) {
-  return currentLang === "ru" ? ru : fr;
+const traductions = {
+  fr: {
+    offline: "⚠️ Vous êtes hors ligne",
+    loading: "Chargement du calendrier...",
+    offlineMode: "Mode hors ligne — données locales...",
+    today: "Aujourd’hui",
+    month: "Mois",
+    week: "Semaine",
+    day: "Jour",
+    list: "Liste",
+    newEvent: "Nouvel événement",
+    editEvent: "Modifier l’événement",
+    title: "Titre",
+    start: "Début",
+    end: "Fin",
+    category: "Catégorie",
+    save: "💾 Enregistrer",
+    cancel: "Annuler",
+    delete: "🗑️ Supprimer",
+    deleteConfirm: "Supprimer cet événement ?",
+  },
+  ru: {
+    offline: "⚠️ Вы не в сети",
+    loading: "Загрузка календаря...",
+    offlineMode: "Автономный режим — локальные данные...",
+    today: "Сегодня",
+    month: "Месяц",
+    week: "Неделя",
+    day: "День",
+    list: "Список",
+    newEvent: "Новое событие",
+    editEvent: "Редактировать событие",
+    title: "Название",
+    start: "Начало",
+    end: "Конец",
+    category: "Категория",
+    save: "💾 Сохранить",
+    cancel: "Отмена",
+    delete: "🗑️ Удалить",
+    deleteConfirm: "Удалить это событие?",
+  }
+};
+
+function t(key) {
+  return traductions[currentLang][key] || key;
 }
 
-function changerLangue(langue) {
-  currentLang = langue;
-  localStorage.setItem("lang", langue);
-  chargerPlanning(); // recharge le calendrier avec la bonne locale
+function appliquerLangue() {
+  LANG_TOGGLE.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
+  document.documentElement.lang = currentLang;
+
+  // Traduire les éléments HTML ayant data-i18n
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.getAttribute("data-i18n");
+    if (t(key)) el.textContent = t(key);
+  });
+
+  // Traduire les placeholders
+  const titleInput = document.getElementById("event-title");
+  if (titleInput)
+    titleInput.placeholder =
+      currentLang === "fr" ? "Ex : Réunion équipe" : "Напр.: собрание команды";
+
+  // Recharger le calendrier avec la bonne locale
+  chargerPlanning();
 }
+
+LANG_TOGGLE.addEventListener("click", () => {
+  currentLang = currentLang === "fr" ? "ru" : "fr";
+  localStorage.setItem("lang", currentLang);
+  appliquerLangue();
+});
 
 /**************************************************************
  * 🔌 CONNEXION RÉSEAU
@@ -62,6 +117,7 @@ window.addEventListener("online", () => {
 
 window.addEventListener("offline", () => {
   isOffline = true;
+  OFFLINE_BANNER.textContent = t("offline");
   OFFLINE_BANNER.classList.remove("hidden");
 });
 
@@ -71,9 +127,7 @@ window.addEventListener("offline", () => {
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
   loader.classList.remove("hidden");
-  loader.textContent = isOffline
-    ? traduireTexte("Mode hors ligne — données locales...", "Автономный режим — локальные данные...")
-    : traduireTexte("Chargement du calendrier...", "Загрузка календаря...");
+  loader.textContent = isOffline ? t("offlineMode") : t("loading");
 
   let events = [];
 
@@ -107,7 +161,7 @@ function renderCalendar(events) {
   const isMobile = window.innerWidth <= 900;
 
   calendar = new FullCalendar.Calendar(calendarEl, {
-    locale: currentLang, // <-- FR ou RU
+    locale: currentLang,
     firstDay: 1,
     nowIndicator: true,
     initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
@@ -115,19 +169,12 @@ function renderCalendar(events) {
       ? { left: "prev,next", center: "title", right: "" }
       : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
     buttonText: {
-      today: traduireTexte("Aujourd’hui", "Сегодня"),
-      month: traduireTexte("Mois", "Месяц"),
-      week: traduireTexte("Semaine", "Неделя"),
-      day: traduireTexte("Jour", "День"),
-      list: traduireTexte("Liste", "Список")
+      today: t("today"),
+      month: t("month"),
+      week: t("week"),
+      day: t("day"),
+      list: t("list")
     },
-    slotMinTime: "08:00:00",
-    slotMaxTime: "18:00:00",
-    allDaySlot: false,
-    selectable: true,
-    editable: true,
-    height: "auto",
-
     events: events.map((e) => ({
       id: e.id,
       title: e.title,
@@ -136,11 +183,10 @@ function renderCalendar(events) {
       backgroundColor: getCategoryColor(e.category),
       extendedProps: { category: e.category },
     })),
-
-    select: (info) => openEventModal(null, info),
+    selectable: true,
+    editable: true,
     eventClick: (info) => openEventModal(info.event),
-    eventDrop: (info) => saveEvent(eventToData(info.event)),
-    eventResize: (info) => saveEvent(eventToData(info.event)),
+    select: (info) => openEventModal(null, info),
   });
 
   calendar.render();
@@ -152,7 +198,7 @@ function renderCalendar(events) {
 function getCategoryColor(category) {
   const colors = {
     "Hôtel-Dieu": "#FFD43B",
-    "Gréneraie/Resto du Cœur": "#2ECC71",
+    "Gréneraie / Resto du Cœur": "#2ECC71",
     "Préfecture": "#E74C3C",
     "Tour de Bretagne": "#3498DB",
     "France Terre d’Asile": "#9B59B6",
@@ -162,64 +208,7 @@ function getCategoryColor(category) {
 }
 
 /**************************************************************
- * 💾 SAUVEGARDE LOCALE + SERVEUR
- **************************************************************/
-function eventToData(event) {
-  return {
-    id: event.id,
-    title: event.title,
-    start: event.startStr,
-    end: event.endStr,
-    category: event.extendedProps.category,
-  };
-}
-
-async function saveEvent(event) {
-  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  const i = saved.findIndex((e) => e.id === event.id);
-  if (i >= 0) saved[i] = event;
-  else saved.push(event);
-  localStorage.setItem("tplEvents", JSON.stringify(saved));
-
-  if (!isOffline) {
-    try {
-      await fetch(PROXY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "patch", data: [event] }),
-      });
-    } catch (err) {
-      console.warn("⚠️ Erreur réseau, enregistrement local uniquement :", err);
-    }
-  }
-}
-
-/**************************************************************
- * 🗑️ SUPPRESSION D’ÉVÉNEMENT
- **************************************************************/
-async function deleteEvent(event) {
-  if (!confirm(traduireTexte("Supprimer cet événement ?", "Удалить это событие?"))) return;
-  event.remove();
-
-  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  saved = saved.filter((e) => e.id !== event.id);
-  localStorage.setItem("tplEvents", JSON.stringify(saved));
-
-  if (!isOffline) {
-    try {
-      await fetch(PROXY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "delete", data: [event.id] }),
-      });
-    } catch (err) {
-      console.warn("⚠️ Erreur de suppression :", err);
-    }
-  }
-}
-
-/**************************************************************
- * 🪟 MODALE D’ÉVÉNEMENT
+ * 🪟 MODALE
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
@@ -236,7 +225,7 @@ function openEventModal(event = null, info = null) {
   modal.classList.remove("hidden");
 
   if (!event) {
-    modalTitle.textContent = traduireTexte("Nouvel événement", "Новое событие");
+    modalTitle.textContent = t("newEvent");
     titleInput.value = "";
     startInput.value = info?.startStr?.slice(0, 16) || "";
     endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
@@ -244,7 +233,7 @@ function openEventModal(event = null, info = null) {
     cancelBtn.classList.remove("hidden");
     deleteBtn.classList.add("hidden");
   } else {
-    modalTitle.textContent = traduireTexte("Modifier l’événement", "Редактировать событие");
+    modalTitle.textContent = t("editEvent");
     titleInput.value = event.title;
     startInput.value = event.startStr.slice(0, 16);
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
@@ -254,9 +243,7 @@ function openEventModal(event = null, info = null) {
   }
 
   const closeModal = () => modal.classList.add("hidden");
-  modal.onclick = (e) => {
-    if (!modalContent.contains(e.target)) closeModal();
-  };
+  modal.onclick = (e) => { if (!modalContent.contains(e.target)) closeModal(); };
 
   saveBtn.onclick = () => {
     const newEvent = {
@@ -266,30 +253,57 @@ function openEventModal(event = null, info = null) {
       end: endInput.value || startInput.value,
       category: categorySelect.value,
     };
-
     if (event) event.remove();
-
     calendar.addEvent({
       ...newEvent,
       backgroundColor: getCategoryColor(newEvent.category),
       extendedProps: { category: newEvent.category },
     });
-
     saveEvent(newEvent);
     closeModal();
   };
 
   cancelBtn.onclick = closeModal;
   deleteBtn.onclick = () => {
-    deleteEvent(event);
-    closeModal();
+    if (confirm(t("deleteConfirm"))) {
+      deleteEvent(event);
+      closeModal();
+    }
   };
+}
+
+/**************************************************************
+ * 💾 SAUVEGARDE LOCALE
+ **************************************************************/
+function saveEvent(event) {
+  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  const i = saved.findIndex((e) => e.id === event.id);
+  if (i >= 0) saved[i] = event;
+  else saved.push(event);
+  localStorage.setItem("tplEvents", JSON.stringify(saved));
+}
+
+/**************************************************************
+ * 🗑️ SUPPRESSION
+ **************************************************************/
+function deleteEvent(event) {
+  event.remove();
+  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  saved = saved.filter((e) => e.id !== event.id);
+  localStorage.setItem("tplEvents", JSON.stringify(saved));
 }
 
 /**************************************************************
  * 🚀 INITIALISATION
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("theme") || "light";
+  appliquerTheme(savedTheme);
+  THEME_TOGGLE.addEventListener("click", () => {
+    const nouveau = document.body.classList.contains("dark") ? "light" : "dark";
+    appliquerTheme(nouveau);
+  });
+
   ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
-  chargerPlanning();
+  appliquerLangue();
 });
