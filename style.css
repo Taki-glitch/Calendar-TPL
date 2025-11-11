@@ -42,8 +42,6 @@ header.header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  flex-wrap: nowrap;          /* 🚫 Empêche le retour à la ligne */
-  white-space: nowrap;        /* 🚫 Garde le titre sur une ligne */
   transition: background-color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -56,8 +54,6 @@ body.dark header.header {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-wrap: nowrap;          /* ✅ Empêche les retours sur petits écrans */
-  min-width: 0;
 }
 
 .header-left img {
@@ -65,23 +61,18 @@ body.dark header.header {
   height: 42px;
   border-radius: 50%;
   object-fit: contain;
-  flex-shrink: 0;
 }
 
 .header-left h1 {
   font-size: 1.6rem;
   margin: 0;
   color: var(--primary-color);
-  white-space: nowrap;        /* ✅ Garde le texte sur une ligne */
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .theme-toggle {
   font-size: 1.5rem;
   cursor: pointer;
   transition: transform 0.3s ease, color 0.3s ease;
-  flex-shrink: 0;
 }
 
 .theme-toggle:hover {
@@ -197,38 +188,14 @@ body.dark .fc-day-today {
 /**************************************************************
  * 📱 RESPONSIVE DESIGN
  **************************************************************/
-@media (max-width: 900px) {
-  .header-left h1 {
-    font-size: 1.4rem;
-  }
-
-  .header-left img {
-    width: 38px;
-    height: 38px;
-  }
-
-  #calendar {
-    margin: 15px;
-    padding: 12px;
-  }
-}
-
 @media (max-width: 768px) {
-  header.header {
-    padding: 8px 16px;
-  }
-
   .header-left h1 {
-    font-size: 1.25rem;
+    font-size: 1.3rem;
   }
 
   .header-left img {
-    width: 34px;
-    height: 34px;
-  }
-
-  .theme-toggle {
-    font-size: 1.4rem;
+    width: 36px;
+    height: 36px;
   }
 
   #calendar {
@@ -238,17 +205,12 @@ body.dark .fc-day-today {
 }
 
 @media (max-width: 480px) {
-  header.header {
-    padding: 6px 12px;
+  .header {
+    padding: 8px 15px;
   }
 
   .header-left h1 {
     font-size: 1.1rem;
-  }
-
-  .header-left img {
-    width: 30px;
-    height: 30px;
   }
 
   .theme-toggle {
@@ -261,3 +223,5 @@ body.dark .fc-day-today {
     font-size: 28px;
   }
 }
+
+Peux tu réécrire le style.css avec la correction, et également en ajustant la taille du texte et du logo pour resté équilibré sur mobile ?
