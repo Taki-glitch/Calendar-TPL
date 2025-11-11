@@ -91,13 +91,26 @@ function renderCalendar(events) {
     editable: true,
     selectable: true,
 
-    // 🕗 Limite d’affichage des heures visibles
+    // 🕗 Limite stricte de la plage horaire visible
     slotMinTime: "08:00:00",
     slotMaxTime: "18:00:00",
+    scrollTime: "08:00:00", // 🔥 Fait défiler automatiquement jusqu’à 8h
 
-    // 🚫 Empêche la création ou le déplacement en dehors des heures autorisées
+    // 🚫 Interdiction de créer/déplacer hors plage
     selectAllow: (selectionInfo) => isInAllowedHours(selectionInfo.start, selectionInfo.end),
     eventAllow: (dropInfo) => isInAllowedHours(dropInfo.start, dropInfo.end),
+
+    // ⚙️ Configuration des vues
+    views: {
+      timeGridWeek: {
+        slotMinTime: "08:00:00",
+        slotMaxTime: "18:00:00",
+      },
+      timeGridDay: {
+        slotMinTime: "08:00:00",
+        slotMaxTime: "18:00:00",
+      },
+    },
 
     events: events.map(event => ({
       id: String(event.id),
@@ -108,6 +121,7 @@ function renderCalendar(events) {
       backgroundColor: getCategoryColor(event.category),
       extendedProps: { category: event.category }
     })),
+
     eventClick: (info) => openEventModal(info.event),
     eventDrop: (info) => saveEvent(eventToData(info.event)),
     eventResize: (info) => saveEvent(eventToData(info.event)),
@@ -123,8 +137,6 @@ function renderCalendar(events) {
 function isInAllowedHours(start, end) {
   const startHour = start.getHours();
   const endHour = end.getHours();
-
-  // Plage autorisée : 8h à 18h inclus
   return startHour >= 8 && endHour <= 18;
 }
 
@@ -248,7 +260,7 @@ function openEventModal(event = null, info = null) {
       category: categorySelect.value,
     };
 
-    // 🚫 Vérifie que les heures sont dans la plage autorisée
+    // 🚫 Vérifie les heures autorisées
     const startDate = new Date(newEvent.start);
     const endDate = new Date(newEvent.end);
     if (!isInAllowedHours(startDate, endDate)) {
@@ -281,7 +293,6 @@ document.addEventListener("DOMContentLoaded", () => {
   ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
   chargerPlanning();
 
-  // Vérification réseau après un court délai
   setTimeout(() => {
     if (navigator.onLine) {
       isOffline = false;
