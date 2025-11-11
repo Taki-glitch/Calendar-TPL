@@ -9,22 +9,20 @@
   <!-- ✅ FullCalendar -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-
-  <!-- ✅ Localisations -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/locales-all.global.min.js"></script>
 
   <!-- ✅ Ton style -->
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- ✅ En-tête avec logo + titre + boutons -->
+  <!-- ✅ En-tête -->
   <header>
     <div class="header-left">
       <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
       <h1 id="site-title">Planning TPL</h1>
     </div>
     <div class="header-buttons">
-      <button id="lang-toggle" aria-label="Changer la langue">🌐</button>
+      <button id="lang-toggle" aria-label="Changer la langue">🇫🇷</button>
       <button id="theme-toggle" aria-label="Changer le thème">🌙</button>
     </div>
   </header>
@@ -47,10 +45,10 @@
     <div class="legend-item"><span class="legend-color fta"></span> <span data-i18n="fta">France Terre d’Asile</span></div>
   </div>
 
-  <!-- ✅ Bouton d’ajout d’événement -->
+  <!-- ✅ Bouton d’ajout -->
   <button id="add-event-btn" aria-label="Ajouter un événement">+</button>
 
-  <!-- ✅ Modale d’événement -->
+  <!-- ✅ Modale -->
   <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2 id="modal-title" data-i18n="newEvent">Nouvel événement</h2>
