@@ -1,5 +1,8 @@
 console.log("✅ script.js chargé correctement !");
 
+/**************************************************************
+ * 🌍 CONFIGURATION
+ **************************************************************/
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
 const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 
@@ -10,7 +13,7 @@ let isOffline = !navigator.onLine;
 let calendar = null;
 
 /**************************************************************
- * 🌗 Thème sombre / clair
+ * 🌗 THÈME SOMBRE / CLAIR
  **************************************************************/
 function appliquerTheme(theme) {
   if (theme === "dark") {
@@ -34,25 +37,43 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /**************************************************************
- * 🔌 Connexion réseau
+ * 🌐 GESTION MULTILINGUE (FR / RU)
+ **************************************************************/
+let currentLang = localStorage.getItem("lang") || "fr";
+
+function traduireTexte(fr, ru) {
+  return currentLang === "ru" ? ru : fr;
+}
+
+function changerLangue(langue) {
+  currentLang = langue;
+  localStorage.setItem("lang", langue);
+  chargerPlanning(); // recharge le calendrier avec la bonne locale
+}
+
+/**************************************************************
+ * 🔌 CONNEXION RÉSEAU
  **************************************************************/
 window.addEventListener("online", () => {
   isOffline = false;
   OFFLINE_BANNER.classList.add("hidden");
   chargerPlanning();
 });
+
 window.addEventListener("offline", () => {
   isOffline = true;
   OFFLINE_BANNER.classList.remove("hidden");
 });
 
 /**************************************************************
- * 🔁 Chargement du planning
+ * 🔁 CHARGEMENT DU PLANNING
  **************************************************************/
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
   loader.classList.remove("hidden");
-  loader.textContent = isOffline ? "Mode hors ligne — données locales..." : "Chargement du calendrier...";
+  loader.textContent = isOffline
+    ? traduireTexte("Mode hors ligne — données locales...", "Автономный режим — локальные данные...")
+    : traduireTexte("Chargement du calendrier...", "Загрузка календаря...");
 
   let events = [];
 
@@ -77,7 +98,7 @@ async function chargerPlanning() {
 }
 
 /**************************************************************
- * 📅 Affichage du calendrier
+ * 📅 AFFICHAGE DU CALENDRIER
  **************************************************************/
 function renderCalendar(events) {
   const calendarEl = document.getElementById("planning");
@@ -86,7 +107,7 @@ function renderCalendar(events) {
   const isMobile = window.innerWidth <= 900;
 
   calendar = new FullCalendar.Calendar(calendarEl, {
-    locale: "fr",
+    locale: currentLang, // <-- FR ou RU
     firstDay: 1,
     nowIndicator: true,
     initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
@@ -94,11 +115,11 @@ function renderCalendar(events) {
       ? { left: "prev,next", center: "title", right: "" }
       : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
     buttonText: {
-      today: "Aujourd’hui",
-      month: "Mois",
-      week: "Semaine",
-      day: "Jour",
-      list: "Liste"
+      today: traduireTexte("Aujourd’hui", "Сегодня"),
+      month: traduireTexte("Mois", "Месяц"),
+      week: traduireTexte("Semaine", "Неделя"),
+      day: traduireTexte("Jour", "День"),
+      list: traduireTexte("Liste", "Список")
     },
     slotMinTime: "08:00:00",
     slotMaxTime: "18:00:00",
@@ -126,7 +147,7 @@ function renderCalendar(events) {
 }
 
 /**************************************************************
- * 🎨 Couleurs des catégories
+ * 🎨 COULEURS DES CATÉGORIES
  **************************************************************/
 function getCategoryColor(category) {
   const colors = {
@@ -141,7 +162,7 @@ function getCategoryColor(category) {
 }
 
 /**************************************************************
- * 💾 Sauvegarde locale + serveur
+ * 💾 SAUVEGARDE LOCALE + SERVEUR
  **************************************************************/
 function eventToData(event) {
   return {
@@ -156,7 +177,8 @@ function eventToData(event) {
 async function saveEvent(event) {
   let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
   const i = saved.findIndex((e) => e.id === event.id);
-  if (i >= 0) saved[i] = event; else saved.push(event);
+  if (i >= 0) saved[i] = event;
+  else saved.push(event);
   localStorage.setItem("tplEvents", JSON.stringify(saved));
 
   if (!isOffline) {
@@ -173,10 +195,10 @@ async function saveEvent(event) {
 }
 
 /**************************************************************
- * 🗑️ Suppression d’un événement
+ * 🗑️ SUPPRESSION D’ÉVÉNEMENT
  **************************************************************/
 async function deleteEvent(event) {
-  if (!confirm("Supprimer cet événement ?")) return;
+  if (!confirm(traduireTexte("Supprimer cet événement ?", "Удалить это событие?"))) return;
   event.remove();
 
   let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
@@ -197,7 +219,7 @@ async function deleteEvent(event) {
 }
 
 /**************************************************************
- * 🪟 Modale (création / modification)
+ * 🪟 MODALE D’ÉVÉNEMENT
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
@@ -214,7 +236,7 @@ function openEventModal(event = null, info = null) {
   modal.classList.remove("hidden");
 
   if (!event) {
-    modalTitle.textContent = "Nouvel événement";
+    modalTitle.textContent = traduireTexte("Nouvel événement", "Новое событие");
     titleInput.value = "";
     startInput.value = info?.startStr?.slice(0, 16) || "";
     endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
@@ -222,7 +244,7 @@ function openEventModal(event = null, info = null) {
     cancelBtn.classList.remove("hidden");
     deleteBtn.classList.add("hidden");
   } else {
-    modalTitle.textContent = "Modifier l’événement";
+    modalTitle.textContent = traduireTexte("Modifier l’événement", "Редактировать событие");
     titleInput.value = event.title;
     startInput.value = event.startStr.slice(0, 16);
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
@@ -265,7 +287,7 @@ function openEventModal(event = null, info = null) {
 }
 
 /**************************************************************
- * 🚀 Initialisation
+ * 🚀 INITIALISATION
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
   ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
