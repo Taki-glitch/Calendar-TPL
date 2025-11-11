@@ -31,14 +31,14 @@ body.dark #planning {
 header {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* ✅ corrige la disposition */
+  justify-content: space-between;
   padding: 10px 16px;
   background-color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   position: sticky;
   top: 0;
   z-index: 2000;
-  flex-wrap: nowrap; /* ✅ empêche le passage à la ligne */
+  flex-wrap: nowrap;
 }
 
 /* Conteneur gauche : logo + titre */
@@ -60,7 +60,16 @@ header h1 {
   font-size: 1.6rem;
   color: #007bff;
   margin: 0;
-  white-space: nowrap; /* ✅ empêche le titre de passer à la ligne */
+  white-space: nowrap;
+}
+
+/**************************************************************
+ * 🌙 BOUTONS EN-TÊTE (THÈME + LANGUE)
+ **************************************************************/
+.header-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 /* Bouton de thème */
@@ -76,6 +85,32 @@ header h1 {
 
 #theme-toggle:hover {
   transform: rotate(20deg);
+}
+
+/* Sélecteur de langue */
+#language-toggle {
+  background: none;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+#language-toggle:hover {
+  background: #f0f0f0;
+  border-color: #007bff;
+}
+
+body.dark #language-toggle {
+  color: #e5e5e5;
+  border-color: #555;
+  background: #1f2228;
+}
+
+body.dark #language-toggle:hover {
+  background: #2b2f36;
 }
 
 /* 📱 Adaptation mobile */
@@ -95,6 +130,11 @@ header h1 {
 
   #theme-toggle {
     font-size: 1.3rem;
+  }
+
+  #language-toggle {
+    padding: 4px 6px;
+    font-size: 0.8rem;
   }
 }
 
