@@ -203,6 +203,8 @@ header h1 {
   z-index: 7000;
   animation: fadeIn 0.25s ease;
   backdrop-filter: blur(4px);
+  /* ✅ Fix tactile mobile : clics passants uniquement sur contenu */
+  pointer-events: none;
 }
 
 .modal.hidden {
@@ -220,6 +222,8 @@ header h1 {
   flex-direction: column;
   gap: 10px;
   animation: slideUp 0.3s ease;
+  /* ✅ Réactive les clics ici */
+  pointer-events: all;
 }
 
 .modal-content h2 {
@@ -255,7 +259,6 @@ header h1 {
 /**************************************************************
  * 🔘 BOUTONS DE MODALE
  **************************************************************/
-.modal-actions,
 .modal-buttons {
   display: flex;
   justify-content: space-between;
