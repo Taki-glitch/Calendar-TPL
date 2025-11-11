@@ -3,68 +3,68 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#007bff" />
   <title>Planning TPL</title>
-
-  <!-- ✅ FullCalendar -->
-  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <header>
-    <img src="logo.png" alt="Logo TPL" class="logo" />
-    <h1>Planning TPL</h1>
-    <button id="theme-toggle" aria-label="Changer le thème">🌙</button>
+  <!-- 🔝 Barre supérieure -->
+  <header class="top-bar">
+    <div class="logo-container">
+      <img src="logo.png" alt="Logo TPL" class="logo" />
+      <h1>Planning TPL</h1>
+    </div>
+    <button id="add-event-btn" class="btn-plus" title="Ajouter un événement">+</button>
   </header>
 
-  <div id="offline-banner" class="hidden">⚠️ Vous êtes hors ligne</div>
-  <div id="loader" class="hidden">Chargement du calendrier...</div>
-  <div id="planning"></div>
-
-  <div id="legend">
-    <div class="legend-item"><span class="legend-color hotel"></span> Hôtel-Dieu</div>
-    <div class="legend-item"><span class="legend-color greneraie"></span> Gréneraie / Resto du Cœur</div>
-    <div class="legend-item"><span class="legend-color pref"></span> Préfecture</div>
-    <div class="legend-item"><span class="legend-color tour"></span> Tour de Bretagne</div>
-    <div class="legend-item"><span class="legend-color fta"></span> France Terre d’Asile</div>
+  <!-- ⚠️ Bannière hors ligne -->
+  <div id="offline-banner" class="hidden" style="background:#ffcc00;color:#333;width:100%;text-align:center;padding:6px 0;font-weight:500;">
+    Mode hors ligne — les modifications seront sauvegardées localement.
   </div>
 
-  <button id="add-event-btn" aria-label="Ajouter un événement">+</button>
+  <!-- ⏳ Indicateur de chargement -->
+  <div id="loader" style="margin-top:20px;">Chargement du calendrier...</div>
 
-  <!-- 🪟 Modale -->
-  <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
+  <!-- 📅 Conteneur du calendrier -->
+  <div id="planning"></div>
+
+  <!-- 🪟 Modale de création / édition -->
+  <div id="event-modal" class="hidden">
     <div class="modal-content">
       <h2 id="modal-title">Nouvel événement</h2>
 
-      <label for="event-title">Titre</label>
-      <input type="text" id="event-title" placeholder="Ex : Réunion équipe" />
+      <label for="event-title">Titre :</label>
+      <input type="text" id="event-title" placeholder="Nom de l’événement" />
 
-      <label for="event-start">Début</label>
+      <label for="event-start">Début :</label>
       <input type="datetime-local" id="event-start" />
 
-      <label for="event-end">Fin</label>
+      <label for="event-end">Fin :</label>
       <input type="datetime-local" id="event-end" />
 
-      <label for="event-category">Catégorie</label>
+      <label for="event-category">Catégorie :</label>
       <select id="event-category">
-        <option>Hôtel-Dieu</option>
-        <option>Gréneraie/Resto du Cœur</option>
-        <option>Préfecture</option>
-        <option>Tour de Bretagne</option>
-        <option>France Terre d’Asile</option>
-        <option>Autre</option>
+        <option value="Hôtel-Dieu">Hôtel-Dieu</option>
+        <option value="Gréneraie/Resto du Cœur">Gréneraie / Resto du Cœur</option>
+        <option value="Préfecture">Préfecture</option>
+        <option value="Tour de Bretagne">Tour de Bretagne</option>
+        <option value="France Terre d’Asile">France Terre d’Asile</option>
+        <option value="Autre">Autre</option>
       </select>
 
       <div class="modal-buttons">
-        <button id="save-event" type="button">💾 Enregistrer</button>
-        <button id="cancel-event" type="button">Annuler</button>
-        <button id="delete-event" type="button" class="danger hidden">🗑️ Supprimer</button>
+        <button id="save-event" class="btn-green">Enregistrer</button>
+        <button id="cancel-event" class="btn-grey">Annuler</button>
+        <button id="delete-event" class="btn-red">Supprimer</button>
       </div>
     </div>
   </div>
 
+  <!-- 📜 Librairie FullCalendar -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+
+  <!-- ⚙️ Script principal -->
   <script src="script.js"></script>
 </body>
-</html> 
+</html>
