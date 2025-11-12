@@ -6,29 +6,50 @@
   <meta name="theme-color" content="#007bff" />
   <title>Planning TPL</title>
 
-  <!-- ✅ FullCalendar -->
+  <!-- FullCalendar -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
-  <!-- ✅ Styles -->
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- ✅ Favicon + PWA -->
+  <!-- Favicon + PWA -->
   <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png" />
   <link rel="apple-touch-icon" href="tpl-logo.png" />
   <link rel="manifest" href="manifest.json" />
 </head>
 
 <body>
-  <!-- 🖼️ En-tête -->
+  <!-- SIDE MENU + OVERLAY -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <nav class="side-menu" id="side-menu" aria-hidden="true">
+    <div class="side-menu-header">
+      <img src="tpl-logo.png" alt="Logo TPL" class="side-logo" />
+      <button id="menu-close" class="menu-close" aria-label="Fermer le menu">✕</button>
+    </div>
+
+    <ul class="side-links">
+      <li><a href="index.html" class="side-link">🗓️ Planning</a></li>
+      <li><a href="instructions.html" class="side-link">📖 Instructions</a></li>
+    </ul>
+
+    <div class="side-actions">
+      <button id="side-theme-toggle" class="side-action-btn" aria-label="Changer le thème">🌙</button>
+      <button id="side-lang-toggle" class="side-action-btn" aria-label="Changer la langue">🇫🇷</button>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
   <header>
     <div class="header-left">
+      <button id="menu-btn" class="menu-btn" aria-label="Ouvrir le menu">☰</button>
       <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
       <h1>Planning TPL</h1>
     </div>
 
-    <!-- 🧭 Menu de navigation -->
-    <nav class="main-nav">
+    <!-- Desktop nav -->
+    <nav class="main-nav" role="navigation" aria-label="Navigation principale">
       <a href="index.html" class="nav-link active">Planning</a>
       <a href="instructions.html" class="nav-link">Instructions</a>
     </nav>
@@ -39,18 +60,16 @@
     </div>
   </header>
 
-  <!-- ⚠️ Bannière offline -->
-  <div id="offline-banner" class="hidden">
-    🚫 Vous êtes hors ligne — mode local activé
-  </div>
+  <!-- BANNIÈRE offline -->
+  <div id="offline-banner" class="hidden">🚫 Vous êtes hors ligne — mode local activé</div>
 
-  <!-- 🔄 Indicateur de chargement -->
+  <!-- LOADER -->
   <div id="loader" class="hidden">Chargement du calendrier...</div>
 
-  <!-- 📅 Calendrier -->
+  <!-- CALENDAR -->
   <div id="planning"></div>
 
-  <!-- 🎨 Légende -->
+  <!-- LEGEND -->
   <div id="legend">
     <div class="legend-item"><span class="legend-color hotel"></span> Hôtel-Dieu</div>
     <div class="legend-item"><span class="legend-color greneraie"></span> Gréneraie / Resto du Cœur</div>
@@ -60,11 +79,11 @@
     <div class="legend-item"><span class="legend-color autre"></span> Autre</div>
   </div>
 
-  <!-- ➕ Bouton flottant -->
+  <!-- ADD BUTTON -->
   <button id="add-event-btn" title="Ajouter un événement">+</button>
 
-  <!-- 🪟 Modale d’événement -->
-  <div id="event-modal" class="modal hidden">
+  <!-- EVENT MODAL -->
+  <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2 id="modal-title">Nouvel événement</h2>
 
@@ -95,10 +114,10 @@
     </div>
   </div>
 
-  <!-- ✅ Script principal -->
+  <!-- Script principal -->
   <script src="script.js"></script>
 
-  <!-- ✅ Service Worker -->
+  <!-- Service Worker -->
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
