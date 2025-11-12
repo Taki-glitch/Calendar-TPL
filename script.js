@@ -219,7 +219,7 @@ async function deleteEvent(event) {
 }
 
 /**************************************************************
- * 🪟 MODALE D’ÉVÉNEMENT (avec traduction complète)
+ * 🪟 MODALE D’ÉVÉNEMENT (avec traduction des boutons)
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
@@ -233,59 +233,15 @@ function openEventModal(event = null, info = null) {
   const deleteBtn = document.getElementById("delete-event");
   const modalTitle = document.getElementById("modal-title");
 
-  const labelTitle = document.querySelector('label[for="event-title"]');
-  const labelStart = document.querySelector('label[for="event-start"]');
-  const labelEnd = document.querySelector('label[for="event-end"]');
-  const labelCategory = document.querySelector('label[for="event-category"]');
-
-  const texts = {
-    fr: {
-      newEvent: "Nouvel événement",
-      editEvent: "Modifier l’événement",
-      save: "💾 Enregistrer",
-      cancel: "Annuler",
-      delete: "🗑️ Supprimer",
-      titleLabel: "Titre",
-      startLabel: "Début",
-      endLabel: "Fin",
-      categoryLabel: "Catégorie",
-      titlePlaceholder: "Entrez un titre",
-      startPlaceholder: "Sélectionnez la date de début",
-      endPlaceholder: "Sélectionnez la date de fin"
-    },
-    ru: {
-      newEvent: "Новое событие",
-      editEvent: "Редактировать событие",
-      save: "💾 Сохранить",
-      cancel: "Отмена",
-      delete: "🗑️ Удалить",
-      titleLabel: "Название",
-      startLabel: "Начало",
-      endLabel: "Конец",
-      categoryLabel: "Категория",
-      titlePlaceholder: "Введите название",
-      startPlaceholder: "Выберите дату начала",
-      endPlaceholder: "Выберите дату окончания"
-    }
-  };
-
-  const t = texts[currentLang];
-
-  labelTitle.textContent = t.titleLabel;
-  labelStart.textContent = t.startLabel;
-  labelEnd.textContent = t.endLabel;
-  labelCategory.textContent = t.categoryLabel;
-  titleInput.placeholder = t.titlePlaceholder;
-  startInput.placeholder = t.startPlaceholder;
-  endInput.placeholder = t.endPlaceholder;
-  saveBtn.textContent = t.save;
-  cancelBtn.textContent = t.cancel;
-  deleteBtn.textContent = t.delete;
+  // Traduction dynamique des boutons
+  saveBtn.textContent = traduireTexte("💾 Enregistrer", "💾 Сохранить");
+  cancelBtn.textContent = traduireTexte("Annuler", "Отмена");
+  deleteBtn.textContent = traduireTexte("🗑️ Supprimer", "🗑️ Удалить");
 
   modal.classList.remove("hidden");
 
   if (!event) {
-    modalTitle.textContent = t.newEvent;
+    modalTitle.textContent = traduireTexte("Nouvel événement", "Новое событие");
     titleInput.value = "";
     startInput.value = info?.startStr?.slice(0, 16) || "";
     endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
@@ -293,7 +249,7 @@ function openEventModal(event = null, info = null) {
     cancelBtn.classList.remove("hidden");
     deleteBtn.classList.add("hidden");
   } else {
-    modalTitle.textContent = t.editEvent;
+    modalTitle.textContent = traduireTexte("Modifier l’événement", "Редактировать событие");
     titleInput.value = event.title;
     startInput.value = event.startStr.slice(0, 16);
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
@@ -341,9 +297,11 @@ function openEventModal(event = null, info = null) {
 document.addEventListener("DOMContentLoaded", () => {
   ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
 
+  // 🌍 Gestion du changement de langue
   const langToggle = document.getElementById("lang-toggle");
   if (langToggle) {
     langToggle.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
+
     langToggle.addEventListener("click", () => {
       const newLang = currentLang === "fr" ? "ru" : "fr";
       changerLangue(newLang);
