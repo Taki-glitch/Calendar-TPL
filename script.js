@@ -6,11 +6,106 @@ console.log("✅ script.js chargé correctement !");
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
 const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 
-const OFFLINE_BANNER = document.getElementById("offline-banner");
-const ADD_EVENT_BTN = document.getElementById("add-event-btn");
-const THEME_TOGGLE = document.getElementById("theme-toggle");
+let OFFLINE_BANNER = null;
+let ADD_EVENT_BTN = null;
+let THEME_TOGGLE = null;
+let LANG_TOGGLE = null;
+let MENU_BTN = null;
+let SIDE_MENU = null;
+let OVERLAY = null;
+let SIDE_THEME_TOGGLE = null;
+let SIDE_LANG_TOGGLE = null;
+let MENU_CLOSE = null;
+
 let isOffline = !navigator.onLine;
 let calendar = null;
+
+/**************************************************************
+ * 🌐 Éléments DOM & initialisations (après DOMContentLoaded)
+ **************************************************************/
+document.addEventListener("DOMContentLoaded", () => {
+  // Query les éléments maintenant (plus sûr)
+  OFFLINE_BANNER = document.getElementById("offline-banner");
+  ADD_EVENT_BTN = document.getElementById("add-event-btn");
+  THEME_TOGGLE = document.getElementById("theme-toggle");
+  LANG_TOGGLE = document.getElementById("lang-toggle");
+  MENU_BTN = document.getElementById("menu-btn");
+  SIDE_MENU = document.getElementById("side-menu");
+  OVERLAY = document.getElementById("overlay");
+  SIDE_THEME_TOGGLE = document.getElementById("side-theme-toggle");
+  SIDE_LANG_TOGGLE = document.getElementById("side-lang-toggle");
+  MENU_CLOSE = document.getElementById("menu-close");
+
+  // Thème
+  const savedTheme = localStorage.getItem("theme") || "light";
+  appliquerTheme(savedTheme);
+
+  THEME_TOGGLE?.addEventListener("click", () => {
+    const nouveauTheme = document.body.classList.contains("dark") ? "light" : "dark";
+    appliquerTheme(nouveauTheme);
+  });
+
+  SIDE_THEME_TOGGLE?.addEventListener("click", () => {
+    const nouveauTheme = document.body.classList.contains("dark") ? "light" : "dark";
+    appliquerTheme(nouveauTheme);
+  });
+
+  // Langue
+  const savedLang = localStorage.getItem("lang") || "fr";
+  currentLang = savedLang;
+  LANG_TOGGLE.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
+  LANG_TOGGLE.addEventListener("click", () => {
+    const newLang = currentLang === "fr" ? "ru" : "fr";
+    changerLangue(newLang);
+    LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
+    // On laisse la page se recharger si nécessaire (car textes statiques)
+    location.reload();
+  });
+
+  SIDE_LANG_TOGGLE?.addEventListener("click", () => {
+    const newLang = currentLang === "fr" ? "ru" : "fr";
+    changerLangue(newLang);
+    // Met à jour les deux toggles visuels
+    if (LANG_TOGGLE) LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
+    if (SIDE_LANG_TOGGLE) SIDE_LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
+    location.reload();
+  });
+
+  // Menu latéral
+  MENU_BTN?.addEventListener("click", openMenu);
+  OVERLAY?.addEventListener("click", closeMenu);
+  MENU_CLOSE?.addEventListener("click", closeMenu);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.body.classList.contains("menu-open")) closeMenu();
+  });
+
+  // Bouton + pour ouvrir la modale
+  ADD_EVENT_BTN?.addEventListener("click", () => openEventModal());
+
+  // Lang toggle initial visual for side
+  if (SIDE_LANG_TOGGLE && LANG_TOGGLE) SIDE_LANG_TOGGLE.textContent = LANG_TOGGLE.textContent;
+
+  // Charger planning
+  chargerPlanning();
+});
+
+/***********************
+ * Fonctions menu
+ ***********************/
+function openMenu() {
+  document.body.classList.add("menu-open");
+  if (OVERLAY) OVERLAY.setAttribute("aria-hidden", "false");
+  if (SIDE_MENU) SIDE_MENU.setAttribute("aria-hidden", "false");
+  // lock scroll on body (simple)
+  document.documentElement.style.overflow = "hidden";
+}
+
+function closeMenu() {
+  document.body.classList.remove("menu-open");
+  if (OVERLAY) OVERLAY.setAttribute("aria-hidden", "true");
+  if (SIDE_MENU) SIDE_MENU.setAttribute("aria-hidden", "true");
+  document.documentElement.style.overflow = "";
+}
 
 /**************************************************************
  * 🌗 THÈME SOMBRE / CLAIR
@@ -18,23 +113,16 @@ let calendar = null;
 function appliquerTheme(theme) {
   if (theme === "dark") {
     document.body.classList.add("dark");
-    THEME_TOGGLE.textContent = "☀️";
+    // update toggles if available
+    if (THEME_TOGGLE) THEME_TOGGLE.textContent = "☀️";
+    if (SIDE_THEME_TOGGLE) SIDE_THEME_TOGGLE.textContent = "☀️";
   } else {
     document.body.classList.remove("dark");
-    THEME_TOGGLE.textContent = "🌙";
+    if (THEME_TOGGLE) THEME_TOGGLE.textContent = "🌙";
+    if (SIDE_THEME_TOGGLE) SIDE_THEME_TOGGLE.textContent = "🌙";
   }
   localStorage.setItem("theme", theme);
 }
-
-document.addEventListener("DOMContentLoaded", () => {
-  const savedTheme = localStorage.getItem("theme") || "light";
-  appliquerTheme(savedTheme);
-
-  THEME_TOGGLE.addEventListener("click", () => {
-    const nouveauTheme = document.body.classList.contains("dark") ? "light" : "dark";
-    appliquerTheme(nouveauTheme);
-  });
-});
 
 /**************************************************************
  * 🌐 GESTION MULTILINGUE (FR / RU)
@@ -48,7 +136,10 @@ function traduireTexte(fr, ru) {
 function changerLangue(langue) {
   currentLang = langue;
   localStorage.setItem("lang", langue);
-  chargerPlanning(); // recharge le calendrier avec la bonne locale
+  // Si le calendrier est déjà initialisé, recharger
+  if (calendar) {
+    chargerPlanning();
+  }
 }
 
 /**************************************************************
@@ -56,13 +147,13 @@ function changerLangue(langue) {
  **************************************************************/
 window.addEventListener("online", () => {
   isOffline = false;
-  OFFLINE_BANNER.classList.add("hidden");
+  OFFLINE_BANNER?.classList.add("hidden");
   chargerPlanning();
 });
 
 window.addEventListener("offline", () => {
   isOffline = true;
-  OFFLINE_BANNER.classList.remove("hidden");
+  OFFLINE_BANNER?.classList.remove("hidden");
 });
 
 /**************************************************************
@@ -233,13 +324,13 @@ function openEventModal(event = null, info = null) {
   const deleteBtn = document.getElementById("delete-event");
   const modalTitle = document.getElementById("modal-title");
 
-  // 🏷️ Labels du formulaire
+  // Labels
   const labelTitle = document.querySelector('label[for="event-title"]');
   const labelStart = document.querySelector('label[for="event-start"]');
   const labelEnd = document.querySelector('label[for="event-end"]');
   const labelCategory = document.querySelector('label[for="event-category"]');
 
-  // Traduction dynamique
+  // Translations
   const texts = {
     fr: {
       newEvent: "Nouvel événement",
@@ -273,23 +364,23 @@ function openEventModal(event = null, info = null) {
 
   const t = texts[currentLang];
 
-  // Appliquer les traductions
-  labelTitle.textContent = t.titleLabel;
-  labelStart.textContent = t.startLabel;
-  labelEnd.textContent = t.endLabel;
-  labelCategory.textContent = t.categoryLabel;
-  titleInput.placeholder = t.titlePlaceholder;
-  startInput.placeholder = t.startPlaceholder;
-  endInput.placeholder = t.endPlaceholder;
-  saveBtn.textContent = t.save;
-  cancelBtn.textContent = t.cancel;
-  deleteBtn.textContent = t.delete;
+  // Apply texts
+  if (labelTitle) labelTitle.textContent = t.titleLabel;
+  if (labelStart) labelStart.textContent = t.startLabel;
+  if (labelEnd) labelEnd.textContent = t.endLabel;
+  if (labelCategory) labelCategory.textContent = t.categoryLabel;
+  if (titleInput) titleInput.placeholder = t.titlePlaceholder;
+  if (startInput) startInput.placeholder = t.startPlaceholder;
+  if (endInput) endInput.placeholder = t.endPlaceholder;
+  if (saveBtn) saveBtn.textContent = t.save;
+  if (cancelBtn) cancelBtn.textContent = t.cancel;
+  if (deleteBtn) deleteBtn.textContent = t.delete;
 
   modal.classList.remove("hidden");
 
-  // ✅ Correction mobile : focus automatique sur le champ titre
+  // Focus mobile (gives time for animation)
   setTimeout(() => {
-    titleInput.focus();
+    titleInput?.focus();
   }, 300);
 
   if (!event) {
@@ -342,24 +433,3 @@ function openEventModal(event = null, info = null) {
     closeModal();
   };
 }
-
-/**************************************************************
- * 🚀 INITIALISATION
- **************************************************************/
-document.addEventListener("DOMContentLoaded", () => {
-  ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
-
-  // 🌍 Gestion du changement de langue
-  const langToggle = document.getElementById("lang-toggle");
-  if (langToggle) {
-    langToggle.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
-
-    langToggle.addEventListener("click", () => {
-      const newLang = currentLang === "fr" ? "ru" : "fr";
-      changerLangue(newLang);
-      langToggle.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
-    });
-  }
-
-  chargerPlanning();
-});
