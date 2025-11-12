@@ -311,6 +311,182 @@ body.dark .instructions-card {
 }
 
 /**************************************************************
+ * 📅 CALENDRIER ET LÉGENDE
+ **************************************************************/
+#planning {
+  max-width: 1200px;
+  margin: 20px auto 10px;
+  padding: 10px;
+  background: var(--card-light);
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+body.dark #planning {
+  background: var(--card-dark);
+}
+
+#legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin: 10px auto 25px;
+  font-size: 0.95rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-color {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.legend-color.hotel { background-color: #FFD43B; }
+.legend-color.greneraie { background-color: #2ECC71; }
+.legend-color.pref { background-color: #E74C3C; }
+.legend-color.tour { background-color: #3498DB; }
+.legend-color.fta { background-color: #9B59B6; }
+.legend-color.autre { background-color: #6c757d; }
+
+/**************************************************************
+ * ➕ BOUTON AJOUT D’ÉVÉNEMENT
+ **************************************************************/
+#add-event-btn {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 60px;
+  height: 60px;
+  background-color: var(--primary);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 2rem;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+  transition: transform 0.25s ease, background-color 0.25s ease;
+  z-index: 3000;
+}
+
+#add-event-btn:hover {
+  transform: scale(1.1);
+  background-color: var(--primary-dark);
+}
+
+body.dark #add-event-btn {
+  background-color: #0a84ff;
+}
+
+/**************************************************************
+ * 🪟 MODALE D’ÉVÉNEMENT
+ **************************************************************/
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 5000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: var(--card-light);
+  padding: 20px 24px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 400px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: fadeIn 0.25s ease;
+}
+
+body.dark .modal-content {
+  background: var(--card-dark);
+  color: var(--text-dark);
+}
+
+.modal-content h2 {
+  text-align: center;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
+
+.modal-content input,
+.modal-content select {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+body.dark .modal-content input,
+body.dark .modal-content select {
+  background-color: #3b3f45;
+  border: 1px solid #555;
+  color: #eee;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: background-color 0.25s ease;
+}
+
+#save-event {
+  background: var(--primary);
+  color: white;
+}
+
+#save-event:hover {
+  background: var(--primary-dark);
+}
+
+#cancel-event {
+  background: #ccc;
+}
+
+#delete-event {
+  background: #e74c3c;
+  color: white;
+}
+
+#delete-event:hover {
+  background: #c0392b;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+/**************************************************************
  * 🖥️ OPTIMISATION DESKTOP
  **************************************************************/
 @media (min-width: 901px) {
