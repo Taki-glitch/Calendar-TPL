@@ -2,117 +2,94 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hors ligne — Planning TPL</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#007bff" />
+  <title>Planning TPL — Hors ligne</title>
 
   <style>
-    :root {
-      --primary: #007bff;
-      --primary-dark: #0056d6;
-      --bg-light: linear-gradient(145deg, #e8f0ff, #f7faff);
-      --bg-dark: linear-gradient(145deg, #1b1e24, #2a2f38);
-      --text-light: #333;
-      --text-dark: #f0f0f0;
-      --shadow-light: rgba(0, 0, 0, 0.1);
-      --shadow-dark: rgba(0, 0, 0, 0.4);
-    }
-
     body {
-      margin: 0;
-      padding: 0;
-      height: 100vh;
+      font-family: "Inter", "Segoe UI", Arial, sans-serif;
+      background-color: #f5f7fb;
+      color: #333;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-family: "Inter", "Segoe UI", Arial, sans-serif;
-      background: var(--bg-light);
-      color: var(--text-light);
-      transition: background 0.3s, color 0.3s;
+      height: 100vh;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      transition: background-color 0.4s ease, color 0.4s ease;
     }
 
-    .logo {
-      width: 90px;
-      height: 90px;
+    body.dark {
+      background-color: #1a1d21;
+      color: #e5e5e5;
+    }
+
+    img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
       margin-bottom: 20px;
-      filter: drop-shadow(0 0 6px var(--shadow-light));
-      transition: filter 0.3s;
     }
 
     h1 {
-      font-size: 1.8rem;
-      color: var(--primary);
-      margin-bottom: 10px;
+      font-size: 1.6rem;
+      margin: 0 0 10px;
+      color: #007bff;
     }
 
     p {
       font-size: 1rem;
+      margin-bottom: 25px;
       max-width: 320px;
-      line-height: 1.5;
-      text-align: center;
     }
 
     button {
-      margin-top: 25px;
-      background: var(--primary);
+      background-color: #007bff;
       color: white;
       border: none;
-      border-radius: 12px;
-      padding: 12px 22px;
+      border-radius: 8px;
+      padding: 12px 20px;
       font-size: 1rem;
       cursor: pointer;
-      box-shadow: 0 4px 8px var(--shadow-light);
-      transition: transform 0.2s, background 0.2s, box-shadow 0.3s;
+      transition: background-color 0.3s ease, transform 0.2s ease;
     }
 
     button:hover {
-      background: var(--primary-dark);
-      transform: scale(1.03);
-      box-shadow: 0 6px 12px var(--shadow-light);
+      background-color: #0056b3;
+      transform: scale(1.05);
     }
 
-    footer {
-      position: absolute;
-      bottom: 15px;
-      font-size: 0.8rem;
-      opacity: 0.7;
-    }
+    @media (max-width: 600px) {
+      img {
+        width: 100px;
+        height: 100px;
+      }
 
-    /* 🌙 Mode sombre automatique */
-    @media (prefers-color-scheme: dark) {
-      body {
-        background: var(--bg-dark);
-        color: var(--text-dark);
-      }
-      .logo {
-        filter: drop-shadow(0 0 6px var(--shadow-dark));
-      }
       h1 {
-        color: #5ca9ff;
+        font-size: 1.4rem;
       }
-      button {
-        background: #5ca9ff;
-        box-shadow: 0 4px 8px var(--shadow-dark);
-      }
-      button:hover {
-        background: #3c8cff;
-        box-shadow: 0 6px 12px var(--shadow-dark);
-      }
-      footer {
-        color: #ccc;
+
+      p {
+        font-size: 0.95rem;
       }
     }
   </style>
 </head>
 
 <body>
-  <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
-  <h1>Vous êtes hors ligne</h1>
-  <p>Impossible de charger le calendrier.<br>
-     Vérifiez votre connexion Internet et réessayez.</p>
+  <img src="tpl-logo.png" alt="Logo TPL" />
+  <h1>Mode hors ligne</h1>
+  <p>Vous n’êtes actuellement pas connecté à Internet.<br>
+  Certaines fonctionnalités ne sont pas disponibles.</p>
+  <button onclick="window.location.reload()">🔄 Recharger la page</button>
 
-  <button onclick="window.location.reload()">🔄 Réessayer</button>
-
-  <footer>Planning TPL — Mode hors ligne</footer>
+  <script>
+    // 🌙 Adapte automatiquement au thème enregistré
+    const theme = localStorage.getItem("theme");
+    if (theme === "dark") document.body.classList.add("dark");
+  </script>
 </body>
 </html>
