@@ -16,7 +16,7 @@
 </head>
 
 <body>
-  <!-- SIDE MENU + OVERLAY -->
+  <!-- 🧭 SIDE MENU + OVERLAY -->
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
   <nav class="side-menu" id="side-menu" aria-hidden="true">
@@ -27,7 +27,7 @@
 
     <ul class="side-links">
       <li><a href="index.html" class="side-link">🗓️ Planning</a></li>
-      <li><a href="instructions.html" class="side-link">📖 Instructions</a></li>
+      <li><a href="instructions.html" class="side-link active">📖 Instructions</a></li>
     </ul>
 
     <div class="side-actions">
@@ -36,7 +36,7 @@
     </div>
   </nav>
 
-  <!-- HEADER -->
+  <!-- 🏷️ HEADER -->
   <header>
     <div class="header-left">
       <button id="menu-btn" class="menu-btn" aria-label="Ouvrir le menu">☰</button>
@@ -44,7 +44,6 @@
       <h1>Planning TPL</h1>
     </div>
 
-    <!-- Desktop nav -->
     <nav class="main-nav" role="navigation" aria-label="Navigation principale">
       <a href="index.html" class="nav-link">Planning</a>
       <a href="instructions.html" class="nav-link active">Instructions</a>
@@ -56,7 +55,7 @@
     </div>
   </header>
 
-  <!-- CONTENT -->
+  <!-- 🧾 CONTENU -->
   <main class="instructions-container">
     <section class="instructions-card">
       <h2>📋 Instructions du TPL</h2>
@@ -88,10 +87,9 @@
     </section>
   </main>
 
-  <!-- Script (theme + lang handled in common script) -->
+  <!-- Scripts -->
   <script src="script.js"></script>
 
-  <!-- Service Worker -->
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
