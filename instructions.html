@@ -6,25 +6,46 @@
   <meta name="theme-color" content="#007bff" />
   <title>Instructions TPL</title>
 
-  <!-- ✅ Styles -->
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- ✅ Favicon + PWA -->
+  <!-- Favicon + PWA -->
   <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png" />
   <link rel="apple-touch-icon" href="tpl-logo.png" />
   <link rel="manifest" href="manifest.json" />
 </head>
 
 <body>
-  <!-- 🖼️ En-tête -->
+  <!-- SIDE MENU + OVERLAY -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <nav class="side-menu" id="side-menu" aria-hidden="true">
+    <div class="side-menu-header">
+      <img src="tpl-logo.png" alt="Logo TPL" class="side-logo" />
+      <button id="menu-close" class="menu-close" aria-label="Fermer le menu">✕</button>
+    </div>
+
+    <ul class="side-links">
+      <li><a href="index.html" class="side-link">🗓️ Planning</a></li>
+      <li><a href="instructions.html" class="side-link">📖 Instructions</a></li>
+    </ul>
+
+    <div class="side-actions">
+      <button id="side-theme-toggle" class="side-action-btn" aria-label="Changer le thème">🌙</button>
+      <button id="side-lang-toggle" class="side-action-btn" aria-label="Changer la langue">🇫🇷</button>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
   <header>
     <div class="header-left">
+      <button id="menu-btn" class="menu-btn" aria-label="Ouvrir le menu">☰</button>
       <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
       <h1>Planning TPL</h1>
     </div>
 
-    <!-- 🧭 Menu de navigation -->
-    <nav class="main-nav">
+    <!-- Desktop nav -->
+    <nav class="main-nav" role="navigation" aria-label="Navigation principale">
       <a href="index.html" class="nav-link">Planning</a>
       <a href="instructions.html" class="nav-link active">Instructions</a>
     </nav>
@@ -35,14 +56,11 @@
     </div>
   </header>
 
-  <!-- 📖 Contenu principal -->
+  <!-- CONTENT -->
   <main class="instructions-container">
     <section class="instructions-card">
       <h2>📋 Instructions du TPL</h2>
       <p>Bienvenue dans la section d’instructions du <strong>Projet TPL</strong>.</p>
-      <p>Cette page a pour but de guider les utilisateurs dans le bon déroulement du programme.</p>
-
-      <hr />
 
       <h3>🔹 Étape 1 — Préparation</h3>
       <ul>
@@ -70,45 +88,10 @@
     </section>
   </main>
 
-  <!-- ✅ Script de thème + langue -->
-  <script>
-    const themeToggle = document.getElementById("theme-toggle");
-    const langToggle = document.getElementById("lang-toggle");
+  <!-- Script (theme + lang handled in common script) -->
+  <script src="script.js"></script>
 
-    // 🌗 Thème sombre/clair
-    const appliquerTheme = (theme) => {
-      if (theme === "dark") {
-        document.body.classList.add("dark");
-        themeToggle.textContent = "☀️";
-      } else {
-        document.body.classList.remove("dark");
-        themeToggle.textContent = "🌙";
-      }
-      localStorage.setItem("theme", theme);
-    };
-
-    const savedTheme = localStorage.getItem("theme") || "light";
-    appliquerTheme(savedTheme);
-
-    themeToggle.addEventListener("click", () => {
-      const newTheme = document.body.classList.contains("dark") ? "light" : "dark";
-      appliquerTheme(newTheme);
-    });
-
-    // 🌍 Gestion de la langue (même stockage que le planning)
-    let currentLang = localStorage.getItem("lang") || "fr";
-    langToggle.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
-
-    langToggle.addEventListener("click", () => {
-      const newLang = currentLang === "fr" ? "ru" : "fr";
-      currentLang = newLang;
-      localStorage.setItem("lang", newLang);
-      langToggle.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
-      location.reload(); // recharge la page pour refléter la langue
-    });
-  </script>
-
-  <!-- ✅ Service Worker -->
+  <!-- Service Worker -->
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
