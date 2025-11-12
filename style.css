@@ -41,7 +41,6 @@ header {
   flex-wrap: nowrap;
 }
 
-/* Conteneur gauche : logo + titre */
 .header-left {
   display: flex;
   align-items: center;
@@ -72,8 +71,8 @@ header h1 {
   gap: 10px;
 }
 
-/* Bouton de thème */
-#theme-toggle {
+#theme-toggle,
+#lang-toggle {
   background: none;
   border: none;
   font-size: 1.5rem;
@@ -87,54 +86,8 @@ header h1 {
   transform: rotate(20deg);
 }
 
-/* 🌍 Bouton drapeau langue */
-#lang-toggle {
-  background: none;
-  border: none;
-  font-size: 1.6rem;
-  cursor: pointer;
-  color: inherit;
-  transition: transform 0.2s ease;
-  flex-shrink: 0;
-}
-
 #lang-toggle:hover {
   transform: scale(1.1);
-}
-
-body.dark #language-toggle {
-  color: #e5e5e5;
-  border-color: #555;
-  background: #1f2228;
-}
-
-body.dark #language-toggle:hover {
-  background: #2b2f36;
-}
-
-/* 📱 Adaptation mobile */
-@media (max-width: 600px) {
-  header {
-    padding: 8px 12px;
-  }
-
-  .header-left img {
-    width: 40px;
-    height: 40px;
-  }
-
-  header h1 {
-    font-size: 1.2rem;
-  }
-
-  #theme-toggle {
-    font-size: 1.3rem;
-  }
-
-  #language-toggle {
-    padding: 4px 6px;
-    font-size: 0.8rem;
-  }
 }
 
 /**************************************************************
@@ -187,7 +140,7 @@ body.dark #language-toggle:hover {
  **************************************************************/
 #planning {
   max-width: 900px;
-  margin: 20px auto 80px auto;
+  margin: 20px auto 30px auto; /* 🔧 Réduction de l’espace bas */
   background: white;
   border-radius: 12px;
   padding: 10px;
@@ -204,7 +157,7 @@ body.dark #planning {
  **************************************************************/
 #legend {
   max-width: 900px;
-  margin: 10px auto 20px;
+  margin: 0 auto 20px; /* 🔧 Réduction de l’espace haut */
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -290,8 +243,8 @@ body.dark #planning {
   z-index: 7000;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
-  overflow-y: auto; /* ✅ Permet de scroller quand le clavier est ouvert */
-  -webkit-overflow-scrolling: touch; /* ✅ iOS : améliore le scroll fluide */
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .modal.hidden {
@@ -310,8 +263,6 @@ body.dark #planning {
   gap: 10px;
   position: relative;
   z-index: 7100;
-
-  /* ✅ Supprime transform/animation qui bloque le clavier sur mobile */
   animation: none;
 }
 
@@ -327,7 +278,6 @@ body.dark .modal-content {
   font-size: 1.4rem;
 }
 
-/* ✅ Sur mobile, décale la modale vers le haut pour ne pas être masquée par le clavier */
 @media (max-width: 768px) {
   .modal-content {
     margin-top: 15vh;
@@ -402,17 +352,4 @@ body.dark .modal-content select {
 .modal-buttons button:active {
   transform: scale(0.96);
   opacity: 0.8;
-}
-
-/**************************************************************
- * 🌈 ANIMATIONS
- **************************************************************/
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
 }
