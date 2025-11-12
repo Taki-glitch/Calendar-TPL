@@ -1,11 +1,8 @@
 /****************************************************
- * 📦 SERVICE WORKER v3.3 — Planning TPL (cache optimisé)
- * ----------------------------------------------------
- * ✅ Correction : "Response body is already used"
- * ✅ Optimisation du cache et fallback réseau
+ * 📦 SERVICE WORKER v3.4 — Planning TPL (avec logo SVG)
  ****************************************************/
 
-const CACHE_VERSION = "v3.3"; // 🆕 incrémente à chaque mise à jour
+const CACHE_VERSION = "v3.4";
 const CACHE_NAME = `tpl-calendar-cache-${CACHE_VERSION}`;
 
 const ASSETS = [
@@ -16,14 +13,15 @@ const ASSETS = [
   "./script.js",
   "./manifest.json",
   "./tpl-logo.png",
+  "./tpl-logo-blue.svg",
 
-  // ✅ FullCalendar (JS intégrés)
+  // ✅ FullCalendar
   "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.js",
   "https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/index.global.min.js",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js",
+  "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js"
 ];
 
 /****************************************************
@@ -38,12 +36,7 @@ self.addEventListener("install", (event) => {
           ASSETS.map(async (url) => {
             try {
               const res = await fetch(url, { cache: "no-store" });
-              if (res.ok) {
-                await cache.put(url, res.clone());
-                console.log("📦 Cached:", url);
-              } else {
-                console.warn("⚠️ Non mis en cache (HTTP error):", url, res.status);
-              }
+              if (res.ok) await cache.put(url, res.clone());
             } catch (err) {
               console.warn("⚠️ Skip asset (erreur réseau):", url, err.message);
             }
@@ -55,20 +48,13 @@ self.addEventListener("install", (event) => {
 });
 
 /****************************************************
- * 🚀 ACTIVATION — Nettoyage des anciens caches
+ * 🚀 ACTIVATION — Nettoyage anciens caches
  ****************************************************/
 self.addEventListener("activate", (event) => {
-  console.log("🚀 Service Worker actif — purge des anciens caches…");
+  console.log("🚀 Service Worker actif — purge anciens caches…");
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            console.log("🧹 Suppression ancien cache :", key);
-            return caches.delete(key);
-          }
-        })
-      )
+      Promise.all(keys.map((key) => key !== CACHE_NAME && caches.delete(key)))
     ).then(() => self.clients.claim())
   );
 });
@@ -78,50 +64,30 @@ self.addEventListener("activate", (event) => {
  ****************************************************/
 self.addEventListener("fetch", (event) => {
   const request = event.request;
-
-  // 🚫 Ignorer les requêtes chrome-extension ou data:
-  if (request.url.startsWith("chrome-extension") || request.url.startsWith("data:")) {
-    return;
-  }
+  if (request.url.startsWith("chrome-extension") || request.url.startsWith("data:")) return;
 
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
-      if (cachedResponse) {
-        console.log("⚙️ Cache hit:", request.url);
-        return cachedResponse;
-      }
+      if (cachedResponse) return cachedResponse;
 
-      // 🔁 Sinon → essai réseau + mise en cache
       return fetch(request)
         .then((networkResponse) => {
-          // ⚠️ Certaines requêtes (ex: POST) n’ont pas de body clonable
-          if (!networkResponse || !networkResponse.ok || networkResponse.type === "opaque") {
-            return networkResponse;
-          }
-
-          const responseClone = networkResponse.clone(); // ✅ Correction ici
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(request, responseClone);
-          });
-
+          if (!networkResponse || !networkResponse.ok || networkResponse.type === "opaque") return networkResponse;
+          const responseClone = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, responseClone));
           return networkResponse;
         })
-        .catch(() => {
-          // 🌐 Si hors ligne → retour vers offline.html
-          if (request.mode === "navigate" || request.destination === "document") {
-            return caches.match("./offline.html");
-          }
-        });
+        .catch(() => (request.mode === "navigate" ? caches.match("./offline.html") : undefined));
     })
   );
 });
 
 /****************************************************
- * 🧭 Message depuis la page (ex: purge manuelle)
+ * 🧭 Message depuis la page
  ****************************************************/
 self.addEventListener("message", (event) => {
   if (event.data === "forceUpdate") {
-    console.log("♻️ Forçage de la mise à jour du Service Worker");
+    console.log("♻️ Forçage mise à jour SW");
     self.skipWaiting();
   }
 });
