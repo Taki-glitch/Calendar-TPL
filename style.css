@@ -45,7 +45,6 @@ header {
   display: flex;
   align-items: center;
   gap: 10px;
-  flex-shrink: 1;
 }
 
 header .logo {
@@ -60,6 +59,54 @@ header h1 {
   color: #007bff;
   margin: 0;
   white-space: nowrap;
+}
+
+/**************************************************************
+ * 🧭 MENU DE NAVIGATION
+ **************************************************************/
+.main-nav {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+}
+
+.nav-link {
+  text-decoration: none;
+  color: #007bff;
+  font-weight: 600;
+  font-size: 1rem;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #0056b3;
+}
+
+.nav-link.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background-color: #007bff;
+  border-radius: 2px;
+}
+
+body.dark .nav-link {
+  color: #66aaff;
+}
+
+body.dark .nav-link.active::after {
+  background-color: #66aaff;
+}
+
+@media (max-width: 600px) {
+  .main-nav {
+    display: none; /* Cache le menu sur petits écrans */
+  }
 }
 
 /**************************************************************
@@ -140,7 +187,7 @@ header h1 {
  **************************************************************/
 #planning {
   max-width: 900px;
-  margin: 20px auto 30px auto; /* 🔧 Réduction de l’espace bas */
+  margin: 20px auto 30px auto;
   background: white;
   border-radius: 12px;
   padding: 10px;
@@ -153,11 +200,11 @@ body.dark #planning {
 }
 
 /**************************************************************
- * 🎨 LÉGENDE DES CATÉGORIES
+ * 🎨 LÉGENDE
  **************************************************************/
 #legend {
   max-width: 900px;
-  margin: 0 auto 20px; /* 🔧 Réduction de l’espace haut */
+  margin: 0 auto 20px;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
@@ -223,12 +270,11 @@ body.dark #planning {
     width: 52px;
     height: 52px;
     font-size: 1.8rem;
-    z-index: 6000;
   }
 }
 
 /**************************************************************
- * 🪟 MODALE — optimisée mobile/tablette (corrigée pour clavier)
+ * 🪟 MODALE (corrigée mobile)
  **************************************************************/
 .modal {
   position: fixed;
@@ -285,7 +331,7 @@ body.dark .modal-content {
 }
 
 /**************************************************************
- * 📝 CHAMPS DE FORMULAIRE
+ * 📝 FORMULAIRE
  **************************************************************/
 .modal-content label {
   font-weight: 600;
@@ -298,7 +344,6 @@ body.dark .modal-content {
   border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  box-sizing: border-box;
   width: 100%;
 }
 
@@ -330,26 +375,9 @@ body.dark .modal-content select {
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
-#save-event {
-  background: #007bff;
-  color: white;
-}
+#save-event { background: #007bff; color: white; }
+#cancel-event { background: #888; color: white; }
+#delete-event { background: #dc3545; color: white; }
 
-#cancel-event {
-  background: #888;
-  color: white;
-}
-
-#delete-event {
-  background: #dc3545;
-  color: white;
-}
-
-.modal-buttons button:hover {
-  opacity: 0.9;
-}
-
-.modal-buttons button:active {
-  transform: scale(0.96);
-  opacity: 0.8;
-}
+.modal-buttons button:hover { opacity: 0.9; }
+.modal-buttons button:active { transform: scale(0.96); opacity: 0.8; }
