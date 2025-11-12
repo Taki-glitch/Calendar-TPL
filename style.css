@@ -275,19 +275,23 @@ body.dark #planning {
 }
 
 /**************************************************************
- * 🪟 MODALE — optimisée mobile/tablette
+ * 🪟 MODALE — optimisée mobile/tablette (corrigée pour clavier)
  **************************************************************/
 .modal {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 7000;
-  animation: fadeIn 0.25s ease;
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
+  overflow-y: auto; /* ✅ Permet de scroller quand le clavier est ouvert */
+  -webkit-overflow-scrolling: touch; /* ✅ iOS : améliore le scroll fluide */
 }
 
 .modal.hidden {
@@ -304,9 +308,11 @@ body.dark #planning {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  animation: slideUp 0.3s ease;
   position: relative;
   z-index: 7100;
+
+  /* ✅ Supprime transform/animation qui bloque le clavier sur mobile */
+  animation: none;
 }
 
 body.dark .modal-content {
@@ -319,6 +325,13 @@ body.dark .modal-content {
   text-align: center;
   color: #007bff;
   font-size: 1.4rem;
+}
+
+/* ✅ Sur mobile, décale la modale vers le haut pour ne pas être masquée par le clavier */
+@media (max-width: 768px) {
+  .modal-content {
+    margin-top: 15vh;
+  }
 }
 
 /**************************************************************
