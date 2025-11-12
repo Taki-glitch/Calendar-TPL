@@ -219,10 +219,7 @@ async function deleteEvent(event) {
 }
 
 /**************************************************************
- * 🪟 MODALE D’ÉVÉNEMENT (avec traduction des boutons)
- **************************************************************/
-/**************************************************************
- * 🪟 MODALE D’ÉVÉNEMENT (avec traduction complète)
+ * 🪟 MODALE D’ÉVÉNEMENT (avec focus mobile)
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
@@ -289,6 +286,11 @@ function openEventModal(event = null, info = null) {
   deleteBtn.textContent = t.delete;
 
   modal.classList.remove("hidden");
+
+  // ✅ Correction mobile : focus automatique sur le champ titre
+  setTimeout(() => {
+    titleInput.focus();
+  }, 300);
 
   if (!event) {
     modalTitle.textContent = t.newEvent;
