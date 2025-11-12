@@ -432,4 +432,4 @@ function openEventModal(event = null, info = null) {
     deleteEvent(event);
     closeModal();
   };
-}
+} 
