@@ -4,7 +4,11 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#007bff" />
-  <title>Instructions TPL</title>
+  <title>Planning TPL</title>
+
+  <!-- FullCalendar -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
 
   <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
@@ -16,7 +20,7 @@
 </head>
 
 <body>
-  <!-- 🧭 SIDE MENU + OVERLAY -->
+  <!-- SIDE MENU + OVERLAY -->
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
   <nav class="side-menu" id="side-menu" aria-hidden="true">
@@ -27,7 +31,7 @@
 
     <ul class="side-links">
       <li><a href="index.html" class="side-link">🗓️ Planning</a></li>
-      <li><a href="instructions.html" class="side-link active">📖 Instructions</a></li>
+      <li><a href="instructions.html" class="side-link">📖 Instructions</a></li>
     </ul>
 
     <div class="side-actions">
@@ -36,7 +40,7 @@
     </div>
   </nav>
 
-  <!-- 🏷️ HEADER -->
+  <!-- HEADER -->
   <header>
     <div class="header-left">
       <button id="menu-btn" class="menu-btn" aria-label="Ouvrir le menu">☰</button>
@@ -44,9 +48,10 @@
       <h1>Planning TPL</h1>
     </div>
 
+    <!-- Desktop nav -->
     <nav class="main-nav" role="navigation" aria-label="Navigation principale">
-      <a href="index.html" class="nav-link">Planning</a>
-      <a href="instructions.html" class="nav-link active">Instructions</a>
+      <a href="index.html" class="nav-link active">Planning</a>
+      <a href="instructions.html" class="nav-link">Instructions</a>
     </nav>
 
     <div class="header-buttons">
@@ -55,41 +60,64 @@
     </div>
   </header>
 
-  <!-- 🧾 CONTENU -->
-  <main class="instructions-container">
-    <section class="instructions-card">
-      <h2>📋 Instructions du TPL</h2>
-      <p>Bienvenue dans la section d’instructions du <strong>Projet TPL</strong>.</p>
+  <!-- BANNIÈRE offline -->
+  <div id="offline-banner" class="hidden">🚫 Vous êtes hors ligne — mode local activé</div>
 
-      <h3>🔹 Étape 1 — Préparation</h3>
-      <ul>
-        <li>Vérifiez votre planning sur la page principale.</li>
-        <li>Assurez-vous que vos horaires sont bien à jour.</li>
-        <li>En cas de modification, utilisez le bouton <strong>+</strong> pour ajouter un événement.</li>
-      </ul>
+  <!-- LOADER -->
+  <div id="loader" class="hidden">Chargement du calendrier...</div>
 
-      <h3>🔹 Étape 2 — Sur le terrain</h3>
-      <ul>
-        <li>Suivez les informations associées à votre site (ex. Hôtel-Dieu, Préfecture...).</li>
-        <li>Communiquez les éventuels imprévus à l’équipe TPL.</li>
-      </ul>
+  <!-- CALENDAR -->
+  <div id="planning"></div>
 
-      <h3>🔹 Étape 3 — Après intervention</h3>
-      <ul>
-        <li>Notez les remarques ou incidents importants.</li>
-        <li>Supprimez ou ajustez les événements terminés pour garder le planning à jour.</li>
-      </ul>
+  <!-- LEGEND -->
+  <div id="legend">
+    <div class="legend-item"><span class="legend-color hotel"></span> Hôtel-Dieu</div>
+    <div class="legend-item"><span class="legend-color greneraie"></span> Gréneraie / Resto du Cœur</div>
+    <div class="legend-item"><span class="legend-color pref"></span> Préfecture</div>
+    <div class="legend-item"><span class="legend-color tour"></span> Tour de Bretagne</div>
+    <div class="legend-item"><span class="legend-color fta"></span> France Terre d’Asile</div>
+    <div class="legend-item"><span class="legend-color autre"></span> Autre</div>
+  </div>
 
-      <hr />
+  <!-- ADD BUTTON -->
+  <button id="add-event-btn" title="Ajouter un événement">+</button>
 
-      <h3>ℹ️ Conseils</h3>
-      <p>Le site est disponible hors ligne grâce à la PWA. Vous pouvez l’ajouter à votre écran d’accueil pour un accès rapide.</p>
-    </section>
-  </main>
+  <!-- EVENT MODAL -->
+  <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content">
+      <h2 id="modal-title">Nouvel événement</h2>
 
-  <!-- Scripts -->
+      <label for="event-title">Titre</label>
+      <input type="text" id="event-title" placeholder="Entrez un titre" />
+
+      <label for="event-start">Début</label>
+      <input type="datetime-local" id="event-start" />
+
+      <label for="event-end">Fin</label>
+      <input type="datetime-local" id="event-end" />
+
+      <label for="event-category">Catégorie</label>
+      <select id="event-category">
+        <option>Hôtel-Dieu</option>
+        <option>Gréneraie/Resto du Cœur</option>
+        <option>Préfecture</option>
+        <option>Tour de Bretagne</option>
+        <option>France Terre d’Asile</option>
+        <option>Autre</option>
+      </select>
+
+      <div class="modal-buttons">
+        <button id="save-event">💾 Enregistrer</button>
+        <button id="cancel-event">Annuler</button>
+        <button id="delete-event" class="hidden">🗑️ Supprimer</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script principal -->
   <script src="script.js"></script>
 
+  <!-- Service Worker -->
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
