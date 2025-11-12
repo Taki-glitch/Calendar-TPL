@@ -21,10 +21,10 @@
       "purpose": "any maskable"
     },
     {
-      "src": "Othertpl-logo.png",
+      "src": "tpl-logo-blue.svg",
       "sizes": "1024x1024",
-      "type": "image/png",
-      "purpose": "any"
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     }
   ],
   "lang": "fr",
