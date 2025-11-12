@@ -309,7 +309,6 @@ body.dark #planning {
   gap: 10px;
   position: relative;
   z-index: 7100;
-  animation: none;
 }
 
 body.dark .modal-content {
@@ -381,3 +380,44 @@ body.dark .modal-content select {
 
 .modal-buttons button:hover { opacity: 0.9; }
 .modal-buttons button:active { transform: scale(0.96); opacity: 0.8; }
+
+/**************************************************************
+ * 📖 PAGE INSTRUCTIONS
+ **************************************************************/
+.instructions-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.instructions-card {
+  background: white;
+  padding: 24px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  line-height: 1.6;
+}
+
+body.dark .instructions-card {
+  background: #2b2f36;
+  color: #f5f5f5;
+}
+
+.instructions-card h2 {
+  text-align: center;
+  color: #007bff;
+  margin-bottom: 10px;
+}
+
+.instructions-card h3 {
+  margin-top: 20px;
+  color: #007bff;
+}
+
+.instructions-card ul {
+  margin: 8px 0 16px 20px;
+}
+
+.instructions-card li {
+  margin-bottom: 6px;
+}
