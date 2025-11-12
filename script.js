@@ -6,142 +6,77 @@ console.log("✅ script.js chargé correctement !");
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxtWnKvuNhaawyd_0z8J_YVl5ZyX4qk8LVNP8oNXNCDMKWtgdzwm-oavdFrzEAufRVz/exec";
 const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 
-let calendar;
+const OFFLINE_BANNER = document.getElementById("offline-banner");
+const ADD_EVENT_BTN = document.getElementById("add-event-btn");
+const THEME_TOGGLE = document.getElementById("theme-toggle");
 let isOffline = !navigator.onLine;
-let currentLang = localStorage.getItem("lang") || "fr";
+let calendar = null;
 
 /**************************************************************
- * 🌐 DOMContentLoaded
- **************************************************************/
-document.addEventListener("DOMContentLoaded", () => {
-  const OFFLINE_BANNER = document.getElementById("offline-banner");
-  const ADD_EVENT_BTN = document.getElementById("add-event-btn");
-  const THEME_TOGGLE = document.getElementById("theme-toggle");
-  const LANG_TOGGLE = document.getElementById("lang-toggle");
-  const MENU_BTN = document.getElementById("menu-btn");
-  const SIDE_MENU = document.getElementById("side-menu");
-  const OVERLAY = document.getElementById("overlay");
-  const SIDE_THEME_TOGGLE = document.getElementById("side-theme-toggle");
-  const SIDE_LANG_TOGGLE = document.getElementById("side-lang-toggle");
-  const MENU_CLOSE = document.getElementById("menu-close");
-
-  /********** Thème **********/
-  const savedTheme = localStorage.getItem("theme") || "light";
-  appliquerTheme(savedTheme);
-
-  const toggleTheme = () => {
-    const nextTheme = document.body.classList.contains("dark") ? "light" : "dark";
-    appliquerTheme(nextTheme);
-  };
-  THEME_TOGGLE?.addEventListener("click", toggleTheme);
-  SIDE_THEME_TOGGLE?.addEventListener("click", toggleTheme);
-
-  /********** Langue **********/
-  LANG_TOGGLE.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
-  SIDE_LANG_TOGGLE.textContent = LANG_TOGGLE.textContent;
-
-  const toggleLang = () => {
-    currentLang = currentLang === "fr" ? "ru" : "fr";
-    localStorage.setItem("lang", currentLang);
-    LANG_TOGGLE.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
-    SIDE_LANG_TOGGLE.textContent = LANG_TOGGLE.textContent;
-    majTraductionGlobale();
-    chargerPlanning(); // recharge la vue sans reload
-  };
-  LANG_TOGGLE.addEventListener("click", toggleLang);
-  SIDE_LANG_TOGGLE.addEventListener("click", toggleLang);
-
-  /********** Menu latéral **********/
-  MENU_BTN?.addEventListener("click", () => openMenu(SIDE_MENU, OVERLAY));
-  MENU_CLOSE?.addEventListener("click", () => closeMenu(SIDE_MENU, OVERLAY));
-  OVERLAY?.addEventListener("click", () => closeMenu(SIDE_MENU, OVERLAY));
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeMenu(SIDE_MENU, OVERLAY);
-  });
-
-  /********** Bouton + **********/
-  ADD_EVENT_BTN?.addEventListener("click", () => openEventModal());
-
-  /********** Réseau **********/
-  window.addEventListener("online", () => {
-    isOffline = false;
-    OFFLINE_BANNER.classList.add("hidden");
-    chargerPlanning();
-  });
-  window.addEventListener("offline", () => {
-    isOffline = true;
-    OFFLINE_BANNER.classList.remove("hidden");
-  });
-
-  /********** Chargement **********/
-  chargerPlanning();
-});
-
-/**************************************************************
- * 🌗 THÈME
+ * 🌗 THÈME SOMBRE / CLAIR
  **************************************************************/
 function appliquerTheme(theme) {
-  const body = document.body;
-  const THEME_TOGGLE = document.getElementById("theme-toggle");
-  const SIDE_THEME_TOGGLE = document.getElementById("side-theme-toggle");
-
   if (theme === "dark") {
-    body.classList.add("dark");
+    document.body.classList.add("dark");
     THEME_TOGGLE.textContent = "☀️";
-    SIDE_THEME_TOGGLE.textContent = "☀️";
   } else {
-    body.classList.remove("dark");
+    document.body.classList.remove("dark");
     THEME_TOGGLE.textContent = "🌙";
-    SIDE_THEME_TOGGLE.textContent = "🌙";
   }
   localStorage.setItem("theme", theme);
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const savedTheme = localStorage.getItem("theme") || "light";
+  appliquerTheme(savedTheme);
+
+  THEME_TOGGLE.addEventListener("click", () => {
+    const nouveauTheme = document.body.classList.contains("dark") ? "light" : "dark";
+    appliquerTheme(nouveauTheme);
+  });
+});
+
 /**************************************************************
- * 🌐 MULTILINGUE
+ * 🌐 GESTION MULTILINGUE (FR / RU)
  **************************************************************/
+let currentLang = localStorage.getItem("lang") || "fr";
+
 function traduireTexte(fr, ru) {
   return currentLang === "ru" ? ru : fr;
 }
 
-function majTraductionGlobale() {
-  // Traduction du bandeau offline + loader + modal
-  document.getElementById("offline-banner").textContent = traduireTexte(
-    "🚫 Vous êtes hors ligne — mode local activé",
-    "🚫 Вы не в сети — автономный режим активирован"
-  );
-
-  const loader = document.getElementById("loader");
-  loader.textContent = traduireTexte("Chargement du calendrier...", "Загрузка календаря...");
+function changerLangue(langue) {
+  currentLang = langue;
+  localStorage.setItem("lang", langue);
+  chargerPlanning(); // recharge le calendrier avec la bonne locale
 }
 
 /**************************************************************
- * 🧭 MENU LATÉRAL
+ * 🔌 CONNEXION RÉSEAU
  **************************************************************/
-function openMenu(SIDE_MENU, OVERLAY) {
-  document.body.classList.add("menu-open");
-  SIDE_MENU?.setAttribute("aria-hidden", "false");
-  OVERLAY?.setAttribute("aria-hidden", "false");
-  document.documentElement.style.overflow = "hidden";
-}
+window.addEventListener("online", () => {
+  isOffline = false;
+  OFFLINE_BANNER.classList.add("hidden");
+  chargerPlanning();
+});
 
-function closeMenu(SIDE_MENU, OVERLAY) {
-  document.body.classList.remove("menu-open");
-  SIDE_MENU?.setAttribute("aria-hidden", "true");
-  OVERLAY?.setAttribute("aria-hidden", "true");
-  document.documentElement.style.overflow = "";
-}
+window.addEventListener("offline", () => {
+  isOffline = true;
+  OFFLINE_BANNER.classList.remove("hidden");
+});
 
 /**************************************************************
- * 🔁 CHARGEMENT DES ÉVÉNEMENTS
+ * 🔁 CHARGEMENT DU PLANNING
  **************************************************************/
 async function chargerPlanning() {
   const loader = document.getElementById("loader");
   loader.classList.remove("hidden");
-  loader.textContent = traduireTexte("Chargement du calendrier...", "Загрузка календаря...");
+  loader.textContent = isOffline
+    ? traduireTexte("Mode hors ligne — données locales...", "Автономный режим — локальные данные...")
+    : traduireTexte("Chargement du calendrier...", "Загрузка календаря...");
 
   let events = [];
+
   if (isOffline) {
     events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
     loader.classList.add("hidden");
@@ -153,8 +88,8 @@ async function chargerPlanning() {
     const text = await res.text();
     events = JSON.parse(text);
     localStorage.setItem("tplEvents", JSON.stringify(events));
-  } catch (e) {
-    console.warn("⚠️ Erreur de chargement, utilisation du cache local :", e);
+  } catch (err) {
+    console.warn("⚠️ Erreur de chargement, mode local :", err);
     events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
   }
 
@@ -163,23 +98,22 @@ async function chargerPlanning() {
 }
 
 /**************************************************************
- * 📅 FULLCALENDAR
+ * 📅 AFFICHAGE DU CALENDRIER
  **************************************************************/
 function renderCalendar(events) {
-  const el = document.getElementById("planning");
+  const calendarEl = document.getElementById("planning");
   if (calendar) calendar.destroy();
 
   const isMobile = window.innerWidth <= 900;
-  calendar = new FullCalendar.Calendar(el, {
-    locale: currentLang === "fr" ? "fr" : "ru",
+
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    locale: currentLang,
     firstDay: 1,
     nowIndicator: true,
     initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
-    headerToolbar: {
-      left: "prev,next today",
-      center: "title",
-      right: isMobile ? "" : "dayGridMonth,timeGridWeek,timeGridDay"
-    },
+    headerToolbar: isMobile
+      ? { left: "prev,next", center: "title", right: "" }
+      : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
     buttonText: {
       today: traduireTexte("Aujourd’hui", "Сегодня"),
       month: traduireTexte("Mois", "Месяц"),
@@ -193,18 +127,20 @@ function renderCalendar(events) {
     selectable: true,
     editable: true,
     height: "auto",
-    events: events.map(e => ({
+
+    events: events.map((e) => ({
       id: e.id,
       title: e.title,
       start: e.start,
       end: e.end,
       backgroundColor: getCategoryColor(e.category),
-      extendedProps: { category: e.category }
+      extendedProps: { category: e.category },
     })),
+
     select: (info) => openEventModal(null, info),
     eventClick: (info) => openEventModal(info.event),
     eventDrop: (info) => saveEvent(eventToData(info.event)),
-    eventResize: (info) => saveEvent(eventToData(info.event))
+    eventResize: (info) => saveEvent(eventToData(info.event)),
   });
 
   calendar.render();
@@ -220,13 +156,13 @@ function getCategoryColor(category) {
     "Préfecture": "#E74C3C",
     "Tour de Bretagne": "#3498DB",
     "France Terre d’Asile": "#9B59B6",
-    "Autre": "#6c757d"
+    "Autre": "#6c757d",
   };
   return colors[category] || "#6c757d";
 }
 
 /**************************************************************
- * 💾 SAUVEGARDE / SUPPRESSION
+ * 💾 SAUVEGARDE LOCALE + SERVEUR
  **************************************************************/
 function eventToData(event) {
   return {
@@ -234,64 +170,73 @@ function eventToData(event) {
     title: event.title,
     start: event.startStr,
     end: event.endStr,
-    category: event.extendedProps.category
+    category: event.extendedProps.category,
   };
 }
 
 async function saveEvent(event) {
-  let data = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  const i = data.findIndex(e => e.id === event.id);
-  if (i >= 0) data[i] = event;
-  else data.push(event);
-  localStorage.setItem("tplEvents", JSON.stringify(data));
+  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  const i = saved.findIndex((e) => e.id === event.id);
+  if (i >= 0) saved[i] = event;
+  else saved.push(event);
+  localStorage.setItem("tplEvents", JSON.stringify(saved));
 
   if (!isOffline) {
     try {
       await fetch(PROXY_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "patch", data: [event] })
+        body: JSON.stringify({ mode: "patch", data: [event] }),
       });
-    } catch (e) {
-      console.warn("⚠️ Sauvegarde réseau échouée :", e);
-    }
-  }
-}
-
-async function deleteEvent(event) {
-  if (!confirm(traduireTexte("Supprimer cet événement ?", "Удалить это событие?"))) return;
-  event.remove();
-  let data = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  data = data.filter(e => e.id !== event.id);
-  localStorage.setItem("tplEvents", JSON.stringify(data));
-
-  if (!isOffline) {
-    try {
-      await fetch(PROXY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "delete", data: [event.id] })
-      });
-    } catch (e) {
-      console.warn("⚠️ Erreur suppression serveur :", e);
+    } catch (err) {
+      console.warn("⚠️ Erreur réseau, enregistrement local uniquement :", err);
     }
   }
 }
 
 /**************************************************************
- * 🪟 MODALE D’ÉVÉNEMENT (labels traduits)
+ * 🗑️ SUPPRESSION D’ÉVÉNEMENT
+ **************************************************************/
+async function deleteEvent(event) {
+  if (!confirm(traduireTexte("Supprimer cet événement ?", "Удалить это событие?"))) return;
+  event.remove();
+
+  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  saved = saved.filter((e) => e.id !== event.id);
+  localStorage.setItem("tplEvents", JSON.stringify(saved));
+
+  if (!isOffline) {
+    try {
+      await fetch(PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "delete", data: [event.id] }),
+      });
+    } catch (err) {
+      console.warn("⚠️ Erreur de suppression :", err);
+    }
+  }
+}
+
+/**************************************************************
+ * 🪟 MODALE D’ÉVÉNEMENT (avec traduction complète)
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
-  const content = document.querySelector(".modal-content");
-  const title = document.getElementById("event-title");
-  const start = document.getElementById("event-start");
-  const end = document.getElementById("event-end");
-  const cat = document.getElementById("event-category");
-  const save = document.getElementById("save-event");
-  const cancel = document.getElementById("cancel-event");
-  const del = document.getElementById("delete-event");
+  const modalContent = document.querySelector(".modal-content");
+  const titleInput = document.getElementById("event-title");
+  const startInput = document.getElementById("event-start");
+  const endInput = document.getElementById("event-end");
+  const categorySelect = document.getElementById("event-category");
+  const saveBtn = document.getElementById("save-event");
+  const cancelBtn = document.getElementById("cancel-event");
+  const deleteBtn = document.getElementById("delete-event");
   const modalTitle = document.getElementById("modal-title");
+
+  const labelTitle = document.querySelector('label[for="event-title"]');
+  const labelStart = document.querySelector('label[for="event-start"]');
+  const labelEnd = document.querySelector('label[for="event-end"]');
+  const labelCategory = document.querySelector('label[for="event-category"]');
 
   const texts = {
     fr: {
@@ -300,11 +245,13 @@ function openEventModal(event = null, info = null) {
       save: "💾 Enregistrer",
       cancel: "Annuler",
       delete: "🗑️ Supprimer",
-      title: "Titre",
-      start: "Début",
-      end: "Fin",
-      category: "Catégorie",
-      placeholder: "Entrez un titre"
+      titleLabel: "Titre",
+      startLabel: "Début",
+      endLabel: "Fin",
+      categoryLabel: "Catégorie",
+      titlePlaceholder: "Entrez un titre",
+      startPlaceholder: "Sélectionnez la date de début",
+      endPlaceholder: "Sélectionnez la date de fin"
     },
     ru: {
       newEvent: "Новое событие",
@@ -312,61 +259,97 @@ function openEventModal(event = null, info = null) {
       save: "💾 Сохранить",
       cancel: "Отмена",
       delete: "🗑️ Удалить",
-      title: "Название",
-      start: "Начало",
-      end: "Конец",
-      category: "Категория",
-      placeholder: "Введите название"
+      titleLabel: "Название",
+      startLabel: "Начало",
+      endLabel: "Конец",
+      categoryLabel: "Категория",
+      titlePlaceholder: "Введите название",
+      startPlaceholder: "Выберите дату начала",
+      endPlaceholder: "Выберите дату окончания"
     }
   };
 
   const t = texts[currentLang];
-  document.querySelector('label[for="event-title"]').textContent = t.title;
-  document.querySelector('label[for="event-start"]').textContent = t.start;
-  document.querySelector('label[for="event-end"]').textContent = t.end;
-  document.querySelector('label[for="event-category"]').textContent = t.category;
-  title.placeholder = t.placeholder;
-  save.textContent = t.save;
-  cancel.textContent = t.cancel;
-  del.textContent = t.delete;
+
+  labelTitle.textContent = t.titleLabel;
+  labelStart.textContent = t.startLabel;
+  labelEnd.textContent = t.endLabel;
+  labelCategory.textContent = t.categoryLabel;
+  titleInput.placeholder = t.titlePlaceholder;
+  startInput.placeholder = t.startPlaceholder;
+  endInput.placeholder = t.endPlaceholder;
+  saveBtn.textContent = t.save;
+  cancelBtn.textContent = t.cancel;
+  deleteBtn.textContent = t.delete;
 
   modal.classList.remove("hidden");
-  setTimeout(() => title.focus(), 300);
 
   if (!event) {
     modalTitle.textContent = t.newEvent;
-    title.value = "";
-    start.value = info?.startStr?.slice(0, 16) || "";
-    end.value = info?.endStr?.slice(0, 16) || "";
-    del.classList.add("hidden");
+    titleInput.value = "";
+    startInput.value = info?.startStr?.slice(0, 16) || "";
+    endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
+    categorySelect.value = "Hôtel-Dieu";
+    cancelBtn.classList.remove("hidden");
+    deleteBtn.classList.add("hidden");
   } else {
     modalTitle.textContent = t.editEvent;
-    title.value = event.title;
-    start.value = event.startStr.slice(0, 16);
-    end.value = event.endStr ? event.endStr.slice(0, 16) : "";
-    del.classList.remove("hidden");
+    titleInput.value = event.title;
+    startInput.value = event.startStr.slice(0, 16);
+    endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
+    categorySelect.value = event.extendedProps.category || "Autre";
+    cancelBtn.classList.add("hidden");
+    deleteBtn.classList.remove("hidden");
   }
 
-  const close = () => modal.classList.add("hidden");
-  modal.onclick = (e) => { if (!content.contains(e.target)) close(); };
-  cancel.onclick = close;
-  del.onclick = () => { deleteEvent(event); close(); };
+  const closeModal = () => modal.classList.add("hidden");
+  modal.onclick = (e) => {
+    if (!modalContent.contains(e.target)) closeModal();
+  };
 
-  save.onclick = () => {
-    const newEvt = {
+  saveBtn.onclick = () => {
+    const newEvent = {
       id: event ? event.id : crypto.randomUUID(),
-      title: title.value.trim() || "(Sans titre)",
-      start: start.value,
-      end: end.value || start.value,
-      category: cat.value
+      title: titleInput.value.trim() || "(Sans titre)",
+      start: startInput.value,
+      end: endInput.value || startInput.value,
+      category: categorySelect.value,
     };
+
     if (event) event.remove();
+
     calendar.addEvent({
-      ...newEvt,
-      backgroundColor: getCategoryColor(newEvt.category),
-      extendedProps: { category: newEvt.category }
+      ...newEvent,
+      backgroundColor: getCategoryColor(newEvent.category),
+      extendedProps: { category: newEvent.category },
     });
-    saveEvent(newEvt);
-    close();
+
+    saveEvent(newEvent);
+    closeModal();
+  };
+
+  cancelBtn.onclick = closeModal;
+  deleteBtn.onclick = () => {
+    deleteEvent(event);
+    closeModal();
   };
 }
+
+/**************************************************************
+ * 🚀 INITIALISATION
+ **************************************************************/
+document.addEventListener("DOMContentLoaded", () => {
+  ADD_EVENT_BTN.addEventListener("click", () => openEventModal());
+
+  const langToggle = document.getElementById("lang-toggle");
+  if (langToggle) {
+    langToggle.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
+    langToggle.addEventListener("click", () => {
+      const newLang = currentLang === "fr" ? "ru" : "fr";
+      changerLangue(newLang);
+      langToggle.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
+    });
+  }
+
+  chargerPlanning();
+});
