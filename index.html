@@ -6,6 +6,12 @@
   <meta name="theme-color" content="#007bff" />
   <title>Planning TPL</title>
 
+  <!-- ✅ Icône d’onglet + PWA -->
+  <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png" />
+  <link rel="icon" type="image/svg+xml" href="tpl-logo-blue.svg" />
+  <link rel="apple-touch-icon" href="tpl-logo.png" />
+  <link rel="manifest" href="manifest.json" />
+
   <!-- ✅ FullCalendar -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
@@ -38,11 +44,11 @@
 
   <!-- ✅ Légende -->
   <div id="legend">
-    <div class="legend-item"><span class="legend-color hotel"></span> <span data-i18n="hotel">Hôtel-Dieu</span></div>
-    <div class="legend-item"><span class="legend-color greneraie"></span> <span data-i18n="greneraie">Gréneraie / Resto du Cœur</span></div>
-    <div class="legend-item"><span class="legend-color pref"></span> <span data-i18n="pref">Préfecture</span></div>
-    <div class="legend-item"><span class="legend-color tour"></span> <span data-i18n="tour">Tour de Bretagne</span></div>
-    <div class="legend-item"><span class="legend-color fta"></span> <span data-i18n="fta">France Terre d’Asile</span></div>
+    <div class="legend-item"><span class="legend-color hotel"></span> <span>Hôtel-Dieu</span></div>
+    <div class="legend-item"><span class="legend-color greneraie"></span> <span>Gréneraie / Resto du Cœur</span></div>
+    <div class="legend-item"><span class="legend-color pref"></span> <span>Préfecture</span></div>
+    <div class="legend-item"><span class="legend-color tour"></span> <span>Tour de Bretagne</span></div>
+    <div class="legend-item"><span class="legend-color fta"></span> <span>France Terre d’Asile</span></div>
   </div>
 
   <!-- ✅ Bouton d’ajout -->
@@ -51,31 +57,31 @@
   <!-- ✅ Modale -->
   <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
-      <h2 id="modal-title" data-i18n="newEvent">Nouvel événement</h2>
+      <h2 id="modal-title">Nouvel événement</h2>
 
-      <label for="event-title" data-i18n="title">Titre</label>
+      <label for="event-title">Titre</label>
       <input type="text" id="event-title" placeholder="Ex : Réunion équipe" />
 
-      <label for="event-start" data-i18n="start">Début</label>
+      <label for="event-start">Début</label>
       <input type="datetime-local" id="event-start" />
 
-      <label for="event-end" data-i18n="end">Fin</label>
+      <label for="event-end">Fin</label>
       <input type="datetime-local" id="event-end" />
 
-      <label for="event-category" data-i18n="category">Catégorie</label>
+      <label for="event-category">Catégorie</label>
       <select id="event-category">
-        <option data-i18n="hotel">Hôtel-Dieu</option>
-        <option data-i18n="greneraie">Gréneraie / Resto du Cœur</option>
-        <option data-i18n="pref">Préfecture</option>
-        <option data-i18n="tour">Tour de Bretagne</option>
-        <option data-i18n="fta">France Terre d’Asile</option>
-        <option data-i18n="other">Autre</option>
+        <option>Hôtel-Dieu</option>
+        <option>Gréneraie / Resto du Cœur</option>
+        <option>Préfecture</option>
+        <option>Tour de Bretagne</option>
+        <option>France Terre d’Asile</option>
+        <option>Autre</option>
       </select>
 
       <div class="modal-buttons">
-        <button id="save-event" type="button" data-i18n="save">💾 Enregistrer</button>
-        <button id="cancel-event" type="button" data-i18n="cancel">Annuler</button>
-        <button id="delete-event" type="button" class="danger hidden" data-i18n="delete">🗑️ Supprimer</button>
+        <button id="save-event" type="button">💾 Enregistrer</button>
+        <button id="cancel-event" type="button">Annuler</button>
+        <button id="delete-event" type="button" class="danger hidden">🗑️ Supprimer</button>
       </div>
     </div>
   </div>
