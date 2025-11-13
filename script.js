@@ -247,7 +247,7 @@ function getCategoryColor(category) {
     "Préfecture": "#E74C3C",
     "Tour de Bretagne": "#3498DB",
     "France Terre d’Asile": "#9B59B6",
-    "Autre": "#6c757d",
+    //"Autre": "#6c757d",
   };
   return colors[category] || "#6c757d";
 }
@@ -396,7 +396,7 @@ function openEventModal(event = null, info = null) {
     titleInput.value = event.title;
     startInput.value = event.startStr.slice(0, 16);
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
-    categorySelect.value = event.extendedProps.category || "Autre";
+    //categorySelect.value = event.extendedProps.category || "Autre";
     cancelBtn.classList.add("hidden");
     //deleteBtn.classList.remove("hidden");
   }
