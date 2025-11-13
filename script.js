@@ -288,7 +288,7 @@ async function saveEvent(event) {
 /**************************************************************
  * 🗑️ SUPPRESSION D’ÉVÉNEMENT
  **************************************************************/
-async function deleteEvent(event) {
+/*async function deleteEvent(event) {
   if (!confirm(traduireTexte("Supprimer cet événement ?", "Удалить это событие?"))) return;
   event.remove();
 
@@ -307,7 +307,7 @@ async function deleteEvent(event) {
       console.warn("⚠️ Erreur de suppression :", err);
     }
   }
-}
+}*/
 
 /**************************************************************
  * 🪟 MODALE D’ÉVÉNEMENT (avec focus mobile)
@@ -321,7 +321,7 @@ function openEventModal(event = null, info = null) {
   const categorySelect = document.getElementById("event-category");
   const saveBtn = document.getElementById("save-event");
   const cancelBtn = document.getElementById("cancel-event");
-  const deleteBtn = document.getElementById("delete-event");
+  //const deleteBtn = document.getElementById("delete-event");
   const modalTitle = document.getElementById("modal-title");
 
   // Labels
@@ -337,7 +337,7 @@ function openEventModal(event = null, info = null) {
       editEvent: "Modifier l’événement",
       save: "💾 Enregistrer",
       cancel: "Annuler",
-      delete: "🗑️ Supprimer",
+      //delete: "🗑️ Supprimer",
       titleLabel: "Titre",
       startLabel: "Début",
       endLabel: "Fin",
@@ -351,7 +351,7 @@ function openEventModal(event = null, info = null) {
       editEvent: "Редактировать событие",
       save: "💾 Сохранить",
       cancel: "Отмена",
-      delete: "🗑️ Удалить",
+      //delete: "🗑️ Удалить",
       titleLabel: "Название",
       startLabel: "Начало",
       endLabel: "Конец",
@@ -374,7 +374,7 @@ function openEventModal(event = null, info = null) {
   if (endInput) endInput.placeholder = t.endPlaceholder;
   if (saveBtn) saveBtn.textContent = t.save;
   if (cancelBtn) cancelBtn.textContent = t.cancel;
-  if (deleteBtn) deleteBtn.textContent = t.delete;
+  //if (deleteBtn) deleteBtn.textContent = t.delete;
 
   modal.classList.remove("hidden");
 
@@ -390,7 +390,7 @@ function openEventModal(event = null, info = null) {
     endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
     categorySelect.value = "Hôtel-Dieu";
     cancelBtn.classList.remove("hidden");
-    deleteBtn.classList.add("hidden");
+    //deleteBtn.classList.add("hidden");
   } else {
     modalTitle.textContent = t.editEvent;
     titleInput.value = event.title;
@@ -398,7 +398,7 @@ function openEventModal(event = null, info = null) {
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr.slice(0, 16);
     categorySelect.value = event.extendedProps.category || "Autre";
     cancelBtn.classList.add("hidden");
-    deleteBtn.classList.remove("hidden");
+    //deleteBtn.classList.remove("hidden");
   }
 
   const closeModal = () => modal.classList.add("hidden");
@@ -428,8 +428,8 @@ function openEventModal(event = null, info = null) {
   };
 
   cancelBtn.onclick = closeModal;
-  deleteBtn.onclick = () => {
-    deleteEvent(event);
-    closeModal();
-  };
+  //deleteBtn.onclick = () => {
+    //deleteEvent(event);
+    //closeModal();
+  //};
 } 
