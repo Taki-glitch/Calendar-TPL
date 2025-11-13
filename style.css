@@ -37,7 +37,7 @@ body.dark header {
 .overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.35);
+  background: rgba(0, 0, 0, 0.35);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.28s ease, visibility 0.28s ease;
@@ -57,9 +57,9 @@ body.menu-open .overlay {
   width: 280px;
   max-width: 80%;
   background: var(--card-light);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   transform: translateX(-110%);
-  transition: transform 0.32s cubic-bezier(.2,.9,.2,1);
+  transition: transform 0.32s cubic-bezier(.2, .9, .2, 1);
   z-index: 4500;
   display: flex;
   flex-direction: column;
@@ -120,7 +120,7 @@ body.menu-open .side-menu {
 }
 
 .side-link:hover {
-  background: rgba(0,0,0,0.04);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 body.dark .side-link {
@@ -140,7 +140,7 @@ body.dark .side-link {
   border-radius: 8px;
   border: none;
   cursor: pointer;
-  background: rgba(0,0,0,0.04);
+  background: rgba(0, 0, 0, 0.04);
 }
 
 /**************************************************************
@@ -387,34 +387,54 @@ body.dark #planning { background: var(--card-dark); }
   border-radius: 14px;
   padding: 20px;
   width: 90%;
-  max-width: 400px;
+  max-width: 420px;
+  box-sizing: border-box;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   position: relative;
   z-index: 7100;
-  animation: none;
 }
 
-body.dark .modal-content { background: var(--card-dark); color: var(--text-dark); }
+body.dark .modal-content {
+  background: var(--card-dark);
+  color: var(--text-dark);
+}
 
-.modal-content h2 { margin-top: 0; text-align: center; color: var(--primary); font-size: 1.4rem; }
+.modal-content h2 {
+  margin-top: 0;
+  text-align: center;
+  color: var(--primary);
+  font-size: 1.4rem;
+}
 
-@media (max-width: 768px) { .modal-content { margin-top: 15vh; } }
+@media (max-width: 768px) {
+  .modal-content {
+    margin-top: 15vh;
+  }
+}
 
 /**************************************************************
- * 📝 FORMULAIRE
+ * 📝 FORMULAIRE (corrigé)
  **************************************************************/
-.modal-content label { font-weight: 600; font-size: 0.95rem; }
+.modal-content label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+  display: block;
+}
 
 .modal-content input,
 .modal-content select {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-  font-size: 1rem;
   width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  margin-top: 4px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
 }
 
 body.dark .modal-content input,
@@ -430,7 +450,7 @@ body.dark .modal-content select {
 .modal-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 15px;
+  margin-top: 10px;
   gap: 10px;
 }
 
@@ -455,7 +475,11 @@ body.dark .modal-content select {
 /**************************************************************
  * 📖 PAGE INSTRUCTIONS
  **************************************************************/
-.instructions-container { max-width: 900px; margin: 30px auto; padding: 20px; }
+.instructions-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+}
 
 .instructions-card {
   background: var(--card-light);
@@ -465,12 +489,26 @@ body.dark .modal-content select {
   line-height: 1.6;
 }
 
-body.dark .instructions-card { background: var(--card-dark); color: var(--text-dark); }
+body.dark .instructions-card {
+  background: var(--card-dark);
+  color: var(--text-dark);
+}
 
-.instructions-card h2 { text-align: center; color: var(--primary); margin-bottom: 10px; }
+.instructions-card h2 {
+  text-align: center;
+  color: var(--primary);
+  margin-bottom: 10px;
+}
 
-.instructions-card h3 { margin-top: 20px; color: var(--primary); }
+.instructions-card h3 {
+  margin-top: 20px;
+  color: var(--primary);
+}
 
-.instructions-card ul { margin: 8px 0 16px 20px; }
+.instructions-card ul {
+  margin: 8px 0 16px 20px;
+}
 
-.instructions-card li { margin-bottom: 6px; }
+.instructions-card li {
+  margin-bottom: 6px;
+}
