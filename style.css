@@ -76,73 +76,6 @@ body.menu-open .side-menu {
   transform: translateX(0);
 }
 
-/* Side header */
-.side-menu-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.side-logo {
-  width: 44px;
-  height: 44px;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-.menu-close {
-  background: none;
-  border: none;
-  font-size: 1.3rem;
-  cursor: pointer;
-  color: inherit;
-}
-
-/* Links */
-.side-links {
-  list-style: none;
-  padding: 8px 0 0 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.side-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  text-decoration: none;
-  color: var(--primary);
-  font-weight: 600;
-}
-
-.side-link:hover {
-  background: rgba(0, 0, 0, 0.04);
-}
-
-body.dark .side-link {
-  color: #9fcaff;
-}
-
-/* actions at bottom of menu */
-.side-actions {
-  margin-top: auto;
-  display: flex;
-  gap: 8px;
-}
-
-.side-action-btn {
-  flex: 1;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  background: rgba(0, 0, 0, 0.04);
-}
-
 /**************************************************************
  * 🖼️ HEADER + LOGO
  **************************************************************/
@@ -156,24 +89,6 @@ header {
   position: sticky;
   top: 0;
   z-index: 2000;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.menu-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: none;
-  background: none;
-  font-size: 1.4rem;
-  cursor: pointer;
-  padding: 6px;
-  margin-right: 4px;
 }
 
 header .logo {
@@ -191,47 +106,7 @@ header h1 {
 }
 
 /**************************************************************
- * 🧭 MENU DE NAVIGATION (desktop)
- **************************************************************/
-.main-nav {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-  justify-content: center;
-}
-
-.nav-link {
-  text-decoration: none;
-  color: var(--primary);
-  font-weight: 600;
-  font-size: 1rem;
-  position: relative;
-  transition: color 0.2s ease;
-}
-
-.nav-link:hover {
-  color: var(--primary-dark);
-}
-
-.nav-link.active::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -4px;
-  width: 100%;
-  height: 2px;
-  background-color: var(--primary);
-  border-radius: 2px;
-}
-
-@media (max-width: 900px) {
-  .main-nav {
-    display: none; /* hide desktop nav on narrower screens */
-  }
-}
-
-/**************************************************************
- * 🌙 BOUTONS EN-TÊTE (THÈME + LANGUE)
+ * 🌙 BOUTONS EN-TÊTE
  **************************************************************/
 .header-buttons {
   display: flex;
@@ -273,43 +148,19 @@ header h1 {
 #offline-banner:not(.hidden) { transform: translateY(0); }
 
 /**************************************************************
- * 🔄 INDICATEUR DE CHARGEMENT
- **************************************************************/
-#loader {
-  position: fixed;
-  top: 60px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
-  color: var(--primary);
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-weight: 500;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  transition: opacity 0.4s ease;
-  z-index: 2500;
-}
-
-#loader.hidden { opacity: 0; pointer-events: none; }
-
-/**************************************************************
- * 📅 CALENDRIER
+ * 📅 CALENDRIER + LÉGENDE
  **************************************************************/
 #planning {
   max-width: 900px;
-  margin: 20px auto 30px auto;
+  margin: 20px auto;
   background: var(--card-light);
   border-radius: 12px;
   padding: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
 }
 
 body.dark #planning { background: var(--card-dark); }
 
-/**************************************************************
- * 🎨 LÉGENDE
- **************************************************************/
 #legend {
   max-width: 900px;
   margin: 0 auto 20px;
@@ -320,8 +171,7 @@ body.dark #planning { background: var(--card-dark); }
   font-size: 0.9em;
 }
 
-.legend-item { display: flex; align-items: center; gap: 6px; white-space: nowrap; }
-
+.legend-item { display: flex; align-items: center; gap: 6px; }
 .legend-color { width: 14px; height: 14px; border-radius: 50%; }
 
 .legend-color.hotel { background: #FFD43B; }
@@ -329,10 +179,9 @@ body.dark #planning { background: var(--card-dark); }
 .legend-color.pref { background: #E74C3C; }
 .legend-color.tour { background: #3498DB; }
 .legend-color.fta { background: #9B59B6; }
-.legend-color.autre { background: #6c757d; }
 
 /**************************************************************
- * ➕ BOUTON FLOTTANT “+”
+ * ➕ BOUTON FLOTTANT
  **************************************************************/
 #add-event-btn {
   position: fixed;
@@ -356,28 +205,18 @@ body.dark #planning { background: var(--card-dark); }
 
 #add-event-btn:hover { transform: scale(1.05); background: var(--primary-dark); }
 
-@media (max-width: 768px) {
-  #add-event-btn { bottom: 1rem; right: 1rem; width: 52px; height: 52px; font-size: 1.8rem; }
-}
-
 /**************************************************************
- * 🪟 MODALE (corrigée mobile)
+ * 🪟 MODALE
  **************************************************************/
 .modal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 7000;
   backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .modal.hidden { display: none; }
@@ -388,13 +227,10 @@ body.dark #planning { background: var(--card-dark); }
   padding: 20px;
   width: 90%;
   max-width: 420px;
-  box-sizing: border-box;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  position: relative;
-  z-index: 7100;
+  gap: 10px;
 }
 
 body.dark .modal-content {
@@ -402,27 +238,18 @@ body.dark .modal-content {
   color: var(--text-dark);
 }
 
+/**************************************************************
+ * 📝 FORMULAIRE
+ **************************************************************/
 .modal-content h2 {
-  margin-top: 0;
   text-align: center;
   color: var(--primary);
-  font-size: 1.4rem;
+  margin-top: 0;
 }
 
-@media (max-width: 768px) {
-  .modal-content {
-    margin-top: 15vh;
-  }
-}
-
-/**************************************************************
- * 📝 FORMULAIRE (corrigé)
- **************************************************************/
 .modal-content label {
   font-weight: 600;
   font-size: 0.95rem;
-  margin-bottom: 4px;
-  display: block;
 }
 
 .modal-content input,
@@ -437,20 +264,28 @@ body.dark .modal-content {
   font-size: 1rem;
 }
 
-body.dark .modal-content input,
-body.dark .modal-content select {
-  background: #1f2228;
-  color: var(--text-dark);
-  border: 1px solid #444;
+/* ✅ Champs “Début” et “Fin” uniformisés */
+.datetime-group {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.datetime-group input[type="datetime-local"] {
+  flex: 1;
+  max-width: 180px;
+  padding: 8px 10px;
+  font-size: 0.95rem;
+  border-radius: 8px;
+  box-sizing: border-box;
 }
 
 /**************************************************************
- * 🔘 BOUTONS DE MODALE
+ * 🔘 BOUTONS MODALE
  **************************************************************/
 .modal-buttons {
   display: flex;
   justify-content: space-between;
-  margin-top: 10px;
   gap: 10px;
 }
 
@@ -462,53 +297,7 @@ body.dark .modal-content select {
   border: none;
   cursor: pointer;
   font-size: 1rem;
-  transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
 #save-event { background: var(--primary); color: white; }
 #cancel-event { background: #888; color: white; }
-#delete-event { background: #dc3545; color: white; }
-
-.modal-buttons button:hover { opacity: 0.9; }
-.modal-buttons button:active { transform: scale(0.96); opacity: 0.8; }
-
-/**************************************************************
- * 📖 PAGE INSTRUCTIONS
- **************************************************************/
-.instructions-container {
-  max-width: 900px;
-  margin: 30px auto;
-  padding: 20px;
-}
-
-.instructions-card {
-  background: var(--card-light);
-  padding: 24px;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  line-height: 1.6;
-}
-
-body.dark .instructions-card {
-  background: var(--card-dark);
-  color: var(--text-dark);
-}
-
-.instructions-card h2 {
-  text-align: center;
-  color: var(--primary);
-  margin-bottom: 10px;
-}
-
-.instructions-card h3 {
-  margin-top: 20px;
-  color: var(--primary);
-}
-
-.instructions-card ul {
-  margin: 8px 0 16px 20px;
-}
-
-.instructions-card li {
-  margin-bottom: 6px;
-}
