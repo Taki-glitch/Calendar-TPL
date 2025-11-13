@@ -20,7 +20,7 @@
 </head>
 
 <body>
-  <!-- SIDE MENU + OVERLAY -->
+  <!-- OVERLAY + MENU LATÉRAL -->
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
   <nav class="side-menu" id="side-menu" aria-hidden="true">
@@ -48,7 +48,6 @@
       <h1>Planning TPL</h1>
     </div>
 
-    <!-- Desktop nav -->
     <nav class="main-nav" role="navigation" aria-label="Navigation principale">
       <a href="index.html" class="nav-link active">Planning</a>
       <a href="instructions.html" class="nav-link">Instructions</a>
@@ -60,29 +59,28 @@
     </div>
   </header>
 
-  <!-- BANNIÈRE offline -->
+  <!-- BANNIÈRE OFFLINE -->
   <div id="offline-banner" class="hidden">🚫 Vous êtes hors ligne — mode local activé</div>
 
   <!-- LOADER -->
   <div id="loader" class="hidden">Chargement du calendrier...</div>
 
-  <!-- CALENDAR -->
+  <!-- CALENDRIER -->
   <div id="planning"></div>
 
-  <!-- LEGEND -->
+  <!-- LÉGENDE -->
   <div id="legend">
     <div class="legend-item"><span class="legend-color hotel"></span> Hôtel-Dieu</div>
     <div class="legend-item"><span class="legend-color greneraie"></span> Gréneraie / Resto du Cœur</div>
     <div class="legend-item"><span class="legend-color pref"></span> Préfecture</div>
     <div class="legend-item"><span class="legend-color tour"></span> Tour de Bretagne</div>
     <div class="legend-item"><span class="legend-color fta"></span> France Terre d’Asile</div>
-    <!-- <div class="legend-item"><span class="legend-color autre"></span> Autre</div> -->
   </div>
 
-  <!-- ADD BUTTON -->
+  <!-- BOUTON AJOUT -->
   <button id="add-event-btn" title="Ajouter un événement">+</button>
 
-  <!-- EVENT MODAL -->
+  <!-- MODALE D'ÉVÉNEMENT -->
   <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2 id="modal-title">Nouvel événement</h2>
@@ -103,21 +101,19 @@
         <option>Préfecture</option>
         <option>Tour de Bretagne</option>
         <option>France Terre d’Asile</option>
-        <!-- <option>Autre</option> -->
       </select>
 
       <div class="modal-buttons">
         <button id="save-event">💾 Enregistrer</button>
         <button id="cancel-event">Annuler</button>
-        <!--<button id="delete-event" class="hidden">🗑️ Supprimer</button> -->
       </div>
     </div>
   </div>
 
-  <!-- Script principal -->
+  <!-- SCRIPT PRINCIPAL -->
   <script src="script.js"></script>
 
-  <!-- Service Worker -->
+  <!-- SERVICE WORKER -->
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
