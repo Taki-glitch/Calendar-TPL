@@ -424,6 +424,16 @@ body.dark .modal-content select {
   border: 1px solid #444;
 }
 
+/* 🔧 AJOUT : Réduction des champs Début / Fin dans la modale */
+.modal-content input[type="datetime-local"],
+.modal-content input[type="date"],
+.modal-content input[type="time"] {
+  width: 85%;              /* Réduit la largeur pour éviter qu’ils dépassent */
+  margin: 0 auto;          /* Centre les champs dans la modale */
+  display: block;
+  box-sizing: border-box;
+}
+
 /**************************************************************
  * 🔘 BOUTONS DE MODALE
  **************************************************************/
