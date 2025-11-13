@@ -96,6 +96,7 @@ header .logo {
   height: 48px;
   border-radius: 50%;
   object-fit: contain;
+  vertical-align: middle;
 }
 
 header h1 {
