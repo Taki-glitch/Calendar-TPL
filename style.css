@@ -92,11 +92,13 @@ header {
 }
 
 header .logo {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
+  height: 40px;            /* Taille visuelle du logo */
+  width: auto;             /* Garde les proportions */
   object-fit: contain;
+  margin-right: 10px;
   vertical-align: middle;
+  display: inline-block;
+  border-radius: 0;        /* ✅ supprime le cercle pour éviter les déformations */
 }
 
 header h1 {
