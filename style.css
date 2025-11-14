@@ -191,7 +191,7 @@ header h1 {
 }
 
 /**************************************************************
- * 🧭 MENU DE NAVIGATION (desktop)
+ * 🧭 NAVIGATION
  **************************************************************/
 .main-nav {
   display: flex;
@@ -225,13 +225,11 @@ header h1 {
 }
 
 @media (max-width: 900px) {
-  .main-nav {
-    display: none; /* hide desktop nav on narrower screens */
-  }
+  .main-nav { display: none; }
 }
 
 /**************************************************************
- * 🌙 BOUTONS EN-TÊTE (THÈME + LANGUE)
+ * 🌙 HEADER BUTTONS
  **************************************************************/
 .header-buttons {
   display: flex;
@@ -273,7 +271,7 @@ header h1 {
 #offline-banner:not(.hidden) { transform: translateY(0); }
 
 /**************************************************************
- * 🔄 INDICATEUR DE CHARGEMENT
+ * 🔄 LOADER
  **************************************************************/
 #loader {
   position: fixed;
@@ -332,7 +330,7 @@ body.dark #planning { background: var(--card-dark); }
 .legend-color.autre { background: #6c757d; }
 
 /**************************************************************
- * ➕ BOUTON FLOTTANT “+”
+ * ➕ BOUTON FLOTANT
  **************************************************************/
 #add-event-btn {
   position: fixed;
@@ -347,7 +345,6 @@ body.dark #planning { background: var(--card-dark); }
   font-size: 2rem;
   cursor: pointer;
   z-index: 5000;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -361,7 +358,7 @@ body.dark #planning { background: var(--card-dark); }
 }
 
 /**************************************************************
- * 🪟 MODALE (corrigée mobile)
+ * 🪟 MODALE
  **************************************************************/
 .modal {
   position: fixed;
@@ -377,7 +374,6 @@ body.dark #planning { background: var(--card-dark); }
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }
 
 .modal.hidden { display: none; }
@@ -392,31 +388,28 @@ body.dark #planning { background: var(--card-dark); }
   display: flex;
   flex-direction: column;
   gap: 10px;
-  position: relative;
-  z-index: 7100;
-  animation: none;
 }
 
 body.dark .modal-content { background: var(--card-dark); color: var(--text-dark); }
 
 .modal-content h2 { margin-top: 0; text-align: center; color: var(--primary); font-size: 1.4rem; }
 
-@media (max-width: 768px) { .modal-content { margin-top: 15vh; } }
-
 /**************************************************************
- * 📝 FORMULAIRE
+ * 📝 FORMULAIRE — TOUT CORRIGÉ ICI
  **************************************************************/
-.modal-content label { font-weight: 600; font-size: 0.95rem; }
 
+/* 🟦 AJOUT : Tous les champs ont la même forme et la même largeur */
 .modal-content input,
 .modal-content select {
-  padding: 10px;
-  border-radius: 8px;
+  padding: 10px;        /* même hauteur que catégorie */
+  border-radius: 8px;   /* même arrondi */
   border: 1px solid #ccc;
   font-size: 1rem;
-  width: 100%;
+  width: 100%;          /* 🟦 Correction : 100% pour tout, comme "Catégorie" */
+  box-sizing: border-box;
 }
 
+/* 🟦 Mode sombre */
 body.dark .modal-content input,
 body.dark .modal-content select {
   background: #1f2228;
@@ -424,18 +417,17 @@ body.dark .modal-content select {
   border: 1px solid #444;
 }
 
-/* 🔧 AJOUT : Réduction des champs Début / Fin dans la modale */
+/* ❌ SUPPRESSION (ancien réglage incorrect qui cassait les champs Début/Fin)
 .modal-content input[type="datetime-local"],
 .modal-content input[type="date"],
 .modal-content input[type="time"] {
-  width: 85%;              /* Réduit la largeur pour éviter qu’ils dépassent */
-  margin: 0 auto;          /* Centre les champs dans la modale */
-  display: block;
-  box-sizing: border-box;
+  width: 85%;
+  margin: 0 auto;
 }
+*/
 
 /**************************************************************
- * 🔘 BOUTONS DE MODALE
+ * 🔘 BOUTONS MODALE — identiques aux champs
  **************************************************************/
 .modal-buttons {
   display: flex;
@@ -444,14 +436,15 @@ body.dark .modal-content select {
   gap: 10px;
 }
 
+/* 🔧 Correction : mêmes dimensions que les champs */
 .modal-buttons button {
   flex: 1;
-  padding: 10px;/* Réduire la hauteur du bouton*/
-  border-radius: 8px; /*arrondir un peu plus petit */
+  padding: 10px;        /* même hauteur que les champs */
+  border-radius: 8px;   /* même arrondi */
   font-weight: 600;
   border: none;
   cursor: pointer;
-  font-size: 1rem; /* taille de texte */
+  font-size: 1rem;
   transition: transform 0.15s ease, opacity 0.15s ease;
 }
 
