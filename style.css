@@ -421,7 +421,7 @@ body.dark .modal-content select {
 .modal-content input[type="datetime-local"],
 .modal-content input[type="date"],
 .modal-content input[type="time"] {
-  width: 85%;
+  width: 100%;
   margin: 0 auto;
 }
 
