@@ -446,8 +446,8 @@ body.dark .modal-content select {
 
 .modal-buttons button {
   flex: 1;
-  padding: 8px;/* Réduire la hauteur du bouton*/
-  border-radius: 6px; /*arrondir un peu plus petit */
+  padding: 10px;/* Réduire la hauteur du bouton*/
+  border-radius: 8px; /*arrondir un peu plus petit */
   font-weight: 600;
   border: none;
   cursor: pointer;
