@@ -395,21 +395,18 @@ body.dark .modal-content { background: var(--card-dark); color: var(--text-dark)
 .modal-content h2 { margin-top: 0; text-align: center; color: var(--primary); font-size: 1.4rem; }
 
 /**************************************************************
- * 📝 FORMULAIRE — TOUT CORRIGÉ ICI
+ * 📝 FORMULAIRE
  **************************************************************/
-
-/* 🟦 AJOUT : Tous les champs ont la même forme et la même largeur */
 .modal-content input,
 .modal-content select {
-  padding: 10px;        /* même hauteur que catégorie */
-  border-radius: 8px;   /* même arrondi */
+  padding: 10px;
+  border-radius: 8px;
   border: 1px solid #ccc;
   font-size: 1rem;
-  width: 100%;          /* 🟦 Correction : 100% pour tout, comme "Catégorie" */
+  width: 100%;
   box-sizing: border-box;
 }
 
-/* 🟦 Mode sombre */
 body.dark .modal-content input,
 body.dark .modal-content select {
   background: #1f2228;
@@ -417,7 +414,6 @@ body.dark .modal-content select {
   border: 1px solid #444;
 }
 
-/* remise du code, car avant : ❌ SUPPRESSION (ancien réglage incorrect qui cassait les champs Début/Fin)*/
 .modal-content input[type="datetime-local"],
 .modal-content input[type="date"],
 .modal-content input[type="time"] {
@@ -426,7 +422,7 @@ body.dark .modal-content select {
 }
 
 /**************************************************************
- * 🔘 BOUTONS MODALE — identiques aux champs
+ * 🔘 BOUTONS MODALE
  **************************************************************/
 .modal-buttons {
   display: flex;
@@ -435,11 +431,10 @@ body.dark .modal-content select {
   gap: 10px;
 }
 
-/* 🔧 Correction : mêmes dimensions que les champs */
 .modal-buttons button {
   flex: 1;
-  padding: 10px;        /* même hauteur que les champs */
-  border-radius: 8px;   /* même arrondi */
+  padding: 10px;
+  border-radius: 8px;
   font-weight: 600;
   border: none;
   cursor: pointer;
@@ -476,3 +471,20 @@ body.dark .instructions-card { background: var(--card-dark); color: var(--text-d
 .instructions-card ul { margin: 8px 0 16px 20px; }
 
 .instructions-card li { margin-bottom: 6px; }
+
+/**************************************************************
+ * 🗺️ CARTE UMAP
+ **************************************************************/
+.map-container {
+  width: 100%;
+  max-width: 900px;
+  margin: 25px auto;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+/* mode sombre : diminuer la bordure lumineuse de l'iframe */
+body.dark .map-container iframe {
+  filter: brightness(0.9);
+}
