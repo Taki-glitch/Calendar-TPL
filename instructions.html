@@ -16,9 +16,10 @@
 </head>
 
 <body>
-  <!-- SIDE MENU + OVERLAY -->
+  <!-- OVERLAY -->
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
+  <!-- SIDE MENU -->
   <nav class="side-menu" id="side-menu" aria-hidden="true">
     <div class="side-menu-header">
       <img src="tpl-logo.png" alt="Logo TPL" class="side-logo" />
@@ -27,7 +28,7 @@
 
     <ul class="side-links">
       <li><a href="index.html" class="side-link">🗓️ Planning</a></li>
-      <li><a href="instructions.html" class="side-link">📖 Instructions</a></li>
+      <li><a href="instructions.html" class="side-link active">📖 Instructions</a></li>
     </ul>
 
     <div class="side-actions">
@@ -39,8 +40,8 @@
   <!-- HEADER -->
   <header>
     <div class="header-left">
-      <button id="menu-btn" class="menu-btn" aria-label="Ouvrir le menu">☰</button>
-      <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
+      <button id="menu-btn" class="menu-btn">☰</button>
+      <img src="tpl-logo.png" class="logo" />
       <h1>Planning TPL</h1>
     </div>
 
@@ -70,7 +71,7 @@
 
       <h3>🔹 Étape 2 — Sur le terrain</h3>
       <ul>
-        <li>Suivez les informations associées à votre site (Hôtel-Dieu, Préfecture, Tour Bretagne...)</li>
+        <li>Suivez les informations associées à votre site.</li>
         <li>Signalez les imprévus à l’équipe TPL.</li>
       </ul>
 
@@ -83,23 +84,22 @@
       <hr />
 
       <h3>🗺️ Carte des points TPL</h3>
-      <p>Voici la carte des différents lieux utilisés pour le TPL :</p>
 
-      <!-- ************* CARTE UMAP ************* -->
-      <div class="map-container">
+      <button id="toggle-map-btn" class="btn map-toggle-btn">Afficher la carte</button>
+
+      <!-- CONTAINER MAP -->
+      <div id="map-wrapper" class="map-wrapper hidden">
         <iframe 
+          id="umap-frame"
           style="width: 100%; height: 350px; border: 0;" 
           allowfullscreen 
-          allow="geolocation"
-          src="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true">
+          allow="geolocation">
         </iframe>
-      </div>
 
-      <p style="text-align:center; margin-top:10px;">
-        <a href="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scrollWheelZoom=true&zoomControl=true" target="_blank">
-          🔎 Voir la carte en plein écran
-        </a>
-      </p>
+        <p style="text-align:center; margin-top:10px;">
+          <a id="umap-fullscreen" href="#" target="_blank">🔎 Voir la carte en plein écran</a>
+        </p>
+      </div>
 
       <hr />
 
@@ -108,7 +108,7 @@
     </section>
   </main>
 
-  <!-- Scripts -->
+  <!-- Script principal -->
   <script src="script.js"></script>
 
   <!-- Service Worker -->
