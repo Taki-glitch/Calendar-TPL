@@ -417,14 +417,13 @@ body.dark .modal-content select {
   border: 1px solid #444;
 }
 
-/* ❌ SUPPRESSION (ancien réglage incorrect qui cassait les champs Début/Fin)
+/* remise du code, car avant : ❌ SUPPRESSION (ancien réglage incorrect qui cassait les champs Début/Fin)*/
 .modal-content input[type="datetime-local"],
 .modal-content input[type="date"],
 .modal-content input[type="time"] {
   width: 85%;
   margin: 0 auto;
 }
-*/
 
 /**************************************************************
  * 🔘 BOUTONS MODALE — identiques aux champs
