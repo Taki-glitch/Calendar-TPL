@@ -44,8 +44,7 @@
       <h1>Planning TPL</h1>
     </div>
 
-    <!-- Desktop nav -->
-    <nav class="main-nav" role="navigation" aria-label="Navigation principale">
+    <nav class="main-nav">
       <a href="index.html" class="nav-link">Planning</a>
       <a href="instructions.html" class="nav-link active">Instructions</a>
     </nav>
@@ -66,29 +65,50 @@
       <ul>
         <li>Vérifiez votre planning sur la page principale.</li>
         <li>Assurez-vous que vos horaires sont bien à jour.</li>
-        <li>En cas de modification, utilisez le bouton <strong>+</strong> pour ajouter un événement.</li>
+        <li>Utilisez le bouton <strong>+</strong> pour ajouter un événement si nécessaire.</li>
       </ul>
 
       <h3>🔹 Étape 2 — Sur le terrain</h3>
       <ul>
-        <li>Suivez les informations associées à votre site (ex. Hôtel-Dieu, Préfecture...).</li>
-        <li>Communiquez les éventuels imprévus à l’équipe TPL.</li>
+        <li>Suivez les informations associées à votre site (Hôtel-Dieu, Préfecture, Tour Bretagne...)</li>
+        <li>Signalez les imprévus à l’équipe TPL.</li>
       </ul>
 
       <h3>🔹 Étape 3 — Après intervention</h3>
       <ul>
-        <li>Notez les remarques ou incidents importants.</li>
-        <li>Supprimez ou ajustez les événements terminés pour garder le planning à jour.</li>
+        <li>Notez les remarques importantes.</li>
+        <li>Mettez à jour ou supprimez les événements terminés.</li>
       </ul>
 
       <hr />
 
+      <h3>🗺️ Carte des points TPL</h3>
+      <p>Voici la carte des différents lieux utilisés pour le TPL :</p>
+
+      <!-- ************* CARTE UMAP ************* -->
+      <div class="map-container">
+        <iframe 
+          style="width: 100%; height: 350px; border: 0;" 
+          allowfullscreen 
+          allow="geolocation"
+          src="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true">
+        </iframe>
+      </div>
+
+      <p style="text-align:center; margin-top:10px;">
+        <a href="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scrollWheelZoom=true&zoomControl=true" target="_blank">
+          🔎 Voir la carte en plein écran
+        </a>
+      </p>
+
+      <hr />
+
       <h3>ℹ️ Conseils</h3>
-      <p>Le site est disponible hors ligne grâce à la PWA. Vous pouvez l’ajouter à votre écran d’accueil pour un accès rapide.</p>
+      <p>Le site fonctionne hors ligne grâce à la PWA. Vous pouvez l’ajouter à votre écran d’accueil.</p>
     </section>
   </main>
 
-  <!-- Script (theme + lang handled in common script) -->
+  <!-- Scripts -->
   <script src="script.js"></script>
 
   <!-- Service Worker -->
