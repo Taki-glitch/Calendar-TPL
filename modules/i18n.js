@@ -1,109 +1,44 @@
 // modules/i18n.js
-export let currentLang = "fr";
+export let currentLang = localStorage.getItem("lang") || "fr";
 const LANG_KEY = "lang";
 
-/* -----------------------------------------------------
-   📌 Dictionnaire des catégories (FR + RU)
------------------------------------------------------ */
-const CATEGORY_LABELS = {
-  hotel: { fr: "Hôtel-Dieu", ru: "Отель-Дьё" },
-  greneraie: { fr: "Gréneraie / Resto du Cœur", ru: "Гренерая / Ресторан" },
-  pref: { fr: "Préfecture", ru: "Префектура" },
-  tour: { fr: "Tour de Bretagne", ru: "Башня Брета́ни" },
-  fta: { fr: "France Terre d’Asile", ru: "France Terre d’Asile" },
-  autre: { fr: "Autre", ru: "Другое" }
-};
-
-/* -----------------------------------------------------
-   🔧 Fonction principale d'initialisation
------------------------------------------------------ */
-export function init() {
+export function initI18n() {
   currentLang = localStorage.getItem(LANG_KEY) || "fr";
+  applyLangToUI();
 
-  // Boutons langue
   document.getElementById("lang-toggle")?.addEventListener("click", toggleLang);
   document.getElementById("side-lang-toggle")?.addEventListener("click", toggleLang);
-
-  // 🔥 ICI la fonction existe vraiment
-  applyLangToUI();
 }
 
-/* -----------------------------------------------------
-   🔄 Basculer FR/RU
------------------------------------------------------ */
 export function toggleLang() {
   currentLang = currentLang === "fr" ? "ru" : "fr";
   localStorage.setItem(LANG_KEY, currentLang);
-
   applyLangToUI();
-
-  // 🔁 Rechargement nécessaire pour FullCalendar
-  location.reload();
+  location.reload(); // nécessaire pour FullCalendar
 }
 
-/* -----------------------------------------------------
-   🏷 Utilitaire simple pour les textes courts
------------------------------------------------------ */
+// Simple helper (texte court)
 export function t(fr, ru) {
   return currentLang === "ru" ? ru : fr;
 }
 
-/* -----------------------------------------------------
-   🔄 Conversion catégorie → libellé
------------------------------------------------------ */
-export function translateCategory(key) {
-  if (!CATEGORY_LABELS[key]) return key;
-  return CATEGORY_LABELS[key][currentLang] || CATEGORY_LABELS[key].fr;
-}
-
-/* -----------------------------------------------------
-   🔄 Conversion libellé → catégorie (inverse)
------------------------------------------------------ */
-export function categoryKeyFromValue(value) {
-  if (CATEGORY_LABELS[value]) return value;
-
-  for (const k of Object.keys(CATEGORY_LABELS)) {
-    if (
-      CATEGORY_LABELS[k].fr === value ||
-      CATEGORY_LABELS[k].ru === value
-    ) {
-      return k;
-    }
-  }
-  return "autre";
-}
-
-/* -----------------------------------------------------
-   📦 Obtenir toutes les catégories traduites
------------------------------------------------------ */
-export function getCategoryMapping() {
-  const map = {};
-  for (const key of Object.keys(CATEGORY_LABELS)) {
-    map[key] = CATEGORY_LABELS[key][currentLang];
-  }
-  return map;
-}
-
-/* -----------------------------------------------------
-   🌐 Fonction manquante ➜ REQUIRED
-   (C’est celle qui causait l’erreur)
------------------------------------------------------ */
+/* -------------------------------------------------------
+   Traduction statique UI
+------------------------------------------------------- */
 export function applyLangToUI() {
-  // Bouton principal
-  const langBtn = document.getElementById("lang-toggle");
-  if (langBtn) langBtn.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
+  const flag = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
+  const btn = document.getElementById("lang-toggle");
+  const side = document.getElementById("side-lang-toggle");
 
-  // Bouton menu
-  const sideBtn = document.getElementById("side-lang-toggle");
-  if (sideBtn) sideBtn.textContent = langBtn?.textContent;
+  if (btn) btn.textContent = flag;
+  if (side) side.textContent = flag;
 
-  // Traduction du <h1>
+  // Traduction du titre <h1>
   const h1 = document.querySelector("header h1");
   if (h1) {
     if (h1.textContent.includes("Planning")) {
-      h1.textContent = t("Planning", "Планирование");
-    }
-    if (h1.textContent.includes("Instructions")) {
+      h1.textContent = t("Planning TPL", "Планирование TPL");
+    } else if (h1.textContent.includes("Instructions")) {
       h1.textContent = t("Instructions", "Инструкции");
     }
   }
