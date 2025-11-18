@@ -4,21 +4,22 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#007bff" />
-  <title>Instructions TPL</title>
+  <title>Instructions – Planning TPL</title>
 
-  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Favicon + PWA -->
+  <!-- Icônes / PWA -->
   <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png" />
   <link rel="apple-touch-icon" href="tpl-logo.png" />
   <link rel="manifest" href="manifest.json" />
 </head>
 
 <body>
-  <!-- SIDE MENU + OVERLAY -->
+
+  <!-- Overlay menu -->
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
+  <!-- Menu latéral -->
   <nav class="side-menu" id="side-menu" aria-hidden="true">
     <div class="side-menu-header">
       <img src="tpl-logo.png" alt="Logo TPL" class="side-logo" />
@@ -27,7 +28,7 @@
 
     <ul class="side-links">
       <li><a href="index.html" class="side-link">🗓️ Planning</a></li>
-      <li><a href="instructions.html" class="side-link">📖 Instructions</a></li>
+      <li><a href="instructions.html" class="side-link active">📖 Instructions</a></li>
     </ul>
 
     <div class="side-actions">
@@ -36,88 +37,85 @@
     </div>
   </nav>
 
-  <!-- HEADER -->
+  <!-- En-tête -->
   <header>
     <div class="header-left">
       <button id="menu-btn" class="menu-btn" aria-label="Ouvrir le menu">☰</button>
       <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
-      <h1>Planning TPL</h1>
+      <h1>Instructions</h1>
     </div>
 
-    <nav class="main-nav">
+    <nav class="main-nav" role="navigation">
       <a href="index.html" class="nav-link">Planning</a>
       <a href="instructions.html" class="nav-link active">Instructions</a>
     </nav>
 
     <div class="header-buttons">
-      <button id="theme-toggle" title="Changer de thème">🌙</button>
-      <button id="lang-toggle" title="Changer de langue">🇫🇷</button>
+      <button id="theme-toggle" aria-label="Changer de thème">🌙</button>
+      <button id="lang-toggle" aria-label="Changer de langue">🇫🇷</button>
     </div>
   </header>
 
-  <!-- CONTENT -->
-  <main class="instructions-container">
-    <section class="instructions-card">
-      <h2>📋 Instructions du TPL</h2>
-      <p>Bienvenue dans la section d’instructions du <strong>Projet TPL</strong>.</p>
+  <main class="instructions-content">
+    <h2>Carte des points de distribution</h2>
 
-      <h3>🔹 Étape 1 — Préparation</h3>
+    <div class="map-container">
+      <!-- uMap auto-thème avec modules/umap.js -->
+      <iframe
+        id="umap-frame"
+        title="Carte des points TPL"
+        width="100%"
+        height="450"
+        style="border: none; width: 100%; border-radius: 12px;"
+        allowfullscreen
+        loading="lazy"
+      ></iframe>
+    </div>
+
+    <section class="instructions-block">
+      <h2>Conseils d'utilisation</h2>
       <ul>
-        <li>Vérifiez votre planning sur la page principale.</li>
-        <li>Assurez-vous que vos horaires sont bien à jour.</li>
-        <li>Utilisez le bouton <strong>+</strong> pour ajouter un événement si nécessaire.</li>
+        <li>Utilisez le bouton <strong>+</strong> en bas à droite pour créer un événement.</li>
+        <li>Un événement peut être déplacé directement dans le calendrier.</li>
+        <li>Les données se synchronisent automatiquement dès que vous êtes en ligne.</li>
+        <li>Vous pouvez exporter le planning en CSV, ICS ou PDF depuis l’écran principal.</li>
+        <li>Le thème sombre / clair s’adapte automatiquement à votre appareil.</li>
       </ul>
+    </section>
 
-      <h3>🔹 Étape 2 — Sur le terrain</h3>
+    <section class="instructions-block">
+      <h2>Localisation des sites</h2>
+      <p>Les principaux lieux d'intervention :</p>
       <ul>
-        <li>Suivez les informations associées à votre site (Hôtel-Dieu, Préfecture, Tour Bretagne...)</li>
-        <li>Signalez les imprévus à l’équipe TPL.</li>
+        <li><strong>Hôtel-Dieu</strong> – Quai Moncousu</li>
+        <li><strong>Gréneraie / Resto du Cœur</strong> – Rue de Gréneraie</li>
+        <li><strong>Préfecture</strong> – Quai Ceineray</li>
+        <li><strong>Tour de Bretagne</strong> – Centre-ville</li>
+        <li><strong>France Terre d’Asile</strong></li>
       </ul>
+    </section>
 
-      <h3>🔹 Étape 3 — Après intervention</h3>
+    <section class="instructions-block">
+      <h2>Astuces PWA</h2>
       <ul>
-        <li>Notez les remarques importantes.</li>
-        <li>Mettez à jour ou supprimez les événements terminés.</li>
+        <li>Vous pouvez installer cette application sur votre écran d’accueil.</li>
+        <li>Elle fonctionne même sans connexion Internet.</li>
+        <li>Les modifications hors ligne sont synchronisées automatiquement.</li>
       </ul>
-
-      <hr />
-
-      <h3>🗺️ Carte des points TPL</h3>
-      <p>Voici la carte des différents lieux utilisés pour le TPL :</p>
-
-      <!-- ************* CARTE UMAP ************* -->
-      <div class="map-container">
-        <iframe 
-          style="width: 100%; height: 350px; border: 0;" 
-          allowfullscreen 
-          allow="geolocation"
-          src="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true">
-        </iframe>
-      </div>
-
-      <p style="text-align:center; margin-top:10px;">
-        <a href="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scrollWheelZoom=true&zoomControl=true" target="_blank">
-          🔎 Voir la carte en plein écran
-        </a>
-      </p>
-
-      <hr />
-
-      <h3>ℹ️ Conseils</h3>
-      <p>Le site fonctionne hors ligne grâce à la PWA. Vous pouvez l’ajouter à votre écran d’accueil.</p>
     </section>
   </main>
 
-  <!-- Scripts -->
-  <script src="script.js"></script>
+  <!-- MODULES JS -->
+  <script type="module" src="app.js"></script>
 
-  <!-- Service Worker -->
+  <!-- Enregistrement du Service Worker -->
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("✅ Service Worker enregistré"))
-        .catch(err => console.error("❌ Erreur Service Worker :", err));
+        .then(() => console.log("SW OK"))
+        .catch(err => console.error("SW ERROR:", err));
     }
   </script>
+
 </body>
 </html>
