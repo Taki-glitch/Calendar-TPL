@@ -1,8 +1,8 @@
 /****************************************************
- * 📦 SERVICE WORKER v3.5 — Planning TPL (fix synchronisation)
+ * 📦 SERVICE WORKER v3.6 — Planning TPL (modules friendly)
  ****************************************************/
 
-const CACHE_VERSION = "v3.5";
+const CACHE_VERSION = "v3.6";
 const CACHE_NAME = `tpl-calendar-cache-${CACHE_VERSION}`;
 
 const ASSETS = [
@@ -10,109 +10,78 @@ const ASSETS = [
   "./index.html",
   "./offline.html",
   "./style.css",
-  "./script.js",
+  "./app.js",
+  "./modules/theme.js",
+  "./modules/i18n.js",
+  "./modules/storage.js",
+  "./modules/calendar.js",
+  "./modules/umap.js",
+  "./modules/export.js",
   "./manifest.json",
   "./tpl-logo.png",
   "./tpl-logo-blue.svg",
-
-  // FullCalendar
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/index.global.min.js",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.10/index.global.min.js",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/timegrid@6.1.10/index.global.min.js",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/list@6.1.10/index.global.min.js",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/interaction@6.1.10/index.global.min.js",
-  "https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.10/locales-all.global.min.js"
+  // FullCalendar (CSS/JS are external CDN - keep them but caching may be opaque)
 ];
 
-/****************************************************
- * 🧱 INSTALLATION — Mise en cache des assets statiques
- ****************************************************/
+/* install */
 self.addEventListener("install", (event) => {
-  console.log("✅ Service Worker installé — version", CACHE_VERSION);
+  console.log("SW install", CACHE_VERSION);
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then((cache) => cache.addAll(ASSETS))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
   );
 });
 
-/****************************************************
- * 🚀 ACTIVATION — Nettoyage anciens caches
- ****************************************************/
+/* activate */
 self.addEventListener("activate", (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(keys.map((key) => key !== CACHE_NAME && caches.delete(key)))
+      Promise.all(keys.map((k) => k !== CACHE_NAME && caches.delete(k)))
     ).then(() => self.clients.claim())
   );
 });
 
-/****************************************************
- * ⚠️ URLS À NE JAMAIS METTRE EN CACHE
- * (planning → toujours en Network First)
- ****************************************************/
 function isDynamicDataRequest(request) {
   const url = request.url;
-
-  return (
-    url.includes("script.google.com") || // Google Apps Script
-    url.includes("workers.dev")         // Proxy Cloudflare
-  );
+  return url.includes("script.google.com") || url.includes("workers.dev");
 }
 
-/****************************************************
- * ⚙️ FETCH — stratégie hybridée :
- * - pour les données : Network First
- * - pour le reste : Cache First + fallback réseau
- ****************************************************/
 self.addEventListener("fetch", (event) => {
-  const request = event.request;
+  const req = event.request;
+  if (req.url.startsWith("chrome-extension") || req.url.startsWith("data:")) return;
 
-  // ❌ On ne touche pas aux extensions / data URIs
-  if (request.url.startsWith("chrome-extension") || request.url.startsWith("data:")) return;
-
-  // 🟦 1) CAS SPÉCIAL : Données du planning → NETWORK FIRST
-  if (isDynamicDataRequest(request)) {
+  if (isDynamicDataRequest(req)) {
+    // network-first
     event.respondWith(
-      fetch(request)
+      fetch(req)
         .then((res) => res)
         .catch(() => {
-          console.warn("⚠️ Offline — impossible de contacter le serveur.");
-          return new Response(JSON.stringify([]), {
-            headers: { "Content-Type": "application/json" }
-          });
+          // fallback to local offline page if navigation
+          if (req.mode === "navigate") return caches.match("./offline.html");
+          // otherwise return empty JSON for service endpoints
+          return new Response(JSON.stringify([]), { headers: { "Content-Type": "application/json" } });
         })
     );
     return;
   }
 
-  // 🟩 2) ASSETS → CACHE FIRST
+  // cache-first for assets
   event.respondWith(
-    caches.match(request).then((cached) => {
+    caches.match(req).then((cached) => {
       if (cached) return cached;
-
-      return fetch(request)
+      return fetch(req)
         .then((res) => {
           if (!res || !res.ok) return res;
           const clone = res.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          caches.open(CACHE_NAME).then((c) => c.put(req, clone));
           return res;
         })
         .catch(() => {
-          if (request.mode === "navigate") {
-            return caches.match("./offline.html");
-          }
+          if (req.mode === "navigate") return caches.match("./offline.html");
         });
     })
   );
 });
 
-/****************************************************
- * 🔄 Mise à jour forcée
- ****************************************************/
-self.addEventListener("message", (event) => {
-  if (event.data === "forceUpdate") {
-    console.log("♻️ Forçage mise à jour SW");
-    self.skipWaiting();
-  }
+self.addEventListener("message", (evt) => {
+  if (evt.data === "forceUpdate") self.skipWaiting();
 });
