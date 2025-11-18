@@ -13,17 +13,21 @@ const CATEGORY_LABELS = {
 
 export function init() {
   currentLang = localStorage.getItem(LANG_KEY) || 'fr';
-  // bind toggles
+
+  // écouter boutons
   document.getElementById('lang-toggle')?.addEventListener('click', toggleLang);
   document.getElementById('side-lang-toggle')?.addEventListener('click', toggleLang);
+
   applyLangToUI();
 }
 
 export function toggleLang() {
   currentLang = currentLang === 'fr' ? 'ru' : 'fr';
   localStorage.setItem(LANG_KEY, currentLang);
+
   applyLangToUI();
-  // simple full reload to let FullCalendar change locale easily
+
+  // Recharger pour FullCalendar
   location.reload();
 }
 
@@ -37,16 +41,13 @@ export function translateCategory(key) {
 }
 
 export function categoryKeyFromValue(value) {
-  // value may be key or label; prefer key
   if (CATEGORY_LABELS[value]) return value;
-  // try find matching label
   for (const k of Object.keys(CATEGORY_LABELS)) {
     if (CATEGORY_LABELS[k].fr === value || CATEGORY_LABELS[k].ru === value) return k;
   }
   return 'autre';
 }
 
-// expose labels (for rendering)
 export function getCategoryMapping() {
   const map = {};
   for (const k of Object.keys(CATEGORY_LABELS)) {
@@ -54,3 +55,35 @@ export function getCategoryMapping() {
   }
   return map;
 }
+
+/* -------------------------------------------------------
+   🔧 Correction : fonction manquante
+   Apply translations to static UI texts
+------------------------------------------------------- */
+export function applyLangToUI() {
+  const langBtn = document.getElementById('lang-toggle');
+  const sideLangBtn = document.getElementById('side-lang-toggle');
+
+  if (langBtn) langBtn.textContent = currentLang === 'fr' ? '🇫🇷' : '🇷🇺';
+  if (sideLangBtn) sideLangBtn.textContent = langBtn.textContent;
+
+  // Traduction du titre de page Instructions / Planning si besoin
+  const h1 = document.querySelector('header h1');
+  if (h1) {
+    if (h1.textContent.includes('Planning')) {
+      h1.textContent = t('Planning', 'Планирование');
+    }
+    if (h1.textContent.includes('Instructions')) {
+      h1.textContent = t('Instructions', 'Инструкции');
+    }
+  }
+
+  // Traduire textes statiques portant data-i18n
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.getAttribute("data-i18n");
+    if (STATIC_LABELS[key]) el.textContent = STATIC_LABELS[key][currentLang];
+  });
+}
+
+// (optionnel) dictionnaire pour messages statiques si tu veux ajouter plus tard
+const STATIC_LABELS = {};
