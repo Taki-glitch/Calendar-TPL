@@ -13,14 +13,13 @@
   <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Favicon + PWA -->
+  <!-- Manifest / icons -->
   <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png" />
   <link rel="apple-touch-icon" href="tpl-logo.png" />
   <link rel="manifest" href="manifest.json" />
 </head>
 
 <body>
-  <!-- OVERLAY + MENU LATÉRAL -->
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
   <nav class="side-menu" id="side-menu" aria-hidden="true">
@@ -40,7 +39,6 @@
     </div>
   </nav>
 
-  <!-- HEADER -->
   <header>
     <div class="header-left">
       <button id="menu-btn" class="menu-btn" aria-label="Ouvrir le menu">☰</button>
@@ -59,28 +57,28 @@
     </div>
   </header>
 
-  <!-- BANNIÈRE OFFLINE -->
   <div id="offline-banner" class="hidden">🚫 Vous êtes hors ligne — mode local activé</div>
-
-  <!-- LOADER -->
   <div id="loader" class="hidden">Chargement du calendrier...</div>
 
-  <!-- CALENDRIER -->
   <div id="planning"></div>
 
-  <!-- LÉGENDE -->
-  <div id="legend">
-    <div class="legend-item"><span class="legend-color hotel"></span> Hôtel-Dieu</div>
-    <div class="legend-item"><span class="legend-color greneraie"></span> Gréneraie / Resto du Cœur</div>
-    <div class="legend-item"><span class="legend-color pref"></span> Préfecture</div>
-    <div class="legend-item"><span class="legend-color tour"></span> Tour de Bretagne</div>
-    <div class="legend-item"><span class="legend-color fta"></span> France Terre d’Asile</div>
+  <div id="legend" aria-hidden="false">
+    <div class="legend-item"><span class="legend-color hotel"></span> <span data-i18n-cat="hotel">Hôtel-Dieu</span></div>
+    <div class="legend-item"><span class="legend-color greneraie"></span> <span data-i18n-cat="greneraie">Gréneraie / Resto du Cœur</span></div>
+    <div class="legend-item"><span class="legend-color pref"></span> <span data-i18n-cat="pref">Préfecture</span></div>
+    <div class="legend-item"><span class="legend-color tour"></span> <span data-i18n-cat="tour">Tour de Bretagne</span></div>
+    <div class="legend-item"><span class="legend-color fta"></span> <span data-i18n-cat="fta">France Terre d’Asile</span></div>
   </div>
 
-  <!-- BOUTON AJOUT -->
+  <!-- Export controls -->
+  <div style="max-width:900px;margin:0 auto 18px;display:flex;gap:8px;justify-content:center;">
+    <button id="export-csv">Export CSV</button>
+    <button id="export-ics">Export .ics</button>
+    <button id="export-print">Imprimer (PDF)</button>
+  </div>
+
   <button id="add-event-btn" title="Ajouter un événement">+</button>
 
-  <!-- MODALE D'ÉVÉNEMENT -->
   <div id="event-modal" class="modal hidden" role="dialog" aria-modal="true">
     <div class="modal-content">
       <h2 id="modal-title">Nouvel événement</h2>
@@ -95,25 +93,27 @@
       <input type="datetime-local" id="event-end" />
 
       <label for="event-category">Catégorie</label>
-      <select id="event-category">
-        <option>Hôtel-Dieu</option>
-        <option>Gréneraie/Resto du Cœur</option>
-        <option>Préfecture</option>
-        <option>Tour de Bretagne</option>
-        <option>France Terre d’Asile</option>
+      <select id="event-category" aria-label="Catégorie">
+        <option value="hotel">Hôtel-Dieu</option>
+        <option value="greneraie">Gréneraie/Resto du Cœur</option>
+        <option value="pref">Préfecture</option>
+        <option value="tour">Tour de Bretagne</option>
+        <option value="fta">France Terre d’Asile</option>
       </select>
 
       <div class="modal-buttons">
-        <button id="save-event">💾 Enregistrer</button>
+        <button id="delete-event" class="hidden">🗑 Supprimer</button>
         <button id="cancel-event">Annuler</button>
+        <button id="save-event">💾 Enregistrer</button>
       </div>
     </div>
   </div>
 
-  <!-- SCRIPT PRINCIPAL -->
-  <script src="script.js"></script>
+  <!-- instructions page link kept in files -->
+  <!-- Load app as module (modularized) -->
+  <script type="module" src="app.js"></script>
 
-  <!-- SERVICE WORKER -->
+  <!-- Service Worker registration (non-module) -->
   <script>
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
