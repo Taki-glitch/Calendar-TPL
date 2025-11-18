@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#007bff" />
+  <title>Instructions TPL</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Favicon + PWA -->
+  <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png" />
+  <link rel="apple-touch-icon" href="tpl-logo.png" />
+  <link rel="manifest" href="manifest.json" />
+</head>
+
+<body>
+  <!-- SIDE MENU + OVERLAY -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <nav class="side-menu" id="side-menu" aria-hidden="true">
+    <div class="side-menu-header">
+      <img src="tpl-logo.png" alt="Logo TPL" class="side-logo" />
+      <button id="menu-close" class="menu-close" aria-label="Fermer le menu">✕</button>
+    </div>
+
+    <ul class="side-links">
+      <li><a href="index.html" class="side-link">🗓️ Planning</a></li>
+      <li><a href="instructions.html" class="side-link">📖 Instructions</a></li>
+    </ul>
+
+    <div class="side-actions">
+      <button id="side-theme-toggle" class="side-action-btn" aria-label="Changer le thème">🌙</button>
+      <button id="side-lang-toggle" class="side-action-btn" aria-label="Changer la langue">🇫🇷</button>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <button id="menu-btn" class="menu-btn" aria-label="Ouvrir le menu">☰</button>
+      <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
+      <h1>Planning TPL</h1>
+    </div>
+
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Planning</a>
+      <a href="instructions.html" class="nav-link active">Instructions</a>
+    </nav>
+
+    <div class="header-buttons">
+      <button id="theme-toggle" title="Changer de thème">🌙</button>
+      <button id="lang-toggle" title="Changer de langue">🇫🇷</button>
+    </div>
+  </header>
+
+  <!-- CONTENT -->
+  <main class="instructions-container">
+    <section class="instructions-card">
+      <h2>📋 Instructions du TPL</h2>
+      <p>Bienvenue dans la section d’instructions du <strong>Projet TPL</strong>.</p>
+
+      <h3>🔹 Étape 1 — Préparation</h3>
+      <ul>
+        <li>Vérifiez votre planning sur la page principale.</li>
+        <li>Assurez-vous que vos horaires sont bien à jour.</li>
+        <li>Utilisez le bouton <strong>+</strong> pour ajouter un événement si nécessaire.</li>
+      </ul>
+
+      <h3>🔹 Étape 2 — Sur le terrain</h3>
+      <ul>
+        <li>Suivez les informations associées à votre site (Hôtel-Dieu, Préfecture, Tour Bretagne...)</li>
+        <li>Signalez les imprévus à l’équipe TPL.</li>
+      </ul>
+
+      <h3>🔹 Étape 3 — Après intervention</h3>
+      <ul>
+        <li>Notez les remarques importantes.</li>
+        <li>Mettez à jour ou supprimez les événements terminés.</li>
+      </ul>
+
+      <hr />
+
+      <h3>🗺️ Carte des points TPL</h3>
+      <p>Voici la carte des différents lieux utilisés pour le TPL :</p>
+
+      <!-- ************* CARTE UMAP ************* -->
+      <div class="map-container">
+        <iframe 
+          style="width: 100%; height: 350px; border: 0;" 
+          allowfullscreen 
+          allow="geolocation"
+          src="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true">
+        </iframe>
+      </div>
+
+      <p style="text-align:center; margin-top:10px;">
+        <a href="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scrollWheelZoom=true&zoomControl=true" target="_blank">
+          🔎 Voir la carte en plein écran
+        </a>
+      </p>
+
+      <hr />
+
+      <h3>ℹ️ Conseils</h3>
+      <p>Le site fonctionne hors ligne grâce à la PWA. Vous pouvez l’ajouter à votre écran d’accueil.</p>
+    </section>
+  </main>
+
+  <!-- Scripts -->
+  <script src="script.js"></script>
+
+  <!-- Service Worker -->
+  <script>
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("✅ Service Worker enregistré"))
+        .catch(err => console.error("❌ Erreur Service Worker :", err));
+    }
+  </script>
+</body>
+</html>
