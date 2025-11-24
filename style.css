@@ -533,3 +533,11 @@ body.dark .consent-content {
 .consent-content button:hover {
   background-color: var(--primary-dark);
 }
+
+.consent-text {
+  text-align: center;
+  margin: 40px auto;
+  font-size: 1.1em;
+  max-width: 600px; /* pour ne pas dépasser sur grand écran */
+  line-height: 1.5;
+}
