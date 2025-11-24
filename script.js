@@ -1,4 +1,4 @@
-// script.js — version intégrale et robuste
+// script.js — version intégrale, robuste et avec consentement multilingue
 console.log("✅ script.js chargé correctement !");
 
 /**************************************************************
@@ -18,6 +18,7 @@ let OVERLAY = null;
 let SIDE_THEME_TOGGLE = null;
 let SIDE_LANG_TOGGLE = null;
 let MENU_CLOSE = null;
+let CONSENT_TEXT = null;
 
 /* --- Calendrier / état --- */
 let isOffline = !navigator.onLine;
@@ -25,12 +26,10 @@ let calendar = null;
 let currentLang = localStorage.getItem("lang") || "fr";
 
 /**************************************************************
- * 🗺️ CONFIG UMAP (choix : clair par défaut)
+ * 🗺️ CONFIG UMAP
  **************************************************************/
 const UMAP_BASE = "//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005";
 function getUmapUrl(theme = "light") {
-  // On utilise à la fois theme et layer pour meilleure compatibilité
-  // clair -> layer=OSM, sombre -> layer=jawg-dark (choix recommandé)
   const layer = theme === "dark" ? "jawg-dark" : "OSM";
   const themeParam = theme === "dark" ? "dark" : "light";
   const params =
@@ -44,7 +43,7 @@ function getUmapUrl(theme = "light") {
  * 🌐 Éléments DOM & initialisations (après DOMContentLoaded)
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
-  // Récupération des éléments (safe queries)
+  // Récupération des éléments
   OFFLINE_BANNER = document.getElementById("offline-banner");
   ADD_EVENT_BTN = document.getElementById("add-event-btn");
   THEME_TOGGLE = document.getElementById("theme-toggle");
@@ -55,45 +54,41 @@ document.addEventListener("DOMContentLoaded", () => {
   SIDE_THEME_TOGGLE = document.getElementById("side-theme-toggle");
   SIDE_LANG_TOGGLE = document.getElementById("side-lang-toggle");
   MENU_CLOSE = document.getElementById("menu-close");
+  CONSENT_TEXT = document.getElementById("consent-text");
 
-  // UMAP elements (may exist only on instructions.html)
-  const MAP_WRAPPER = document.getElementById("map-wrapper");
-  const MAP_IFRAME = document.getElementById("umap-frame");
-  const MAP_BTN = document.getElementById("toggle-map-btn");
-  const MAP_FULLSCREEN = document.getElementById("umap-fullscreen");
-
-  // Lecture thème + appli (clair par défaut)
+  // Lecture thème + appli
   const savedTheme = localStorage.getItem("theme") || "light";
-  appliquerTheme(savedTheme); // this will also update uMap if present
+  appliquerTheme(savedTheme);
 
-  // Theme toggle listeners
+  // Toggle thème
   THEME_TOGGLE?.addEventListener("click", () => {
-    const nouveauTheme = document.body.classList.contains("dark") ? "light" : "dark";
-    appliquerTheme(nouveauTheme);
+    appliquerTheme(document.body.classList.contains("dark") ? "light" : "dark");
   });
-
   SIDE_THEME_TOGGLE?.addEventListener("click", () => {
-    const nouveauTheme = document.body.classList.contains("dark") ? "light" : "dark";
-    appliquerTheme(nouveauTheme);
+    appliquerTheme(document.body.classList.contains("dark") ? "light" : "dark");
   });
 
   // Langue
-  const savedLang = localStorage.getItem("lang") || "fr";
-  currentLang = savedLang;
+  currentLang = localStorage.getItem("lang") || "fr";
   if (LANG_TOGGLE) LANG_TOGGLE.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
+  if (CONSENT_TEXT) updateConsentText();
+
   LANG_TOGGLE?.addEventListener("click", () => {
     const newLang = currentLang === "fr" ? "ru" : "fr";
     changerLangue(newLang);
     if (LANG_TOGGLE) LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
-    location.reload();
+    if (SIDE_LANG_TOGGLE) SIDE_LANG_TOGGLE.textContent = LANG_TOGGLE.textContent;
+    updateConsentText();
+    chargerPlanning();
   });
 
   SIDE_LANG_TOGGLE?.addEventListener("click", () => {
     const newLang = currentLang === "fr" ? "ru" : "fr";
     changerLangue(newLang);
     if (LANG_TOGGLE) LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
-    if (SIDE_LANG_TOGGLE) SIDE_LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
-    location.reload();
+    if (SIDE_LANG_TOGGLE) SIDE_LANG_TOGGLE.textContent = LANG_TOGGLE.textContent;
+    updateConsentText();
+    chargerPlanning();
   });
 
   // Menu latéral
@@ -104,122 +99,58 @@ document.addEventListener("DOMContentLoaded", () => {
     if (e.key === "Escape" && document.body.classList.contains("menu-open")) closeMenu();
   });
 
-  // Bouton + pour ouvrir la modale (peut être absent sur instructions)
+  // Bouton + pour ouvrir la modale
   ADD_EVENT_BTN?.addEventListener("click", () => openEventModal());
 
-  // Synchronisation visuelle toggles langue
-  if (SIDE_LANG_TOGGLE && LANG_TOGGLE) SIDE_LANG_TOGGLE.textContent = LANG_TOGGLE.textContent;
-
-  // === UMAP : initialisation et bouton afficher/masquer ===
-  // Setup initial iframe src only if wrapper exists and iframe exists
-  if (MAP_IFRAME) {
-    // If the map wrapper is present but hidden, load iframe lazily when shown.
-    // We'll set iframe.src now only if the wrapper is visible, else set when user opens map.
-    const mapInitiallyVisible = localStorage.getItem("mapVisible") === "true";
-    if (MAP_WRAPPER) {
-      if (mapInitiallyVisible) {
-        MAP_WRAPPER.classList.remove("hidden");
-        MAP_BTN && (MAP_BTN.textContent = "Masquer la carte");
-        MAP_IFRAME.src = getUmapUrl(savedTheme);
-      } else {
-        MAP_WRAPPER.classList.add("hidden");
-        MAP_BTN && (MAP_BTN.textContent = "Afficher la carte");
-        // don't set src yet (lazy load)
-      }
-    } else {
-      // If wrapper is absent but iframe exists, set it
-      MAP_IFRAME.src = getUmapUrl(savedTheme);
-    }
-
-    // Fullscreen link
-    if (MAP_FULLSCREEN) {
-      MAP_FULLSCREEN.href = getUmapUrl(savedTheme).replace("scrollWheelZoom=false", "scrollWheelZoom=true");
-    }
-
-    // Toggle button behavior
-    MAP_BTN?.addEventListener("click", () => {
-      if (!MAP_WRAPPER) return;
-      const nowVisible = MAP_WRAPPER.classList.toggle("hidden") === false;
-      // Lazy load iframe when shown
-      if (nowVisible && MAP_IFRAME && !MAP_IFRAME.src) {
-        MAP_IFRAME.src = getUmapUrl(localStorage.getItem("theme") || savedTheme);
-      }
-      MAP_BTN.textContent = nowVisible ? "Masquer la carte" : "Afficher la carte";
-      localStorage.setItem("mapVisible", nowVisible ? "true" : "false");
-    });
-  }
-
-  // Charger planning (si page a un planning)
+  // Charger planning
   chargerPlanning();
 });
 
 /***********************
- * Fonctions menu
+ * Menu
  ***********************/
 function openMenu() {
   document.body.classList.add("menu-open");
-  const overlay = document.getElementById("overlay");
-  const side = document.getElementById("side-menu");
-  overlay?.setAttribute("aria-hidden", "false");
-  side?.setAttribute("aria-hidden", "false");
-  // lock scroll on body (simple)
+  OVERLAY?.setAttribute("aria-hidden", "false");
+  SIDE_MENU?.setAttribute("aria-hidden", "false");
   document.documentElement.style.overflow = "hidden";
 }
 
 function closeMenu() {
   document.body.classList.remove("menu-open");
-  const overlay = document.getElementById("overlay");
-  const side = document.getElementById("side-menu");
-  overlay?.setAttribute("aria-hidden", "true");
-  side?.setAttribute("aria-hidden", "true");
+  OVERLAY?.setAttribute("aria-hidden", "true");
+  SIDE_MENU?.setAttribute("aria-hidden", "true");
   document.documentElement.style.overflow = "";
 }
 
 /**************************************************************
- * 🌗 THÈME SOMBRE / CLAIR (met à jour aussi la carte uMap si présente)
+ * Thème
  **************************************************************/
 function appliquerTheme(theme) {
   if (theme === "dark") {
     document.body.classList.add("dark");
-    const tgl = document.getElementById("theme-toggle");
-    const stgl = document.getElementById("side-theme-toggle");
-    if (tgl) tgl.textContent = "☀️";
-    if (stgl) stgl.textContent = "☀️";
+    THEME_TOGGLE && (THEME_TOGGLE.textContent = "☀️");
+    SIDE_THEME_TOGGLE && (SIDE_THEME_TOGGLE.textContent = "☀️");
   } else {
     document.body.classList.remove("dark");
-    const tgl = document.getElementById("theme-toggle");
-    const stgl = document.getElementById("side-theme-toggle");
-    if (tgl) tgl.textContent = "🌙";
-    if (stgl) stgl.textContent = "🌙";
+    THEME_TOGGLE && (THEME_TOGGLE.textContent = "🌙");
+    SIDE_THEME_TOGGLE && (SIDE_THEME_TOGGLE.textContent = "🌙");
   }
 
-  // Mettre à jour la carte uMap si présente
+  // Mise à jour carte uMap si présente
   const MAP_IFRAME = document.getElementById("umap-frame");
   const MAP_FULLSCREEN = document.getElementById("umap-fullscreen");
   if (MAP_IFRAME) {
-    // Remap URL to match theme
-    // If iframe has been lazy-loaded, update its src accordingly
     const newSrc = getUmapUrl(theme);
-    // If iframe has no src (not loaded yet), don't force load unless map visible
-    const wrapper = document.getElementById("map-wrapper");
-    if (!MAP_IFRAME.src || wrapper && !wrapper.classList.contains("hidden")) {
-      MAP_IFRAME.src = newSrc;
-    } else {
-      // update href for fullscreen in any case
-      // Some browsers may not allow changing src when cross-origin; but setting is fine
-      // We still update src to ensure theme correctness when user opens map next time
-      MAP_IFRAME.src = newSrc;
-    }
-    if (MAP_FULLSCREEN) {
-      MAP_FULLSCREEN.href = newSrc.replace("scrollWheelZoom=false", "scrollWheelZoom=true");
-    }
+    MAP_IFRAME.src = newSrc;
+    if (MAP_FULLSCREEN) MAP_FULLSCREEN.href = newSrc.replace("scrollWheelZoom=false", "scrollWheelZoom=true");
   }
 
   localStorage.setItem("theme", theme);
 }
 
 /**************************************************************
- * 🌐 GESTION MULTILINGUE (FR / RU)
+ * Multilingue + consentement
  **************************************************************/
 function traduireTexte(fr, ru) {
   return currentLang === "ru" ? ru : fr;
@@ -228,31 +159,35 @@ function traduireTexte(fr, ru) {
 function changerLangue(langue) {
   currentLang = langue;
   localStorage.setItem("lang", langue);
-  // Si le calendrier est déjà initialisé, recharger
-  if (calendar) {
-    chargerPlanning();
-  }
+}
+
+function updateConsentText() {
+  if (!CONSENT_TEXT) return;
+  const texts = {
+    fr: "En utilisant ce planning, vous acceptez d’écrire vos noms et prénoms. Aucune autre donnée personnelle n’est enregistrée.",
+    ru: "Используя этот план, вы соглашаетесь указать свои имя и фамилию. Другие персональные данные не сохраняются."
+  };
+  CONSENT_TEXT.textContent = texts[currentLang] || texts.fr;
 }
 
 /**************************************************************
- * 🔌 CONNEXION RÉSEAU
+ * Connexion réseau
  **************************************************************/
 window.addEventListener("online", () => {
   isOffline = false;
-  document.getElementById("offline-banner")?.classList.add("hidden");
+  OFFLINE_BANNER?.classList.add("hidden");
   chargerPlanning();
 });
 
 window.addEventListener("offline", () => {
   isOffline = true;
-  document.getElementById("offline-banner")?.classList.remove("hidden");
+  OFFLINE_BANNER?.classList.remove("hidden");
 });
 
 /**************************************************************
- * 🔁 CHARGEMENT DU PLANNING
+ * Charger planning
  **************************************************************/
 async function chargerPlanning() {
-  // if no loader on page, safe-exit
   const loader = document.getElementById("loader");
   if (loader) {
     loader.classList.remove("hidden");
@@ -262,7 +197,6 @@ async function chargerPlanning() {
   }
 
   let events = [];
-
   if (isOffline) {
     events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
     loader && loader.classList.add("hidden");
@@ -284,11 +218,11 @@ async function chargerPlanning() {
 }
 
 /**************************************************************
- * 📅 AFFICHAGE DU CALENDRIER
+ * Calendrier
  **************************************************************/
 function renderCalendar(events) {
   const calendarEl = document.getElementById("planning");
-  if (!calendarEl) return; // safe: page may not have calendar
+  if (!calendarEl) return;
 
   if (calendar) calendar.destroy();
 
@@ -315,27 +249,25 @@ function renderCalendar(events) {
     selectable: true,
     editable: true,
     height: "auto",
-
-    events: events.map((e) => ({
+    events: events.map(e => ({
       id: e.id,
       title: e.title,
       start: e.start,
       end: e.end,
       backgroundColor: getCategoryColor(e.category),
-      extendedProps: { category: e.category },
+      extendedProps: { category: e.category }
     })),
-
     select: (info) => openEventModal(null, info),
     eventClick: (info) => openEventModal(info.event),
     eventDrop: (info) => saveEvent(eventToData(info.event)),
-    eventResize: (info) => saveEvent(eventToData(info.event)),
+    eventResize: (info) => saveEvent(eventToData(info.event))
   });
 
   calendar.render();
 }
 
 /**************************************************************
- * 🎨 COULEURS DES CATÉGORIES
+ * Couleurs catégories
  **************************************************************/
 function getCategoryColor(category) {
   const colors = {
@@ -343,13 +275,13 @@ function getCategoryColor(category) {
     "Gréneraie/Resto du Cœur": "#2ECC71",
     "Préfecture": "#E74C3C",
     "Tour de Bretagne": "#3498DB",
-    "France Terre d’Asile": "#9B59B6",
+    "France Terre d’Asile": "#9B59B6"
   };
   return colors[category] || "#6c757d";
 }
 
 /**************************************************************
- * 💾 SAUVEGARDE LOCALE + SERVEUR
+ * Sauvegarde locale + serveur
  **************************************************************/
 function eventToData(event) {
   return {
@@ -357,7 +289,7 @@ function eventToData(event) {
     title: event.title,
     start: event.startStr,
     end: event.endStr,
-    category: event.extendedProps?.category || "Autre",
+    category: event.extendedProps?.category || "Autre"
   };
 }
 
@@ -382,35 +314,11 @@ async function saveEvent(event) {
 }
 
 /**************************************************************
- * 🗑️ SUPPRESSION D’ÉVÉNEMENT (commentée — utilitaire)
- **************************************************************/
-/*async function deleteEvent(event) {
-  if (!confirm(traduireTexte("Supprimer cet événement ?", "Удалить это событие?"))) return;
-  event.remove();
-
-  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
-  saved = saved.filter((e) => e.id !== event.id);
-  localStorage.setItem("tplEvents", JSON.stringify(saved));
-
-  if (!isOffline) {
-    try {
-      await fetch(PROXY_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ mode: "delete", data: [event.id] }),
-      });
-    } catch (err) {
-      console.warn("⚠️ Erreur de suppression :", err);
-    }
-  }
-}*/
-
-/**************************************************************
- * 🪟 MODALE D’ÉVÉNEMENT (avec focus mobile)
+ * Modale événement
  **************************************************************/
 function openEventModal(event = null, info = null) {
   const modal = document.getElementById("event-modal");
-  if (!modal) return; // safe: no modal on some pages
+  if (!modal) return;
   const modalContent = modal.querySelector(".modal-content");
   const titleInput = document.getElementById("event-title");
   const startInput = document.getElementById("event-start");
@@ -420,13 +328,13 @@ function openEventModal(event = null, info = null) {
   const cancelBtn = document.getElementById("cancel-event");
   const modalTitle = document.getElementById("modal-title");
 
-  // Labels
-  const labelTitle = document.querySelector('label[for="event-title"]');
-  const labelStart = document.querySelector('label[for="event-start"]');
-  const labelEnd = document.querySelector('label[for="event-end"]');
-  const labelCategory = document.querySelector('label[for="event-category"]');
+  const labels = {
+    titleLabel: document.querySelector('label[for="event-title"]'),
+    startLabel: document.querySelector('label[for="event-start"]'),
+    endLabel: document.querySelector('label[for="event-end"]'),
+    categoryLabel: document.querySelector('label[for="event-category"]')
+  };
 
-  // Translations
   const texts = {
     fr: {
       newEvent: "Nouvel événement",
@@ -458,60 +366,52 @@ function openEventModal(event = null, info = null) {
 
   const t = texts[currentLang] || texts.fr;
 
-  // Apply texts (safe)
-  if (labelTitle) labelTitle.textContent = t.titleLabel;
-  if (labelStart) labelStart.textContent = t.startLabel;
-  if (labelEnd) labelEnd.textContent = t.endLabel;
-  if (labelCategory) labelCategory.textContent = t.categoryLabel;
+  if (labels.titleLabel) labels.titleLabel.textContent = t.titleLabel;
+  if (labels.startLabel) labels.startLabel.textContent = t.startLabel;
+  if (labels.endLabel) labels.endLabel.textContent = t.endLabel;
+  if (labels.categoryLabel) labels.categoryLabel.textContent = t.categoryLabel;
   if (titleInput) titleInput.placeholder = t.titlePlaceholder;
   if (startInput) startInput.placeholder = t.startPlaceholder;
   if (endInput) endInput.placeholder = t.endPlaceholder;
   if (saveBtn) saveBtn.textContent = t.save;
   if (cancelBtn) cancelBtn.textContent = t.cancel;
+  modalTitle && (modalTitle.textContent = event ? t.editEvent : t.newEvent);
 
   modal.classList.remove("hidden");
-
-  // Focus mobile (gives time for animation)
-  setTimeout(() => {
-    titleInput?.focus();
-  }, 300);
+  setTimeout(() => titleInput?.focus(), 300);
 
   if (!event) {
-    modalTitle && (modalTitle.textContent = t.newEvent);
-    if (titleInput) titleInput.value = "";
-    if (startInput) startInput.value = info?.startStr?.slice(0, 16) || "";
-    if (endInput) endInput.value = info?.endStr ? info.endStr.slice(0, 16) : "";
-    if (categorySelect) categorySelect.value = "Hôtel-Dieu";
+    titleInput.value = "";
+    startInput.value = info?.startStr?.slice(0, 16) || "";
+    endInput.value = info?.endStr?.slice(0, 16) || "";
+    categorySelect.value = "Hôtel-Dieu";
     cancelBtn?.classList.remove("hidden");
   } else {
-    modalTitle && (modalTitle.textContent = t.editEvent);
-    if (titleInput) titleInput.value = event.title || "";
-    if (startInput) startInput.value = event.startStr ? event.startStr.slice(0, 16) : "";
-    if (endInput) endInput.value = event.endStr ? event.endStr.slice(0, 16) : event.startStr ? event.startStr.slice(0, 16) : "";
+    titleInput.value = event.title || "";
+    startInput.value = event.startStr ? event.startStr.slice(0, 16) : "";
+    endInput.value = event.endStr ? event.endStr.slice(0, 16) : startInput.value;
     cancelBtn?.classList.add("hidden");
   }
 
   const closeModal = () => modal.classList.add("hidden");
-  modal.onclick = (e) => {
-    if (modalContent && !modalContent.contains(e.target)) closeModal();
-  };
+  modal.onclick = (e) => { if (!modalContent.contains(e.target)) closeModal(); };
 
   if (saveBtn) {
     saveBtn.onclick = () => {
       const newEvent = {
-        id: event ? event.id : (crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString()),
-        title: (titleInput && titleInput.value.trim()) || "(Sans titre)",
-        start: startInput ? startInput.value : "",
-        end: endInput ? (endInput.value || (startInput ? startInput.value : "")) : "",
-        category: categorySelect ? categorySelect.value : "Autre",
+        id: event ? event.id : (crypto?.randomUUID ? crypto.randomUUID() : Date.now().toString()),
+        title: titleInput.value.trim() || "(Sans titre)",
+        start: startInput.value,
+        end: endInput.value || startInput.value,
+        category: categorySelect.value || "Autre"
       };
 
-      if (event && typeof event.remove === "function") event.remove();
+      if (event?.remove) event.remove();
 
-      calendar && calendar.addEvent({
+      calendar?.addEvent({
         ...newEvent,
         backgroundColor: getCategoryColor(newEvent.category),
-        extendedProps: { category: newEvent.category },
+        extendedProps: { category: newEvent.category }
       });
 
       saveEvent(newEvent);
@@ -519,7 +419,5 @@ function openEventModal(event = null, info = null) {
     };
   }
 
-  if (cancelBtn) cancelBtn.onclick = closeModal;
+  cancelBtn?.addEventListener("click", closeModal);
 }
-
-/* End of script.js */
