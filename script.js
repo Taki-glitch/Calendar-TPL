@@ -1,4 +1,4 @@
-// script.js — version intégrale et robuste avec consentement utilisateurs
+// script.js — version intégrale avec consentement utilisateurs
 console.log("✅ script.js chargé correctement !");
 
 /**************************************************************
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
   SIDE_LANG_TOGGLE = document.getElementById("side-lang-toggle");
   MENU_CLOSE = document.getElementById("menu-close");
 
-  // UMAP
+  // UMAP elements
   const MAP_WRAPPER = document.getElementById("map-wrapper");
   const MAP_IFRAME = document.getElementById("umap-frame");
   const MAP_BTN = document.getElementById("toggle-map-btn");
@@ -74,20 +74,14 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   // --- Langue ---
-  const savedLang = localStorage.getItem("lang") || "fr";
-  currentLang = savedLang;
+  currentLang = localStorage.getItem("lang") || "fr";
   if (LANG_TOGGLE) LANG_TOGGLE.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
   LANG_TOGGLE?.addEventListener("click", () => {
-    const newLang = currentLang === "fr" ? "ru" : "fr";
-    changerLangue(newLang);
-    if (LANG_TOGGLE) LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
+    changerLangue(currentLang === "fr" ? "ru" : "fr");
     location.reload();
   });
   SIDE_LANG_TOGGLE?.addEventListener("click", () => {
-    const newLang = currentLang === "fr" ? "ru" : "fr";
-    changerLangue(newLang);
-    if (LANG_TOGGLE) LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
-    if (SIDE_LANG_TOGGLE) SIDE_LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
+    changerLangue(currentLang === "fr" ? "ru" : "fr");
     location.reload();
   });
 
@@ -134,10 +128,10 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // --- Charger le planning ---
+  // --- Charger le planning immédiatement ---
   chargerPlanning();
 
-  // --- Initialiser le consentement utilisateurs ---
+  // --- Consentement utilisateurs ---
   initConsentement();
 });
 
@@ -172,49 +166,47 @@ function appliquerTheme(theme) {
 function changerLangue(lang) {
   currentLang = lang;
   localStorage.setItem("lang", lang);
+  if (calendar) chargerPlanning();
 }
 
 /**************************************************************
- * 📅 Calendrier
+ * 🔁 CHARGEMENT DU PLANNING
  **************************************************************/
-function chargerPlanning() {
-  fetch(PROXY_URL)
-    .then((res) => res.json())
-    .then((data) => {
-      renderCalendar(data.events || []);
-    })
-    .catch((err) => console.error("Erreur chargement planning :", err));
+async function chargerPlanning() {
+  let events = [];
+  try {
+    const res = await fetch(PROXY_URL);
+    events = await res.json();
+    localStorage.setItem("tplEvents", JSON.stringify(events));
+  } catch (err) {
+    console.warn("⚠️ Erreur de chargement, mode local :", err);
+    events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  }
+  renderCalendar(events);
 }
 
+/**************************************************************
+ * 📅 RENDER CALENDRIER
+ **************************************************************/
 function renderCalendar(events) {
-  // Ici tu mets ton code FullCalendar avec events
-  // Exemple simplifié :
-  calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
+  const calendarEl = document.getElementById("planning");
+  if (!calendarEl) return;
+  if (calendar) calendar.destroy();
+
+  calendar = new FullCalendar.Calendar(calendarEl, {
     locale: currentLang,
     initialView: "dayGridMonth",
     events: events,
     editable: true,
     selectable: true,
   });
+
   calendar.render();
 }
 
 /**************************************************************
- * 🍀 Menu latéral
+ * 🍀 UTILITAIRES
  **************************************************************/
-function openMenu() {
-  document.body.classList.add("menu-open");
-  OVERLAY?.classList.add("active");
-}
-function closeMenu() {
-  document.body.classList.remove("menu-open");
-  OVERLAY?.classList.remove("active");
-}
-
-/**************************************************************
- * 📝 Événements
- **************************************************************/
-function openEventModal() {
-  console.log("Ouvrir modal ajout événement");
-  // Implémentation modale ajout événement
-}
+function openMenu() { document.body.classList.add("menu-open"); }
+function closeMenu() { document.body.classList.remove("menu-open"); }
+function openEventModal(event = null, info = null) { console.log("Open modal", event, info); }
