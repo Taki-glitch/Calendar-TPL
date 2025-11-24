@@ -159,10 +159,62 @@ function initConsentement() {
 }
 
 /**************************************************************
- * --- Ici viennent toutes tes autres fonctions existantes ---
- * appliquerTheme(), changerLangue(), openMenu(), closeMenu(),
- * chargerPlanning(), renderCalendar(), getCategoryColor(),
- * saveEvent(), eventToData(), openEventModal()
+ * 🌗 Thème
  **************************************************************/
+function appliquerTheme(theme) {
+  document.body.classList.toggle("dark", theme === "dark");
+  localStorage.setItem("theme", theme);
+}
 
-// ... le reste du script.js original continue ici sans modification
+/**************************************************************
+ * 🌐 Langue
+ **************************************************************/
+function changerLangue(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+}
+
+/**************************************************************
+ * 📅 Calendrier
+ **************************************************************/
+function chargerPlanning() {
+  fetch(PROXY_URL)
+    .then((res) => res.json())
+    .then((data) => {
+      renderCalendar(data.events || []);
+    })
+    .catch((err) => console.error("Erreur chargement planning :", err));
+}
+
+function renderCalendar(events) {
+  // Ici tu mets ton code FullCalendar avec events
+  // Exemple simplifié :
+  calendar = new FullCalendar.Calendar(document.getElementById("calendar"), {
+    locale: currentLang,
+    initialView: "dayGridMonth",
+    events: events,
+    editable: true,
+    selectable: true,
+  });
+  calendar.render();
+}
+
+/**************************************************************
+ * 🍀 Menu latéral
+ **************************************************************/
+function openMenu() {
+  document.body.classList.add("menu-open");
+  OVERLAY?.classList.add("active");
+}
+function closeMenu() {
+  document.body.classList.remove("menu-open");
+  OVERLAY?.classList.remove("active");
+}
+
+/**************************************************************
+ * 📝 Événements
+ **************************************************************/
+function openEventModal() {
+  console.log("Ouvrir modal ajout événement");
+  // Implémentation modale ajout événement
+}
