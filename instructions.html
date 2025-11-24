@@ -1,132 +1,184 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Instructions — Planning TPL</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#007bff" />
+  <title>Инструкции TPL</title>
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Favicon + PWA -->
+  <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png" />
+  <link rel="apple-touch-icon" href="tpl-logo.png" />
+  <link rel="manifest" href="manifest.json" />
 </head>
+
 <body>
+  <!-- SIDE MENU + OVERLAY -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
+
+  <nav class="side-menu" id="side-menu" aria-hidden="true">
+    <div class="side-menu-header">
+      <img src="tpl-logo.png" alt="Логотип TPL" class="side-logo" />
+      <button id="menu-close" class="menu-close" aria-label="Закрыть меню">✕</button>
+    </div>
+
+    <ul class="side-links">
+      <li><a href="index.html" class="side-link">🗓️ Расписание</a></li>
+      <li><a href="instructions.html" class="side-link">📖 Инструкции</a></li>
+    </ul>
+
+    <div class="side-actions">
+      <button id="side-theme-toggle" class="side-action-btn" aria-label="Сменить тему">🌙</button>
+      <button id="side-lang-toggle" class="side-action-btn" aria-label="Сменить язык">🇷🇺</button>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
   <header>
-    <h1 id="instructions-title">Инструкции</h1>
-    <button id="lang-toggle">🇷🇺</button>
+    <div class="header-left">
+      <button id="menu-btn" class="menu-btn" aria-label="Открыть меню">☰</button>
+      <img src="tpl-logo.png" alt="Логотип TPL" class="logo" />
+      <h1>Расписание TPL</h1>
+    </div>
+
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Расписание</a>
+      <a href="instructions.html" class="nav-link active">Инструкции</a>
+    </nav>
+
+    <div class="header-buttons">
+      <button id="theme-toggle" title="Сменить тему">🌙</button>
+      <button id="lang-toggle" title="Сменить язык">🇷🇺</button>
+    </div>
   </header>
 
-  <main>
-    <p id="instructions-welcome">Добро пожаловать! Здесь вы найдете инструкции по использованию планирования.</p>
+  <!-- CONTENT -->
+  <main class="instructions-container">
+    <section class="instructions-card">
+      <h2 id="instructions-title">📋 Инструкции TPL</h2>
+      <p id="instructions-welcome">Добро пожаловать в раздел инструкций проекта <strong>TPL</strong>.</p>
 
-    <section>
-      <h2 id="step1-title">Шаг 1</h2>
-      <ul id="step1-items"></ul>
-    </section>
+      <h3 id="step1-title">🔹 Шаг 1 — Подготовка</h3>
+      <ul id="step1-items">
+        <li>Проверьте своё расписание на главной странице.</li>
+        <li>Убедитесь, что нужный вам временной слот свободен.</li>
+        <li>Используйте кнопку <strong>+</strong>, чтобы добавить событие при необходимости.</li>
+      </ul>
 
-    <section>
-      <h2 id="step2-title">Шаг 2</h2>
-      <ul id="step2-items"></ul>
-    </section>
+      <h3 id="step2-title">🔹 Шаг 2 — На месте</h3>
+      <ul id="step2-items">
+        <li>Следуйте информации, связанной с вашим участком (Hôtel-Dieu, Préfecture, Tour Bretagne и т.д.).</li>
+        <li>Находитесь в безопасной зоне и регулярно меняйте своё расположение.</li>
+        <li>В случае опасности (агрессивный человек и т.п.) покиньте место, если необходимо.</li>
+      </ul>
 
-    <section>
-      <h2 id="step3-title">Шаг 3</h2>
-      <ul id="step3-items"></ul>
-    </section>
+      <h3 id="step3-title">🔹 Шаг 3 — После служения</h3>
+      <ul id="step3-items">
+        <li>Сообщите важные замечания брату Тимоте Девину.</li>
+        <li>Не стесняйтесь записываться на другие временные слоты.</li>
+      </ul>
 
-    <section>
-      <h2 id="map-title">Карта</h2>
-      <p id="map-text">Вы можете открыть карту в полноэкранном режиме:</p>
-      <button id="fullscreen-map">Полноэкранная карта</button>
-    </section>
+      <hr />
 
-    <section>
-      <h2 id="tips-title">Советы</h2>
-      <p id="tips-text">Полезные советы по использованию планирования.</p>
+      <h3 id="map-title">🗺️ Карта точек TPL</h3>
+      <p id="map-text">Вот карта различных мест, используемых для TPL:</p>
+
+      <div class="map-container">
+        <iframe 
+          style="width: 100%; height: 350px; border: 0;" 
+          allowfullscreen 
+          allow="geolocation"
+          src="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true">
+        </iframe>
+      </div>
+
+      <p style="text-align:center; margin-top:10px;">
+        <a id="fullscreen-map" href="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scrollWheelZoom=true&zoomControl=true" target="_blank">
+          🔎 Открыть карту на весь экран
+        </a>
+      </p>
+
+      <hr />
+
+      <h3 id="tips-title">ℹ️ Советы</h3>
+      <p id="tips-text">Сайт работает офлайн благодаря PWA. Вы можете добавить его на главный экран вашего телефона или планшета.</p>
     </section>
   </main>
 
+  <!-- Scripts -->
+  <script src="script.js"></script>
   <script>
     const translations = {
-      fr: {
-        instructionsTitle: "Instructions",
-        instructionsWelcome: "Bienvenue ! Voici les instructions pour utiliser le planning.",
-        step1Title: "Étape 1",
-        step1Items: ["Ouvrir le planning", "Sélectionner une date", "Consulter les événements"],
-        step2Title: "Étape 2",
-        step2Items: ["Ajouter un événement", "Modifier un événement existant", "Supprimer un événement"],
-        step3Title: "Étape 3",
-        step3Items: ["Exporter en PDF", "Changer le thème", "Accéder aux instructions"],
-        mapTitle: "Carte",
-        mapText: "Vous pouvez ouvrir la carte en plein écran :",
-        fullscreenMap: "Carte plein écran",
-        tipsTitle: "Conseils",
-        tipsText: "Quelques astuces pour mieux utiliser le planning."
-      },
+      fr: { /* ... déjà défini dans script.js ... */ },
       ru: {
-        instructionsTitle: "Инструкции",
-        instructionsWelcome: "Добро пожаловать! Здесь вы найдете инструкции по использованию планирования.",
-        step1Title: "Шаг 1",
-        step1Items: ["Открыть планирование", "Выбрать дату", "Просмотреть события"],
-        step2Title: "Шаг 2",
-        step2Items: ["Добавить событие", "Изменить существующее событие", "Удалить событие"],
-        step3Title: "Шаг 3",
-        step3Items: ["Экспорт в PDF", "Сменить тему", "Перейти к инструкциям"],
-        mapTitle: "Карта",
-        mapText: "Вы можете открыть карту в полноэкранном режиме:",
-        fullscreenMap: "Полноэкранная карта",
-        tipsTitle: "Советы",
-        tipsText: "Полезные советы по использованию планирования."
+        instructionsTitle: "📋 Инструкции TPL",
+        instructionsWelcome: "Добро пожаловать в раздел инструкций проекта TPL.",
+        step1Title: "🔹 Шаг 1 — Подготовка",
+        step1Items: [
+          "Проверьте своё расписание на главной странице.",
+          "Убедитесь, что нужный вам временной слот свободен.",
+          "Используйте кнопку +, чтобы добавить событие при необходимости."
+        ],
+        step2Title: "🔹 Шаг 2 — На месте",
+        step2Items: [
+          "Следуйте информации, связанной с вашим участком (Hôtel-Dieu, Préfecture, Tour Bretagne и т.д.).",
+          "Находитесь в безопасной зоне и регулярно меняйте своё расположение.",
+          "В случае опасности (агрессивный человек и т.п.) покиньте место, если необходимо."
+        ],
+        step3Title: "🔹 Шаг 3 — После служения",
+        step3Items: [
+          "Сообщите важные замечания брату Тимоте Девину.",
+          "Не стесняйтесь записываться на другие временные слоты."
+        ],
+        mapTitle: "🗺️ Карта точек TPL",
+        mapText: "Вот карта различных мест, используемых для TPL:",
+        fullscreenMap: "🔎 Открыть карту на весь экран",
+        tipsTitle: "ℹ️ Советы",
+        tipsText: "Сайт работает офлайн благодаря PWA. Вы можете добавить его на главный экран вашего телефона или планшета."
       }
     };
 
-    // Récupérer la langue stockée ou utiliser la langue du document
-    const storedLang = localStorage.getItem("tpl-lang");
-    const initialLang = storedLang || document.documentElement.lang || "fr";
-
     function updateInstructionsLanguage(lang) {
       if (!translations[lang]) return;
-      document.documentElement.lang = lang;
-
       document.getElementById("instructions-title").textContent = translations[lang].instructionsTitle;
       document.getElementById("instructions-welcome").textContent = translations[lang].instructionsWelcome;
-
-      const fillList = (id, items) => {
-        const ul = document.getElementById(id);
-        ul.innerHTML = "";
-        items.forEach(item => {
-          const li = document.createElement("li");
-          li.textContent = item;
-          ul.appendChild(li);
-        });
-      };
-
-      fillList("step1-items", translations[lang].step1Items);
-      fillList("step2-items", translations[lang].step2Items);
-      fillList("step3-items", translations[lang].step3Items);
-
       document.getElementById("step1-title").textContent = translations[lang].step1Title;
+      const step1List = document.getElementById("step1-items"); step1List.innerHTML = "";
+      translations[lang].step1Items.forEach(item => { const li = document.createElement("li"); li.textContent = item; step1List.appendChild(li); });
       document.getElementById("step2-title").textContent = translations[lang].step2Title;
+      const step2List = document.getElementById("step2-items"); step2List.innerHTML = "";
+      translations[lang].step2Items.forEach(item => { const li = document.createElement("li"); li.textContent = item; step2List.appendChild(li); });
       document.getElementById("step3-title").textContent = translations[lang].step3Title;
-
+      const step3List = document.getElementById("step3-items"); step3List.innerHTML = "";
+      translations[lang].step3Items.forEach(item => { const li = document.createElement("li"); li.textContent = item; step3List.appendChild(li); });
       document.getElementById("map-title").textContent = translations[lang].mapTitle;
       document.getElementById("map-text").textContent = translations[lang].mapText;
       document.getElementById("fullscreen-map").textContent = translations[lang].fullscreenMap;
-
       document.getElementById("tips-title").textContent = translations[lang].tipsTitle;
       document.getElementById("tips-text").textContent = translations[lang].tipsText;
-
       document.getElementById("lang-toggle").textContent = lang === "fr" ? "🇫🇷" : "🇷🇺";
-
-      localStorage.setItem("tpl-lang", lang);
+      document.getElementById("side-lang-toggle").textContent = lang === "fr" ? "🇫🇷" : "🇷🇺";
     }
 
     function toggleLanguage() {
-      const current = document.documentElement.lang;
-      const newLang = current === "fr" ? "ru" : "fr";
+      const newLang = document.documentElement.lang === "fr" ? "ru" : "fr";
+      document.documentElement.lang = newLang;
       updateInstructionsLanguage(newLang);
     }
 
     document.getElementById("lang-toggle").addEventListener("click", toggleLanguage);
+    document.getElementById("side-lang-toggle").addEventListener("click", toggleLanguage);
 
-    // Initialisation
-    updateInstructionsLanguage(initialLang);
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("service-worker.js")
+        .then(() => console.log("✅ Service Worker зарегистрирован"))
+        .catch(err => console.error("❌ Ошибка Service Worker :", err));
+    }
+
+    updateInstructionsLanguage(document.documentElement.lang);
   </script>
 </body>
 </html>
