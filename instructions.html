@@ -23,8 +23,8 @@
     </div>
 
     <ul class="side-links">
-      <li><a href="index.html" class="side-link" id="side-link-calendar">🗓️ Расписание</a></li>
-      <li><a href="instructions.html" class="side-link" id="side-link-instructions">📖 Инструкции</a></li>
+      <li><a href="index.html" class="side-link">🗓️ Расписание</a></li>
+      <li><a href="instructions.html" class="side-link">📖 Инструкции</a></li>
     </ul>
 
     <div class="side-actions">
@@ -132,8 +132,6 @@
         fullscreenMap: "Agrandir la carte",
         tipsTitle: "Conseils rapides",
         tipsText: "**Mode Sombre (Dark Mode)** : Utilisez le bouton 🌙 pour basculer en mode sombre. Ce réglage est conservé. Mode Hors Ligne : L'application fonctionne sans connexion. Les données sont mises en cache et les modifications sont synchronisées plus tard.",
-        sideLinkCalendar: "🗓️ Calendrier", // Ajout
-        sideLinkInstructions: "📖 Instructions", // Ajout
       },
       ru: {
         title: "Инструкции TPL",
@@ -161,51 +159,40 @@
         fullscreenMap: "Развернуть карту",
         tipsTitle: "Краткие советы",
         tipsText: "**Темный режим (Dark Mode)** : Используйте кнопку 🌙 для переключения в темный режим. Эта настройка сохраняется. Автономный режим : Приложение работает без подключения. Данные кэшируются, а изменения синхронизируются позже.",
-        sideLinkCalendar: "🗓️ Расписание", // Ajout
-        sideLinkInstructions: "📖 Инструкции", // Ajout
       }
     };
 
     function updateInstructionsLanguage(lang) {
-      const t = translations[lang]; // Simplification
-      
-      document.title = t.title;
-      document.getElementById("main-title").textContent = t.mainTitle;
-      document.getElementById("section1-title").textContent = t.section1Title;
-      document.getElementById("section1-text").textContent = t.section1Text;
-      document.getElementById("step1-title").textContent = t.step1Title;
-      document.getElementById("step1-text").textContent = t.step1Text;
-      document.getElementById("step2-title").textContent = t.step2Title;
-      document.getElementById("step2-text").textContent = t.step2Text;
+      document.title = translations[lang].title;
+      document.getElementById("main-title").textContent = translations[lang].mainTitle;
+      document.getElementById("section1-title").textContent = translations[lang].section1Title;
+      document.getElementById("section1-text").textContent = translations[lang].section1Text;
+      document.getElementById("step1-title").textContent = translations[lang].step1Title;
+      document.getElementById("step1-text").textContent = translations[lang].step1Text;
+      document.getElementById("step2-title").textContent = translations[lang].step2Title;
+      document.getElementById("step2-text").textContent = translations[lang].step2Text;
 
       const step2List = document.getElementById("step2-list");
       step2List.innerHTML = "";
-      t.step2Items.forEach(item => { const li = document.createElement("li"); li.innerHTML = item; step2List.appendChild(li); }); // Utilisation de innerHTML pour le gras
+      translations[lang].step2Items.forEach(item => { const li = document.createElement("li"); li.innerHTML = item; step2List.appendChild(li); });
 
-      document.getElementById("step3-title").textContent = t.step3Title;
-      document.getElementById("step3-text").textContent = t.step3Text;
+      document.getElementById("step3-title").textContent = translations[lang].step3Title;
+      document.getElementById("step3-text").textContent = translations[lang].step3Text;
       const step3List = document.getElementById("step3-list");
       step3List.innerHTML = "";
-      t.step3Items.forEach(item => { const li = document.createElement("li"); li.innerHTML = item; step3List.appendChild(li); }); // Utilisation de innerHTML pour le gras
+      translations[lang].step3Items.forEach(item => { const li = document.createElement("li"); li.innerHTML = item; step3List.appendChild(li); });
       
-      document.getElementById("map-title").textContent = t.mapTitle;
-      document.getElementById("map-text").textContent = t.mapText;
-      document.getElementById("fullscreen-map").textContent = t.fullscreenMap;
-      document.getElementById("tips-title").textContent = t.tipsTitle;
-      document.getElementById("tips-text").innerHTML = t.tipsText; // Utilisation de innerHTML pour le gras/saut de ligne
+      document.getElementById("map-title").textContent = translations[lang].mapTitle;
+      document.getElementById("map-text").textContent = translations[lang].mapText;
+      document.getElementById("fullscreen-map").textContent = translations[lang].fullscreenMap;
+      document.getElementById("tips-title").textContent = translations[lang].tipsTitle;
+      document.getElementById("tips-text").innerHTML = translations[lang].tipsText;
       
-      // Mise à jour des drapeaux (Corrigé)
-      const flag = lang === "fr" ? "🇫🇷" : "🇷🇺";
-      document.getElementById("lang-toggle").textContent = flag;
-      document.getElementById("side-lang-toggle").textContent = flag;
-
-      // Mise à jour des liens du menu latéral (Ajouté)
-      document.getElementById("side-link-calendar").textContent = t.sideLinkCalendar;
-      document.getElementById("side-link-instructions").textContent = t.sideLinkInstructions;
+      document.getElementById("lang-toggle").textContent = lang === "fr" ? "🇫🇷" : "🇷🇺";
+      document.getElementById("side-lang-toggle").textContent = lang === "fr" ? "🇫🇷" : "🇷🇺";
     }
 
     function toggleLanguage() {
-      // Logique pour basculer la langue correctement
       const newLang = document.documentElement.lang === "fr" ? "ru" : "fr";
       document.documentElement.lang = newLang;
       updateInstructionsLanguage(newLang);
@@ -220,7 +207,6 @@
         .catch(err => console.error("❌ Ошибка Service Worker :", err));
     }
 
-    // Applique la traduction initiale basée sur l'attribut lang (ru dans ce cas)
     updateInstructionsLanguage(document.documentElement.lang);
   </script>
 </body>
