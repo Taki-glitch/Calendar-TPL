@@ -137,7 +137,8 @@
         tipsText: "**Mode Sombre (Dark Mode)** : Utilisez le bouton 🌙 pour basculer en mode sombre. Ce réglage est conservé.<br>**Mode Hors Ligne** : L'application fonctionne sans connexion. Les données sont mises en cache et les modifications sont synchronisées plus tard.",
         sideLinkCalendar: "🗓️ Calendrier",
         sideLinkInstructions: "📖 Instructions",
-        offlineMessage: "❌ Hors ligne. Le contenu affiché n'est pas à jour."
+        offlineMessage: "❌ Hors ligne. Le contenu affiché n'est pas à jour.",
+        menuClose: "Fermer le menu"
       },
       ru: {
         title: "Инструкции TPL",
@@ -167,7 +168,8 @@
         tipsText: "**Темный режим (Dark Mode)** : Используйте кнопку 🌙 для переключения в темный режим. Эта настройка сохраняется.<br>**Автономный режим** : Приложение работает без подключения. Данные кэшируются, а изменения синхронизируются позже.",
         sideLinkCalendar: "🗓️ Расписание",
         sideLinkInstructions: "📖 Инструкции",
-        offlineMessage: "❌ Нет подключения. Отображаемый контент устарел."
+        offlineMessage: "❌ Нет подключения. Отображаемый контент устарел.",
+        menuClose: "Закрыть меню"
       }
     };
 
@@ -180,103 +182,4 @@
       document.title = t.title;
 
       // Header
-      document.getElementById("main-title").textContent = t.mainTitle;
-
-      // Section 1: Ajouter
-      document.getElementById("section1-title").textContent = t.section1Title;
-      document.getElementById("section1-text").textContent = t.section1Text;
-
-      // Step 1
-      document.getElementById("step1-title").textContent = t.step1Title;
-      document.getElementById("step1-text").textContent = t.step1Text;
-
-      // Step 2
-      document.getElementById("step2-title").textContent = t.step2Title;
-      document.getElementById("step2-text").textContent = t.step2Text;
-      const step2List = document.getElementById("step2-list");
-      step2List.innerHTML = "";
-      t.step2Items.forEach(item => { const li = document.createElement("li"); li.innerHTML = item; step2List.appendChild(li); });
-
-      // Step 3
-      document.getElementById("step3-title").textContent = t.step3Title;
-      document.getElementById("step3-text").textContent = t.step3Text;
-      const step3List = document.getElementById("step3-list");
-      step3List.innerHTML = "";
-      t.step3Items.forEach(item => { const li = document.createElement("li"); li.innerHTML = item; step3List.appendChild(li); });
-
-      // Map
-      document.getElementById("map-title").textContent = t.mapTitle;
-      document.getElementById("map-text").textContent = t.mapText;
-      document.getElementById("fullscreen-map").textContent = t.fullscreenMap;
-
-      // Tips
-      document.getElementById("tips-title").textContent = t.tipsTitle;
-      document.getElementById("tips-text").innerHTML = t.tipsText;
-
-      // Side Menu Links
-      document.getElementById("side-link-calendar").textContent = t.sideLinkCalendar;
-      document.getElementById("side-link-instructions").textContent = t.sideLinkInstructions;
-
-      // Language Toggles (Flag)
-      const flag = lang === "fr" ? "🇫🇷" : "🇷🇺";
-      document.getElementById("lang-toggle").textContent = flag;
-      document.getElementById("side-lang-toggle").textContent = flag;
-      document.getElementById("menu-close").setAttribute("aria-label", lang === "fr" ? "Fermer le menu" : "Закрыть меню");
-      document.getElementById("offline-message").textContent = t.offlineMessage;
-    }
-
-    /**************************************************************
-     * 🌙 GESTION DU THÈME
-     **************************************************************/
-    // Initialisation du thème
-    if (localStorage.getItem("theme") === "dark" || (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
-      document.body.classList.add("dark");
-    }
-
-    function toggleTheme() {
-      document.body.classList.toggle("dark");
-      const isDark = document.body.classList.contains("dark");
-      localStorage.setItem("theme", isDark ? "dark" : "light");
-    }
-
-    document.getElementById("side-theme-toggle")?.addEventListener("click", toggleTheme);
-
-    /**************************************************************
-     * 🌐 GESTION DE LA LANGUE (MIS À JOUR)
-     **************************************************************/
-
-    /**
-     * Bascule la langue de la page et la sauvegarde dans localStorage.
-     */
-    function toggleLanguage() {
-      const newLang = document.documentElement.lang === "fr" ? "ru" : "fr";
-      document.documentElement.lang = newLang;
-      localStorage.setItem("lang", newLang); // Sauvegarde la préférence
-      updateInstructionsLanguage(newLang);
-    }
-
-    // Initialisation de la langue : lit la préférence stockée ou utilise 'fr' par défaut.
-    const storedLang = localStorage.getItem("lang");
-    const initialLang = (storedLang && (storedLang === "fr" || storedLang === "ru")) ? storedLang : "fr";
-    document.documentElement.lang = initialLang; // S'assure que l'attribut lang est correct.
-
-    // Événements
-    document.getElementById("lang-toggle").addEventListener("click", toggleLanguage);
-    document.getElementById("side-lang-toggle").addEventListener("click", toggleLanguage);
-
-    /**************************************************************
-     * 🚀 INITIALISATION FINALE & SERVICE WORKER
-     **************************************************************/
-
-    // Applique la traduction initiale
-    updateInstructionsLanguage(initialLang);
-
-    // Initialisation du Service Worker (non modifié)
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("✅ Service Worker enregistré"))
-        .catch(err => console.error("❌ Erreur Service Worker :", err));
-    }
-  </script>
-</body>
-</html>
+      document.getElementById("main-title
