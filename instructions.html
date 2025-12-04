@@ -1,22 +1,19 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <meta name="theme-color" content="#007bff" />
   <title>Инструкции TPL</title>
 
-  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Favicon + PWA -->
   <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png" />
   <link rel="apple-touch-icon" href="tpl-logo.png" />
   <link rel="manifest" href="manifest.json" />
 </head>
 
 <body>
-  <!-- SIDE MENU + OVERLAY -->
   <div class="overlay" id="overlay" aria-hidden="true"></div>
 
   <nav class="side-menu" id="side-menu" aria-hidden="true">
@@ -26,159 +23,260 @@
     </div>
 
     <ul class="side-links">
-      <li><a href="index.html" class="side-link">🗓️ Расписание</a></li>
-      <li><a href="instructions.html" class="side-link">📖 Инструкции</a></li>
+      <li><a href="index.html" class="side-link" id="side-link-calendar">🗓️ Расписание</a></li>
+      <li><a href="instructions.html" class="side-link" id="side-link-instructions">📖 Инструкции</a></li>
     </ul>
 
     <div class="side-actions">
-      <button id="side-theme-toggle" class="side-action-btn" aria-label="Сменить тему">🌙</button>
-      <button id="side-lang-toggle" class="side-action-btn" aria-label="Сменить язык">🇷🇺</button>
+      <button class="side-action-btn" id="side-theme-toggle" aria-label="Changer de thème">
+        <span class="icon-light">☀️</span>
+        <span class="icon-dark">🌙</span>
+      </button>
+
+      <button class="side-action-btn" id="side-lang-toggle" aria-label="Changer de langue">
+        🇫🇷
+      </button>
     </div>
   </nav>
 
-  <!-- HEADER -->
+  <div class="offline-banner hidden" id="offline-banner" aria-live="polite">
+    <p id="offline-message">❌ Hors ligne. Le contenu affiché n'est pas à jour.</p>
+  </div>
+
   <header>
-    <div class="header-left">
-      <button id="menu-btn" class="menu-btn" aria-label="Открыть меню">☰</button>
-      <img src="tpl-logo.png" alt="Логотип TPL" class="logo" />
-      <h1>Расписание TPL</h1>
-    </div>
-
-    <nav class="main-nav">
-      <a href="index.html" class="nav-link">Расписание</a>
-      <a href="instructions.html" class="nav-link active">Инструкции</a>
-    </nav>
-
-    <div class="header-buttons">
-      <button id="theme-toggle" title="Сменить тему">🌙</button>
-      <button id="lang-toggle" title="Сменить язык">🇷🇺</button>
+    <div class="header-container">
+      <button id="menu-btn" class="menu-btn" aria-label="Ouvrir le menu">☰</button>
+      <h1 id="main-title">Инструкции по использованию</h1>
+      <button id="lang-toggle" class="lang-toggle" aria-label="Changer de langue">🇫🇷</button>
     </div>
   </header>
 
-  <!-- CONTENT -->
-  <main class="instructions-container">
-    <section class="instructions-card">
-      <h2 id="instructions-title">📋 Инструкции TPL</h2>
-      <p id="instructions-welcome">Добро пожаловать в раздел инструкций проекта <strong>TPL</strong>.</p>
+  <main class="content-container">
+    <h2 id="section1-title">Comment ajouter un événement ?</h2>
+    <p id="section1-text">
+      L'ajout d'un événement se fait directement sur le planning.
+    </p>
 
-      <h3 id="step1-title">🔹 Шаг 1 — Подготовка</h3>
-      <ul id="step1-items">
-        <li>Проверьте своё расписание на главной странице.</li>
-        <li>Убедитесь, что нужный вам временной слот свободен.</li>
-        <li>Используйте кнопку <strong>+</strong>, чтобы добавить событие при необходимости.</li>
-      </ul>
+    <h3 id="step1-title">Étape 1 : Choisir la date</h3>
+    <p id="step1-text">
+      Cliquez ou tapez sur le jour/l'heure souhaité(e) dans la vue du planning. Un pop-up apparaîtra.
+    </p>
 
-      <h3 id="step2-title">🔹 Шаг 2 — На месте</h3>
-      <ul id="step2-items">
-        <li>Следуйте информации, связанной с вашим участком (Hôtel-Dieu, Préfecture, Tour Bretagne и т.д.).</li>
-        <li>Находитесь в безопасной зоне и регулярно меняйте своё расположение.</li>
-        <li>В случае опасности (агрессивный человек и т.п.) покиньте место, если необходимо.</li>
-      </ul>
+    <h3 id="step2-title">Étape 2 : Remplir les informations</h3>
+    <p id="step2-text">
+      Dans le pop-up, remplissez :
+    </p>
+    <ul id="step2-list">
+      <li>**Titre** : Votre nom et prénom. (Exemple : "Jean DUPONT")</li>
+      <li>**Début** : L'heure de début de votre service.</li>
+      <li>**Fin** : L'heure de fin de votre service.</li>
+      <li>**Catégorie** : Le lieu de votre permanence (Hôtel-Dieu, Préfecture, etc.).</li>
+    </ul>
 
-      <h3 id="step3-title">🔹 Шаг 3 — После служения</h3>
-      <ul id="step3-items">
-        <li>Сообщите важные замечания брату Тимоте Девину.</li>
-        <li>Не стесняйтесь записываться на другие временные слоты.</li>
-      </ul>
+    <h3 id="step3-title">Étape 3 : Enregistrer</h3>
+    <p id="step3-text">
+      Cliquez sur **« Enregistrer »**. Votre événement est maintenant visible par tous.
+      Vous pouvez cliquer dessus pour le modifier ou le supprimer.
+    </p>
+    <ul id="step3-list">
+      <li>Assurez-vous d'être connecté à Internet pour que votre modification soit enregistrée sur le serveur.</li>
+      <li>Si vous êtes hors ligne, l'événement sera enregistré localement et synchronisé dès que possible.</li>
+    </ul>
 
-      <hr />
-
-      <h3 id="map-title">🗺️ Карта точек TPL</h3>
-      <p id="map-text">Вот карта различных мест, используемых для TPL:</p>
-
-      <div class="map-container">
-        <iframe 
-          style="width: 100%; height: 350px; border: 0;" 
-          allowfullscreen 
-          allow="geolocation"
-          src="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true">
-        </iframe>
-      </div>
-
-      <p style="text-align:center; margin-top:10px;">
-        <a id="fullscreen-map" href="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scrollWheelZoom=true&zoomControl=true" target="_blank">
-          🔎 Открыть карту на весь экран
-        </a>
+    <div class="map-container">
+      <h2 id="map-title">Carte des lieux de permanence TPL</h2>
+      <p id="map-text">
+        Vous trouverez ici la carte interactive Umap des lieux récurrents d'intervention de TPL.
+        Elle peut être basculée en mode sombre pour une meilleure lisibilité.
       </p>
+      <iframe 
+        src="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true" 
+        width="100%" height="450px" frameborder="0" allowfullscreen>
+      </iframe>
+      <button id="fullscreen-map">Agrandir la carte</button>
+    </div>
 
-      <hr />
-
-      <h3 id="tips-title">ℹ️ Советы</h3>
-      <p id="tips-text">Сайт работает офлайн благодаря PWA. Вы можете добавить его на главный экран вашего телефона или планшета.</p>
-    </section>
+    <h2 id="tips-title">Conseils rapides</h2>
+    <p id="tips-text">
+      **Mode Sombre (Dark Mode)** : Utilisez le bouton 🌙 pour basculer en mode sombre. Ce réglage est conservé.
+      <br>
+      **Mode Hors Ligne** : L'application fonctionne sans connexion. Les données sont mises en cache et les modifications sont synchronisées plus tard.
+    </p>
   </main>
 
-  <!-- Scripts -->
-  <script src="script.js"></script>
   <script>
+    /**************************************************************
+     * 🌍 TRADUCTIONS
+     **************************************************************/
     const translations = {
-      fr: { /* ... déjà défini dans script.js ... */ },
-      ru: {
-        instructionsTitle: "📋 Инструкции TPL",
-        instructionsWelcome: "Добро пожаловать в раздел инструкций проекта TPL.",
-        step1Title: "🔹 Шаг 1 — Подготовка",
-        step1Items: [
-          "Проверьте своё расписание на главной странице.",
-          "Убедитесь, что нужный вам временной слот свободен.",
-          "Используйте кнопку +, чтобы добавить событие при необходимости."
-        ],
-        step2Title: "🔹 Шаг 2 — На месте",
+      fr: {
+        title: "Instructions TPL",
+        mainTitle: "Instructions d'utilisation",
+        section1Title: "Comment ajouter un événement ?",
+        section1Text: "L'ajout d'un événement se fait directement sur le planning.",
+        step1Title: "Étape 1 : Choisir la date",
+        step1Text: "Cliquez ou tapez sur le jour/l'heure souhaité(e) dans la vue du planning. Un pop-up apparaîtra.",
+        step2Title: "Étape 2 : Remplir les informations",
+        step2Text: "Dans le pop-up, remplissez :",
         step2Items: [
-          "Следуйте информации, связанной с вашим участком (Hôtel-Dieu, Préfecture, Tour Bretagne и т.д.).",
-          "Находитесь в безопасной зоне и регулярно меняйте своё расположение.",
-          "В случае опасности (агрессивный человек и т.п.) покиньте место, если необходимо."
+          "**Titre** : Votre nom et prénom. (Exemple : \"Jean DUPONT\")",
+          "**Début** : L'heure de début de votre service.",
+          "**Fin** : L'heure de fin de votre service.",
+          "**Catégorie** : Le lieu de votre permanence (Hôtel-Dieu, Préfecture, etc.)."
         ],
-        step3Title: "🔹 Шаг 3 — После служения",
+        step3Title: "Étape 3 : Enregistrer",
+        step3Text: "Cliquez sur **« Enregistrer »**. Votre événement est maintenant visible par tous. Vous pouvez cliquer dessus pour le modifier ou le supprimer.",
         step3Items: [
-          "Сообщите важные замечания брату Тимоте Девину.",
-          "Не стесняйтесь записываться на другие временные слоты."
+          "Assurez-vous d'être connecté à Internet pour que votre modification soit enregistrée sur le serveur.",
+          "Si vous êtes hors ligne, l'événement sera enregistré localement et synchronisé dès que possible."
         ],
-        mapTitle: "🗺️ Карта точек TPL",
-        mapText: "Вот карта различных мест, используемых для TPL:",
-        fullscreenMap: "🔎 Открыть карту на весь экран",
-        tipsTitle: "ℹ️ Советы",
-        tipsText: "Сайт работает офлайн благодаря PWA. Вы можете добавить его на главный экран вашего телефона или планшета."
+        mapTitle: "Carte des lieux de permanence TPL",
+        mapText: "Vous trouverez ici la carte interactive Umap des lieux récurrents d'intervention de TPL. Elle peut être basculée en mode sombre pour une meilleure lisibilité.",
+        fullscreenMap: "Agrandir la carte",
+        tipsTitle: "Conseils rapides",
+        tipsText: "**Mode Sombre (Dark Mode)** : Utilisez le bouton 🌙 pour basculer en mode sombre. Ce réglage est conservé.<br>**Mode Hors Ligne** : L'application fonctionne sans connexion. Les données sont mises en cache et les modifications sont synchronisées plus tard.",
+        sideLinkCalendar: "🗓️ Calendrier",
+        sideLinkInstructions: "📖 Instructions",
+        offlineMessage: "❌ Hors ligne. Le contenu affiché n'est pas à jour."
+      },
+      ru: {
+        title: "Инструкции TPL",
+        mainTitle: "Инструкции по использованию",
+        section1Title: "Как добавить событие?",
+        section1Text: "Событие добавляется прямо в расписании.",
+        step1Title: "Шаг 1: Выберите дату",
+        step1Text: "Нажмите или коснитесь желаемого дня/времени в календаре. Появится всплывающее окно.",
+        step2Title: "Шаг 2: Заполните информацию",
+        step2Text: "Во всплывающем окне заполните:",
+        step2Items: [
+          "**Название** : Ваши имя и фамилия. (Например: \"Иван ИВАНОВ\")",
+          "**Начало** : Время начала вашего дежурства.",
+          "**Конец** : Время окончания вашего дежурства.",
+          "**Категория** : Место вашего дежурства (Hôtel-Dieu, Préfecture и т. д.)."
+        ],
+        step3Title: "Шаг 3: Сохранить",
+        step3Text: "Нажмите **«Сохранить»**. Ваше событие теперь видно всем. Вы можете нажать на него, чтобы изменить или удалить.",
+        step3Items: [
+          "Убедитесь, что вы подключены к Интернету, чтобы ваши изменения были сохранены на сервере.",
+          "Если вы не в сети, событие будет сохранено локально и синхронизировано при первой возможности."
+        ],
+        mapTitle: "Карта мест дежурств TPL",
+        mapText: "Здесь вы найдете интерактивную карту Umap постоянных мест работы TPL. Ее можно переключить в темный режим для лучшей читаемости.",
+        fullscreenMap: "Развернуть карту",
+        tipsTitle: "Краткие советы",
+        tipsText: "**Темный режим (Dark Mode)** : Используйте кнопку 🌙 для переключения в темный режим. Эта настройка сохраняется.<br>**Автономный режим** : Приложение работает без подключения. Данные кэшируются, а изменения синхронизируются позже.",
+        sideLinkCalendar: "🗓️ Расписание",
+        sideLinkInstructions: "📖 Инструкции",
+        offlineMessage: "❌ Нет подключения. Отображаемый контент устарел."
       }
     };
 
+    /**
+     * Met à jour le contenu de la page d'instructions dans la langue spécifiée.
+     * @param {string} lang 'fr' ou 'ru'
+     */
     function updateInstructionsLanguage(lang) {
-      if (!translations[lang]) return;
-      document.getElementById("instructions-title").textContent = translations[lang].instructionsTitle;
-      document.getElementById("instructions-welcome").textContent = translations[lang].instructionsWelcome;
-      document.getElementById("step1-title").textContent = translations[lang].step1Title;
-      const step1List = document.getElementById("step1-items"); step1List.innerHTML = "";
-      translations[lang].step1Items.forEach(item => { const li = document.createElement("li"); li.textContent = item; step1List.appendChild(li); });
-      document.getElementById("step2-title").textContent = translations[lang].step2Title;
-      const step2List = document.getElementById("step2-items"); step2List.innerHTML = "";
-      translations[lang].step2Items.forEach(item => { const li = document.createElement("li"); li.textContent = item; step2List.appendChild(li); });
-      document.getElementById("step3-title").textContent = translations[lang].step3Title;
-      const step3List = document.getElementById("step3-items"); step3List.innerHTML = "";
-      translations[lang].step3Items.forEach(item => { const li = document.createElement("li"); li.textContent = item; step3List.appendChild(li); });
-      document.getElementById("map-title").textContent = translations[lang].mapTitle;
-      document.getElementById("map-text").textContent = translations[lang].mapText;
-      document.getElementById("fullscreen-map").textContent = translations[lang].fullscreenMap;
-      document.getElementById("tips-title").textContent = translations[lang].tipsTitle;
-      document.getElementById("tips-text").textContent = translations[lang].tipsText;
-      document.getElementById("lang-toggle").textContent = lang === "fr" ? "🇫🇷" : "🇷🇺";
-      document.getElementById("side-lang-toggle").textContent = lang === "fr" ? "🇫🇷" : "🇷🇺";
+      const t = translations[lang];
+      document.title = t.title;
+
+      // Header
+      document.getElementById("main-title").textContent = t.mainTitle;
+
+      // Section 1: Ajouter
+      document.getElementById("section1-title").textContent = t.section1Title;
+      document.getElementById("section1-text").textContent = t.section1Text;
+
+      // Step 1
+      document.getElementById("step1-title").textContent = t.step1Title;
+      document.getElementById("step1-text").textContent = t.step1Text;
+
+      // Step 2
+      document.getElementById("step2-title").textContent = t.step2Title;
+      document.getElementById("step2-text").textContent = t.step2Text;
+      const step2List = document.getElementById("step2-list");
+      step2List.innerHTML = "";
+      t.step2Items.forEach(item => { const li = document.createElement("li"); li.innerHTML = item; step2List.appendChild(li); });
+
+      // Step 3
+      document.getElementById("step3-title").textContent = t.step3Title;
+      document.getElementById("step3-text").textContent = t.step3Text;
+      const step3List = document.getElementById("step3-list");
+      step3List.innerHTML = "";
+      t.step3Items.forEach(item => { const li = document.createElement("li"); li.innerHTML = item; step3List.appendChild(li); });
+
+      // Map
+      document.getElementById("map-title").textContent = t.mapTitle;
+      document.getElementById("map-text").textContent = t.mapText;
+      document.getElementById("fullscreen-map").textContent = t.fullscreenMap;
+
+      // Tips
+      document.getElementById("tips-title").textContent = t.tipsTitle;
+      document.getElementById("tips-text").innerHTML = t.tipsText;
+
+      // Side Menu Links
+      document.getElementById("side-link-calendar").textContent = t.sideLinkCalendar;
+      document.getElementById("side-link-instructions").textContent = t.sideLinkInstructions;
+
+      // Language Toggles (Flag)
+      const flag = lang === "fr" ? "🇫🇷" : "🇷🇺";
+      document.getElementById("lang-toggle").textContent = flag;
+      document.getElementById("side-lang-toggle").textContent = flag;
+      document.getElementById("menu-close").setAttribute("aria-label", lang === "fr" ? "Fermer le menu" : "Закрыть меню");
+      document.getElementById("offline-message").textContent = t.offlineMessage;
     }
 
+    /**************************************************************
+     * 🌙 GESTION DU THÈME
+     **************************************************************/
+    // Initialisation du thème
+    if (localStorage.getItem("theme") === "dark" || (!localStorage.getItem("theme") && window.matchMedia("(prefers-color-scheme: dark)").matches)) {
+      document.body.classList.add("dark");
+    }
+
+    function toggleTheme() {
+      document.body.classList.toggle("dark");
+      const isDark = document.body.classList.contains("dark");
+      localStorage.setItem("theme", isDark ? "dark" : "light");
+    }
+
+    document.getElementById("side-theme-toggle")?.addEventListener("click", toggleTheme);
+
+    /**************************************************************
+     * 🌐 GESTION DE LA LANGUE (MIS À JOUR)
+     **************************************************************/
+
+    /**
+     * Bascule la langue de la page et la sauvegarde dans localStorage.
+     */
     function toggleLanguage() {
       const newLang = document.documentElement.lang === "fr" ? "ru" : "fr";
       document.documentElement.lang = newLang;
+      localStorage.setItem("lang", newLang); // Sauvegarde la préférence
       updateInstructionsLanguage(newLang);
     }
 
+    // Initialisation de la langue : lit la préférence stockée ou utilise 'fr' par défaut.
+    const storedLang = localStorage.getItem("lang");
+    const initialLang = (storedLang && (storedLang === "fr" || storedLang === "ru")) ? storedLang : "fr";
+    document.documentElement.lang = initialLang; // S'assure que l'attribut lang est correct.
+
+    // Événements
     document.getElementById("lang-toggle").addEventListener("click", toggleLanguage);
     document.getElementById("side-lang-toggle").addEventListener("click", toggleLanguage);
 
+    /**************************************************************
+     * 🚀 INITIALISATION FINALE & SERVICE WORKER
+     **************************************************************/
+
+    // Applique la traduction initiale
+    updateInstructionsLanguage(initialLang);
+
+    // Initialisation du Service Worker (non modifié)
     if ("serviceWorker" in navigator) {
       navigator.serviceWorker.register("service-worker.js")
-        .then(() => console.log("✅ Service Worker зарегистрирован"))
-        .catch(err => console.error("❌ Ошибка Service Worker :", err));
+        .then(() => console.log("✅ Service Worker enregistré"))
+        .catch(err => console.error("❌ Erreur Service Worker :", err));
     }
-
-    updateInstructionsLanguage(document.documentElement.lang);
   </script>
 </body>
 </html>
