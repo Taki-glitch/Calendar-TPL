@@ -165,7 +165,7 @@ function updateConsentText() {
   if (!CONSENT_TEXT) return;
   const texts = {
     fr: "En utilisant ce planning, vous acceptez d’écrire vos noms et prénoms. Aucune autre donnée personnelle n’est enregistrée.",
-    ru: "Используя этот план, вы соглашаетесь указать свои имя и фамилию. Другие персональные данные не сохраняются."
+    ru: "Используя это расписание, вы соглашаетесь указать свои имя и фамилию. Другие персональные данные не сохраняются."
   };
   CONSENT_TEXT.textContent = texts[currentLang] || texts.fr;
 }
