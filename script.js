@@ -276,6 +276,7 @@ function getCategoryColor(category) {
     "Préfecture": "#E74C3C",
     "Tour de Bretagne": "#3498DB",
     "France Terre d’Asile": "#9B59B6"
+    "Pirmil": "#E67E22"
   };
   return colors[category] || "#6c757d";
 }
