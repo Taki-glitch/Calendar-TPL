@@ -327,6 +327,7 @@ body.dark #planning { background: var(--card-dark); }
 .legend-color.pref { background: #E74C3C; }
 .legend-color.tour { background: #3498DB; }
 .legend-color.fta { background: #9B59B6; }
+.legend-color.pirmil { background: #E67E22; }
 .legend-color.autre { background: #6c757d; }
 
 /**************************************************************
