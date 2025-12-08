@@ -4,7 +4,7 @@ console.log("✅ script.js chargé correctement !");
 /**************************************************************
  * 🌍 CONFIGURATION
  **************************************************************/
-const GAS_URL = "https://script.google.com/macros/s/AKfycbzARY2zGRqXeK7_tvy73UQo_6QMg0MEd67m3V-ophhpxmPKltofyMt_oTnf-UgRdJpS/exec";
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxe6BC6lG4yEg4wUbuVlyVMSwytU6YKLvO7RA6uSDSKE2O3ke5y6ooTy3hSRnAPMAXn/exec";
 const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 
 /* --- Variables DOM générales (assignées après DOMContentLoaded) --- */
