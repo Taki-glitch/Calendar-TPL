@@ -254,6 +254,8 @@ function renderCalendar(events) {
       title: e.title,
       start: e.start,
       end: e.end,
+      // on ajoute la propriété category également au niveau racine (pour robustesse)
+      category: e.category,
       backgroundColor: getCategoryColor(e.category),
       extendedProps: { category: e.category }
     })),
@@ -285,12 +287,14 @@ function getCategoryColor(category) {
  * Sauvegarde locale + serveur
  **************************************************************/
 function eventToData(event) {
+  // event peut être un objet FullCalendar EventApi
   return {
     id: event.id,
     title: event.title,
     start: event.startStr,
     end: event.endStr,
-    category: event.extendedProps?.category || "Autre"
+    // On vérifie extendedProps puis une propriété category possible
+    category: event.extendedProps?.category || event.category || "Autre"
   };
 }
 
@@ -382,15 +386,18 @@ function openEventModal(event = null, info = null) {
   setTimeout(() => titleInput?.focus(), 300);
 
   if (!event) {
+    // Création : valeurs par défaut
     titleInput.value = "";
     startInput.value = info?.startStr?.slice(0, 16) || "";
     endInput.value = info?.endStr?.slice(0, 16) || "";
     categorySelect.value = "Hôtel-Dieu";
     cancelBtn?.classList.remove("hidden");
   } else {
+    // Édition : on restaure correctement la catégorie depuis extendedProps ou event.category
     titleInput.value = event.title || "";
     startInput.value = event.startStr ? event.startStr.slice(0, 16) : "";
     endInput.value = event.endStr ? event.endStr.slice(0, 16) : startInput.value;
+    categorySelect.value = event.extendedProps?.category || event.category || "Autre";
     cancelBtn?.classList.add("hidden");
   }
 
@@ -398,6 +405,8 @@ function openEventModal(event = null, info = null) {
   modal.onclick = (e) => { if (!modalContent.contains(e.target)) closeModal(); };
 
   if (saveBtn) {
+    // on retire tout gestionnaire précédent pour éviter doublons si modal réutilisée
+    saveBtn.onclick = null;
     saveBtn.onclick = () => {
       const newEvent = {
         id: event ? event.id : (crypto?.randomUUID ? crypto.randomUUID() : Date.now().toString()),
@@ -407,14 +416,23 @@ function openEventModal(event = null, info = null) {
         category: categorySelect.value || "Autre"
       };
 
-      if (event?.remove) event.remove();
+      // Si on est en édition, retirer l'ancienne instance du calendrier
+      if (event?.remove) {
+        try { event.remove(); } catch (e) { /* ignore */ }
+      }
 
+      // Ajouter dans FullCalendar avec extendedProps et couleur
       calendar?.addEvent({
-        ...newEvent,
+        id: newEvent.id,
+        title: newEvent.title,
+        start: newEvent.start,
+        end: newEvent.end,
+        category: newEvent.category,
         backgroundColor: getCategoryColor(newEvent.category),
         extendedProps: { category: newEvent.category }
       });
 
+      // Sauvegarde (local + serveur si disponible)
       saveEvent(newEvent);
       closeModal();
     };
