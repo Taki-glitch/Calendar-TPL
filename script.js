@@ -160,11 +160,13 @@ function changerLangue(langue) {
   currentLang = langue;
   localStorage.setItem("lang", langue);
 
-  // 🔁 Si on est sur instructions.html, on retraduit la page
-  if (typeof updateInstructionsLanguage === "function") {
-    updateInstructionsLanguage(langue);
-  }
+  // 🔔 Notifier les pages ouvertes
+  document.dispatchEvent(
+    new CustomEvent("langChanged", { detail: langue })
+  );
 }
+
+
 
 function updateConsentText() {
   if (!CONSENT_TEXT) return;
