@@ -230,19 +230,12 @@
         document.documentElement.lang = lang;
       }
 
-      function toggleLanguage() {
-        const newLang = document.documentElement.lang === "fr" ? "ru" : "fr";
-        updateInstructionsLanguage(newLang);
-      }
-
-      // Événements
-      const langBtn = document.getElementById("lang-toggle");
-      const sideLangBtn = document.getElementById("side-lang-toggle");
-      if (langBtn) langBtn.addEventListener("click", toggleLanguage);
-      if (sideLangBtn) sideLangBtn.addEventListener("click", toggleLanguage);
-
+      
       // Initialisation
       updateInstructionsLanguage(document.documentElement.lang);
+      
+      // Synchronisation langue avec script.js
+			updateInstructionsLanguage(localStorage.getItem("lang") || "fr");
 
       // Service Worker
       if ("serviceWorker" in navigator) {
