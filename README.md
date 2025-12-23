@@ -10,7 +10,6 @@ Elle fonctionne **en ligne et hors ligne**, s’adapte à tous les écrans, et p
 - 📆 Affichage du planning avec **FullCalendar**
 - 🌍 Interface **multilingue** (français, russe, etc.)
 - 🌗 **Mode clair / sombre** automatique et manuel
-- 📄 **Export PDF optimisé** du planning
 - ✏️ **Édition locale** des événements
 - 📱 **Responsive** (mobile, tablette, ordinateur)
 - 🔌 **Fonctionnement hors ligne** (Service Worker)
@@ -72,12 +71,6 @@ L’application peut être installée sur ordinateur ou mobile via l’option
 
 La langue est gérée dynamiquement et mémorisée dans le navigateur via le localStorage.
 Le changement de langue est immédiat et ne nécessite pas de rechargement de page.
-
-⸻
-
-📄 Export PDF
-
-Le planning peut être exporté en PDF avec une mise en page optimisée, compatible avec le mode clair et le mode sombre.
 
 ⸻
 
