@@ -1,24 +1,24 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html id="html-root" lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <meta name="theme-color" content="#007bff">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#007bff" />
   <title>Instructions TPL</title>
 
-  <link rel="stylesheet" href="style.css">
-  <link rel="icon" href="tpl-logo.png">
-  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="tpl-logo.png" />
+  <link rel="apple-touch-icon" href="tpl-logo.png" />
+  <link rel="manifest" href="manifest.json" />
 </head>
 
 <body>
+<div class="overlay" id="overlay" aria-hidden="true"></div>
 
-<div class="overlay" id="overlay"></div>
-
-<nav class="side-menu" id="side-menu">
+<nav class="side-menu" id="side-menu" aria-hidden="true">
   <div class="side-menu-header">
-    <img src="tpl-logo.png" class="side-logo" alt="TPL">
-    <button id="menu-close">✕</button>
+    <img src="tpl-logo.png" alt="Logo TPL" class="side-logo" />
+    <button id="menu-close" class="menu-close">✕</button>
   </div>
 
   <ul class="side-links">
@@ -35,7 +35,7 @@
 <header>
   <div class="header-left">
     <button id="menu-btn">☰</button>
-    <img src="tpl-logo.png" class="logo" alt="TPL">
+    <img src="tpl-logo.png" class="logo" />
     <h1>Planning TPL</h1>
   </div>
 
@@ -51,40 +51,40 @@
 </header>
 
 <main class="instructions-container">
-  <section class="instructions-card">
+<section class="instructions-card">
 
-    <h2 data-i18n="instructionsTitle"></h2>
-    <p data-i18n="instructionsWelcome"></p>
+<h2 data-i18n="instructions_title"></h2>
+<p data-i18n="instructions_intro"></p>
 
-    <h3 data-i18n="step1Title"></h3>
-    <ul id="step1-items"></ul>
+<h3 data-i18n="step1_title"></h3>
+<ul id="step1-items"></ul>
 
-    <h3 data-i18n="step2Title"></h3>
-    <ul id="step2-items"></ul>
+<h3 data-i18n="step2_title"></h3>
+<ul id="step2-items"></ul>
 
-    <h3 data-i18n="step3Title"></h3>
-    <ul id="step3-items"></ul>
+<h3 data-i18n="step3_title"></h3>
+<ul id="step3-items"></ul>
 
-    <hr>
+<hr>
 
-    <h3 data-i18n="mapTitle"></h3>
-    <p data-i18n="mapText"></p>
+<h3 data-i18n="map_title"></h3>
+<p data-i18n="map_text"></p>
 
-    <iframe id="umap-frame" style="width:100%;height:350px;border:0" allowfullscreen></iframe>
+<iframe id="umap-frame" style="width:100%;height:350px;border:0" allowfullscreen></iframe>
 
-    <p style="text-align:center">
-      <a id="umap-fullscreen" target="_blank" data-i18n="fullscreenMap"></a>
-    </p>
+<p style="text-align:center">
+  <a id="umap-fullscreen" target="_blank" data-i18n="map_fullscreen"></a>
+</p>
 
-    <hr>
+<hr>
 
-    <h3 data-i18n="tipsTitle"></h3>
-    <p data-i18n="tipsText"></p>
+<h3 data-i18n="tips_title"></h3>
+<p data-i18n="tips_text"></p>
 
-    <h3 data-i18n="rgpdTitle"></h3>
-    <p data-i18n="rgpdText"></p>
+<h3 data-i18n="rgpd_title"></h3>
+<p data-i18n="rgpd_text"></p>
 
-  </section>
+</section>
 </main>
 
 <script src="script.js"></script>
