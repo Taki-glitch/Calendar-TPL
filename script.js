@@ -159,6 +159,11 @@ function traduireTexte(fr, ru) {
 function changerLangue(langue) {
   currentLang = langue;
   localStorage.setItem("lang", langue);
+
+  // 🔁 Si on est sur instructions.html, on retraduit la page
+  if (typeof updateInstructionsLanguage === "function") {
+    updateInstructionsLanguage(langue);
+  }
 }
 
 function updateConsentText() {
