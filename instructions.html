@@ -6,87 +6,249 @@
   <meta name="theme-color" content="#007bff" />
   <title>Instructions TPL</title>
 
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="tpl-logo.png" />
+
+  <!-- Favicon + PWA -->
+  <link rel="icon" type="image/png" sizes="192x192" href="tpl-logo.png" />
   <link rel="apple-touch-icon" href="tpl-logo.png" />
   <link rel="manifest" href="manifest.json" />
 </head>
 
 <body>
-<div class="overlay" id="overlay" aria-hidden="true"></div>
+  <!-- SIDE MENU + OVERLAY -->
+  <div class="overlay" id="overlay" aria-hidden="true"></div>
 
-<nav class="side-menu" id="side-menu" aria-hidden="true">
-  <div class="side-menu-header">
-    <img src="tpl-logo.png" alt="Logo TPL" class="side-logo" />
-    <button id="menu-close" class="menu-close">✕</button>
-  </div>
+  <nav class="side-menu" id="side-menu" aria-hidden="true">
+    <div class="side-menu-header">
+      <img src="tpl-logo.png" alt="Logo TPL" class="side-logo" />
+      <button id="menu-close" class="menu-close" aria-label="Close menu">✕</button>
+    </div>
 
-  <ul class="side-links">
-    <li><a href="index.html">🗓️ Planning</a></li>
-    <li><a href="instructions.html" class="active">📖 Instructions</a></li>
-  </ul>
+    <ul class="side-links">
+      <li><a href="index.html" class="side-link">🗓️ Planning</a></li>
+      <li><a href="instructions.html" class="side-link active">📖 Instructions</a></li>
+    </ul>
 
-  <div class="side-actions">
-    <button id="side-theme-toggle">🌙</button>
-    <button id="side-lang-toggle">🇫🇷</button>
-  </div>
-</nav>
-
-<header>
-  <div class="header-left">
-    <button id="menu-btn">☰</button>
-    <img src="tpl-logo.png" class="logo" />
-    <h1>Planning TPL</h1>
-  </div>
-
-  <nav class="main-nav">
-    <a href="index.html">Planning</a>
-    <a href="instructions.html" class="active">Instructions</a>
+    <div class="side-actions">
+      <button id="side-theme-toggle" class="side-action-btn" aria-label="Toggle theme">🌙</button>
+      <button id="side-lang-toggle" class="side-action-btn" aria-label="Toggle language">🇷🇺</button>
+    </div>
   </nav>
 
-  <div class="header-buttons">
-    <button id="theme-toggle">🌙</button>
-    <button id="lang-toggle">🇫🇷</button>
-  </div>
-</header>
+  <!-- HEADER -->
+  <header>
+    <div class="header-left">
+      <button id="menu-btn" class="menu-btn" aria-label="Open menu">☰</button>
+      <img src="tpl-logo.png" alt="Logo TPL" class="logo" />
+      <h1 id="header-title">Planning TPL</h1>
+    </div>
 
-<main class="instructions-container">
-<section class="instructions-card">
+    <nav class="main-nav">
+      <a href="index.html" class="nav-link">Planning</a>
+      <a href="instructions.html" class="nav-link active">Instructions</a>
+    </nav>
 
-<h2 data-i18n="instructions_title"></h2>
-<p data-i18n="instructions_intro"></p>
+    <div class="header-buttons">
+      <button id="theme-toggle" title="Toggle theme">🌙</button>
+      <button id="lang-toggle" title="Toggle language">🇷🇺</button>
+    </div>
+  </header>
 
-<h3 data-i18n="step1_title"></h3>
-<ul id="step1-items"></ul>
+  <!-- CONTENT -->
+  <main class="instructions-container">
+    <section class="instructions-card">
+      <h2 id="instructions-title">📋 Instructions TPL</h2>
+      <p id="instructions-welcome">Bienvenue dans la section Instructions pour le <strong>TPL</strong>.</p>
 
-<h3 data-i18n="step2_title"></h3>
-<ul id="step2-items"></ul>
+      <h3 id="step1-title">🔹 Étape 1 — Préparation</h3>
+      <ul id="step1-items">
+        <li>Avant de placer votre créneau, vérifiez sa disponibilité</li>
+        <li>Utilisez le bouton <strong>+</strong> pour ajouter un événement si nécessaire</li>
+        <li>Pour que le créneau soit bien écrit, merci d'indiquer votre nom et prénom. Exemple : DUPONT Jean</li>
+        <li>Vous pouvez modifier votre événement. <strong>Veillez à ne pas modifier les créneaux d'autres compagnons, afin d'éviter les erreurs de planning</strong></li>
+        <li>Vous ne pouvez pas supprimer un événement. Si vous avez fait une erreur, ou si vous souhaitez annuler votre créneau, veuillez contacter le frère Timothé DEVIN</li>
+        <li>Lorsque vous récupérez le présentoir, vous pouvez choisir une des affiches disponibles (le thème du mois est en premier). Si vous constatez un problème au niveau des affiches, ou des publications manquantes ou en mauvais état, merci de contacter frère Timothé DEVIN</li>
+      </ul>
 
-<h3 data-i18n="step3_title"></h3>
-<ul id="step3-items"></ul>
+      <h3 id="step2-title">🔹 Étape 2 — Sur place</h3>
+      <ul id="step2-items">
+        <li>Veillez à respecter les emplacements indiquées sur la carte ci-dessous pour les différentes sites (Hôtel-Dieu, Préfecture, Tour Bretagne, etc.)</li>
+        <li>Restez dans une zone sécurisée et changez régulièrement de position</li>
+        <li>En cas de danger (personne agressive, etc.), quittez le lieu si nécessaire. Si besoin, n'hésitez pas à laisser le présentoir sur place</li>
+      </ul>
 
-<hr>
+      <h3 id="step3-title">🔹 Étape 3 — Après le service</h3>
+      <ul id="step3-items">
+        <li>Remontez les remarques importantes (incidents, faits inhabituels) à frère Timothé Devin</li>
+        <li>N’hésitez pas à vous inscrire sur d’autres créneaux</li>
+      </ul>
 
-<h3 data-i18n="map_title"></h3>
-<p data-i18n="map_text"></p>
+      <hr />
 
-<iframe id="umap-frame" style="width:100%;height:350px;border:0" allowfullscreen></iframe>
+      <h3 id="map-title">🗺️ Carte des points TPL</h3>
+      <p id="map-text">Voici la carte des différents lieux utilisés pour le projet TPL :</p>
 
-<p style="text-align:center">
-  <a id="umap-fullscreen" target="_blank" data-i18n="map_fullscreen"></a>
-</p>
+      <div class="map-container">
+        <iframe 
+          style="width: 100%; height: 350px; border: 0;" 
+          allowfullscreen 
+          allow="geolocation"
+          src="https://umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true">
+        </iframe>
+      </div>
 
-<hr>
+      <p style="text-align:center; margin-top:10px;">
+        <a id="fullscreen-map" href="//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005?scrollWheelZoom=true&zoomControl=true" target="_blank">
+          🔎 Ouvrir la carte en plein écran
+        </a>
+      </p>
 
-<h3 data-i18n="tips_title"></h3>
-<p data-i18n="tips_text"></p>
+      <hr />
 
-<h3 data-i18n="rgpd_title"></h3>
-<p data-i18n="rgpd_text"></p>
+      <h3 id="tips-title">ℹ️ Conseils</h3>
+      <p id="tips-text">Le site fonctionne hors ligne grâce à la PWA. Vous pouvez l’ajouter à l’écran d’accueil de votre téléphone ou tablette. En vous inscrivant sur un créneau, vous acceptez d'écrire votre nom et prénom. Aucune autre donnée n'est conservée.</p>
 
-</section>
-</main>
+      <h3 id="tips-title">🔒 Protection des données personnelles (RGPD)</h3>
+      <p id="tips-text">En vous inscrivant sur ce planning, vous fournissez uniquement vos nom et prénom afin de permettre l’organisation des services. Aucune autre donnée personnelle n’est collectée. Les informations que vous saisissez sont stockées de manière sécurisée sur Google Sheets (service conforme au RGPD). Elles ne sont utilisées que pour gérer les inscriptions et ne sont jamais transmises à des tiers. Vous pouvez demander à tout moment la modification ou la suppression de vos informations en contactant l’organisateur du planning.</p>
+    </section>
+  </main>
 
-<script src="script.js"></script>
+  <!-- Scripts -->
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const translations = {
+        fr: {
+          instructionsTitle: "📋 Instructions TPL",
+          instructionsWelcome: "Bienvenue dans la section Instructions du TPL.",
+          step1Title: "🔹 Étape 1 — Préparation",
+          step1Items: [
+            "Avant de placer votre créneau, vérifiez sa disponibilité",
+            "Utilisez le bouton + pour ajouter un événement si nécessaire",
+            "Pour que le créneau soit bien écrit, merci d'indiquer votre nom et prénom. Exemple : DUPONT Jean",
+            "Vous pouvez modifier votre événement. Veillez à ne pas modifier les créneaux d'autres compagnons, afin d'éviter les erreurs de planning",
+            "Vous ne pouvez pas supprimer un événement. Si vous avez fait une erreur, ou si vous souhaitez annuler votre créneau, veuillez contacter le frère Timothé DEVIN",
+            "Lorsque vous récupérez le présentoir, vous pouvez choisir une des affiches disponibles (le thème du mois est en premier). Si vous constatez un problème au niveau des affiches, ou des publications manquantes ou en mauvais état, merci de contacter frère Timothé DEVIN"
+          ],
+          step2Title: "🔹 Étape 2 — Sur place",
+          step2Items: [
+            "Veillez à respecter les emplacements indiquées sur la carte ci-dessous pour les différentes sites (Hôtel-Dieu, Préfecture, Tour Bretagne, etc.)",
+            "Restez dans une zone sécurisée et changez régulièrement de position",
+            "En cas de danger (personne agressive, etc.), quittez le lieu si nécessaire. Si besoin, n'hésitez pas à laisser le présentoir sur place"
+          ],
+          step3Title: "🔹 Étape 3 — Après le service",
+          step3Items: [
+            "Remontez les remarques importantes (incidents, faits inhabituels) à frère Timothé Devin",
+            "N’hésitez pas à vous inscrire sur d’autres créneaux"
+          ],
+          mapTitle: "🗺️ Carte des points TPL",
+          mapText: "Voici la carte des différents lieux utilisés pour le projet TPL :",
+          fullscreenMap: "🔎 Ouvrir la carte en plein écran",
+          tipsTitle: "ℹ️ Conseils",
+          tipsText: "Le site fonctionne hors ligne grâce à la PWA. Vous pouvez l’ajouter à l’écran d’accueil de votre téléphone ou tablette. En vous inscrivant sur un créneau, vous acceptez d'écrire votre nom et prénom. Aucune autre donnée n'est conservée."
+
+          tipsTitle: "🔒 Protection des données personnelles (RGPD)",
+          tipsText: "En vous inscrivant sur ce planning, vous fournissez uniquement vos nom et prénom afin de permettre l’organisation des services. Aucune autre donnée personnelle n’est collectée. Les informations que vous saisissez sont stockées de manière sécurisée sur Google Sheets (service conforme au RGPD). Elles ne sont utilisées que pour gérer les inscriptions et ne sont jamais transmises à des tiers. Vous pouvez demander à tout moment la modification ou la suppression de vos informations en contactant l’organisateur du planning."
+        },
+        ru: {
+          instructionsTitle: "📋 Инструкции стенд",
+          instructionsWelcome: "Добро пожаловать в раздел инструкций для стенда.",
+          step1Title: "🔹 Шаг 1 — Подготовка",
+          step1Items: [
+            "Перед тем как выбрать время, проверьте его доступность",
+            "При необходимости используйте кнопку +, чтобы добавить событие",
+            "Чтобы ваше время было правильно записано, укажите ваши имя и фамилию. Пример: «ИВАНОВ Иван»",
+            "Вы можете изменить своё событие. Пожалуйста, не изменяйте события других участников, чтобы избежать ошибок в расписании",
+            "Вы не можете удалить событие. Если вы допустили ошибку или хотите отменить своё время, пожалуйста, свяжитесь с братом Тимотэ ДЕВИН",
+            "Когда вы забираете стенд, вы можете выбрать один из доступных плакатов (тема месяца стоит первой). Если вы заметили проблему с плакатами или отсутствие/плохое состояние материалов, пожалуйста, свяжитесь с братом Тимотэ ДЕВИН"
+          ],
+          step2Title: "🔹 Шаг 2 — На месте",
+          step2Items: [
+            "Пожалуйста, соблюдайте обозначенные на карте ниже места для различных точек (Отель-Дьё, Префектура, Тур Бретань и т. д.)",
+            "Оставайтесь в безопасной зоне и регулярно меняйте позицию",
+            "В случае опасности (агрессивный человек и т. п.) при необходимости покиньте место. При нужде вы можете оставить стенд на месте"
+          ],
+          step3Title: "🔹 Шаг 3 — После служения",
+          step3Items: [
+            "Передайте брату Тимотэ ДЕВИН важные замечания (инциденты, необычные события)",
+            "Не стесняйтесь записываться на другое время"
+          ],
+          mapTitle: "🗺️ Карта точек стенда",
+          mapText: "Ниже представлена карта различных мест, используемых для служения со стендом :",
+          fullscreenMap: "🔎 Открыть карту на весь экран",
+          tipsTitle: "ℹ️ Советы",
+          tipsText: "Сайт работает офлайн благодаря PWA. Вы можете добавить его на главный экран вашего телефона или планшета. Записываясь на служение, вы соглашаетесь указать свои имя и фамилию. Другие данные не сохраняются."
+
+          tipsTitle: "🔒 Защита персональных данных (RGPD)",
+          tipsText: "Записываясь в этом расписании, вы указываете только ваше имя и фамилию, чтобы обеспечить организацию служений. Другие персональные данные не собираются. Введённая вами информация хранится в защищённом виде в Google Sheets (сервис соответствует требованиям GDPR). Эти данные используются исключительно для управления записями и никогда не передаются третьим лицам. Вы можете в любое время запросить изменение или удаление ваших данных, связавшись с организатором расписания."
+        }
+      };
+
+      function updateInstructionsLanguage(lang) {
+        if (!translations[lang]) return;
+
+        // Texte principal
+        const elems = [
+          { id: "instructions-title", val: translations[lang].instructionsTitle },
+          { id: "instructions-welcome", val: translations[lang].instructionsWelcome },
+          { id: "step1-title", val: translations[lang].step1Title },
+          { id: "step2-title", val: translations[lang].step2Title },
+          { id: "step3-title", val: translations[lang].step3Title },
+          { id: "map-title", val: translations[lang].mapTitle },
+          { id: "map-text", val: translations[lang].mapText },
+          { id: "fullscreen-map", val: translations[lang].fullscreenMap },
+          { id: "tips-title", val: translations[lang].tipsTitle },
+          { id: "tips-text", val: translations[lang].tipsText },
+        ];
+
+        elems.forEach(item => {
+          const el = document.getElementById(item.id);
+          if (el) el.textContent = item.val;
+        });
+
+        // Listes
+        ["step1-items", "step2-items", "step3-items"].forEach((listId, i) => {
+          const listEl = document.getElementById(listId);
+          if (!listEl) return;
+          listEl.innerHTML = "";
+          translations[lang][`step${i+1}Items`].forEach(text => {
+            const li = document.createElement("li");
+            li.textContent = text;
+            listEl.appendChild(li);
+          });
+        });
+
+        // Boutons langue
+        const langBtn = document.getElementById("lang-toggle");
+        const sideLangBtn = document.getElementById("side-lang-toggle");
+        if (langBtn) langBtn.textContent = lang === "fr" ? "🇫🇷" : "🇷🇺";
+        if (sideLangBtn) sideLangBtn.textContent = lang === "fr" ? "🇫🇷" : "🇷🇺";
+
+        document.documentElement.lang = lang;
+      }
+
+      function toggleLanguage() {
+        const newLang = document.documentElement.lang === "fr" ? "ru" : "fr";
+        updateInstructionsLanguage(newLang);
+      }
+
+      // Événements
+      const langBtn = document.getElementById("lang-toggle");
+      const sideLangBtn = document.getElementById("side-lang-toggle");
+      if (langBtn) langBtn.addEventListener("click", toggleLanguage);
+      if (sideLangBtn) sideLangBtn.addEventListener("click", toggleLanguage);
+
+      // Initialisation
+      updateInstructionsLanguage(document.documentElement.lang);
+
+      // Service Worker
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("service-worker.js")
+          .then(() => console.log("✅ Service Worker enregistré"))
+          .catch(err => console.error("❌ Erreur Service Worker :", err));
+      }
+    });
+  </script>
 </body>
 </html>
