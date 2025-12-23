@@ -200,3 +200,95 @@ document.addEventListener("DOMContentLoaded", () => {
  **************************************************************/
 window.addEventListener("online", () => location.reload());
 window.addEventListener("offline", () => OFFLINE_BANNER?.classList.remove("hidden"));
+
+/**************************************************************
+ * 🌍 Traduction page instructions (SAFE)
+ **************************************************************/
+const INSTRUCTIONS_I18N = {
+  fr: {
+    instructions_title: "📋 Instructions TPL",
+    instructions_intro: "Bienvenue dans la section Instructions pour le TPL.",
+    step1_title: "🔹 Étape 1 — Préparation",
+    step1_items: [
+      "Avant de placer votre créneau, vérifiez sa disponibilité",
+      "Utilisez le bouton + pour ajouter un événement si nécessaire",
+      "Indiquez votre nom et prénom (ex : DUPONT Jean)",
+      "Ne modifiez pas les créneaux des autres compagnons",
+      "Pour toute erreur, contactez Timothé DEVIN"
+    ],
+    step2_title: "🔹 Étape 2 — Sur place",
+    step2_items: [
+      "Respectez les emplacements indiqués sur la carte",
+      "Restez dans une zone sécurisée",
+      "En cas de danger, quittez le lieu si nécessaire"
+    ],
+    step3_title: "🔹 Étape 3 — Après le service",
+    step3_items: [
+      "Remontez les incidents",
+      "Inscrivez-vous à d'autres créneaux"
+    ],
+    map_title: "🗺️ Carte des points TPL",
+    map_text: "Voici les emplacements du projet TPL :",
+    map_fullscreen: "🔎 Ouvrir la carte en plein écran",
+    tips_title: "ℹ️ Conseils",
+    tips_text: "Le site fonctionne hors ligne grâce à la PWA.",
+    rgpd_title: "🔒 Protection des données (RGPD)",
+    rgpd_text: "Seuls les noms et prénoms sont enregistrés."
+  },
+  ru: {
+    instructions_title: "📋 Инструкции",
+    instructions_intro: "Добро пожаловать в раздел инструкций.",
+    step1_title: "🔹 Шаг 1 — Подготовка",
+    step1_items: [
+      "Проверьте доступность времени",
+      "Используйте кнопку + при необходимости",
+      "Укажите имя и фамилию",
+      "Не изменяйте записи других",
+      "При ошибке свяжитесь с Тимоте Девен"
+    ],
+    step2_title: "🔹 Шаг 2 — На месте",
+    step2_items: [
+      "Соблюдайте указанные места",
+      "Оставайтесь в безопасной зоне",
+      "При опасности покиньте место"
+    ],
+    step3_title: "🔹 Шаг 3 — После служения",
+    step3_items: [
+      "Сообщите о проблемах",
+      "Записывайтесь снова"
+    ],
+    map_title: "🗺️ Карта точек",
+    map_text: "Карта мест служения:",
+    map_fullscreen: "🔎 Открыть карту",
+    tips_title: "ℹ️ Советы",
+    tips_text: "Сайт работает офлайн.",
+    rgpd_title: "🔒 Защита данных",
+    rgpd_text: "Сохраняются только имя и фамилия."
+  }
+};
+
+function applyInstructionsLanguage() {
+  const container = document.querySelector(".instructions-container");
+  if (!container) return;
+
+  const lang = localStorage.getItem("lang") || "fr";
+  const t = INSTRUCTIONS_I18N[lang];
+
+  document.querySelectorAll("[data-i18n]").forEach(el => {
+    const key = el.dataset.i18n;
+    if (t[key]) el.textContent = t[key];
+  });
+
+  ["step1","step2","step3"].forEach(step => {
+    const ul = document.getElementById(`${step}-items`);
+    if (!ul) return;
+    ul.innerHTML = "";
+    t[`${step}_items`].forEach(txt => {
+      const li = document.createElement("li");
+      li.textContent = txt;
+      ul.appendChild(li);
+    });
+  });
+}
+
+document.addEventListener("DOMContentLoaded", applyInstructionsLanguage);
