@@ -230,9 +230,20 @@
         document.documentElement.lang = lang;
       }
 
+      // 🔔 Écoute changement de langue (même onglet)
+      document.addEventListener("langChanged", (e) => {
+      updateInstructionsLanguage(e.detail || "fr");
+      });
       
+      // 🔁 Écoute changement de langue (autre onglet / page)
+      window.addEventListener("storage", (e) => {
+      if (e.key === "lang") {
+        updateInstructionsLanguage(e.newValue || "fr");
+      }
+    	  });
+    
       // Initialisation
-      //updateInstructionsLanguage(document.documentElement.lang);
+      updateInstructionsLanguage(document.documentElement.lang);
       
       // Synchronisation langue avec script.js
 			updateInstructionsLanguage(localStorage.getItem("lang") || "fr");
