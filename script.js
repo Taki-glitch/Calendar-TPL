@@ -1,4 +1,4 @@
-// script.js — version intégrale, robuste et multilingue unifié
+// script.js — version intégrale, robuste et avec consentement multilingue
 console.log("✅ script.js chargé correctement !");
 
 /**************************************************************
@@ -7,164 +7,43 @@ console.log("✅ script.js chargé correctement !");
 const GAS_URL = "https://script.google.com/macros/s/AKfycbxe6BC6lG4yEg4wUbuVlyVMSwytU6YKLvO7RA6uSDSKE2O3ke5y6ooTy3hSRnAPMAXn/exec";
 const PROXY_URL = "https://fancy-band-a66d.tsqdevin.workers.dev/?url=" + encodeURIComponent(GAS_URL);
 
-/**************************************************************
- * 🌐 ÉTAT GLOBAL
- **************************************************************/
-let currentLang = localStorage.getItem("lang") || "fr";
+/* --- Variables DOM générales (assignées après DOMContentLoaded) --- */
+let OFFLINE_BANNER = null;
+let ADD_EVENT_BTN = null;
+let THEME_TOGGLE = null;
+let LANG_TOGGLE = null;
+let MENU_BTN = null;
+let SIDE_MENU = null;
+let OVERLAY = null;
+let SIDE_THEME_TOGGLE = null;
+let SIDE_LANG_TOGGLE = null;
+let MENU_CLOSE = null;
+let CONSENT_TEXT = null;
+
+/* --- Calendrier / état --- */
 let isOffline = !navigator.onLine;
 let calendar = null;
+let currentLang = localStorage.getItem("lang") || "fr";
 
 /**************************************************************
- * 🌍 UMAP
+ * 🗺️ CONFIG UMAP
  **************************************************************/
 const UMAP_BASE = "//umap.openstreetmap.fr/fr/map/points-tpl-nantes-russe_1315005";
 function getUmapUrl(theme = "light") {
   const layer = theme === "dark" ? "jawg-dark" : "OSM";
   const themeParam = theme === "dark" ? "dark" : "light";
   const params =
-    "?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled" +
-    "&moreControl=true&searchControl=null&tilelayersControl=null&embedControl=null" +
-    "&datalayersControl=true&onLoadPanel=none&captionBar=false&captionMenus=true";
+    "?scaleControl=false&miniMap=false&scrollWheelZoom=false&zoomControl=true&editMode=disabled&moreControl=true" +
+    "&searchControl=null&tilelayersControl=null&embedControl=null&datalayersControl=true&onLoadPanel=none" +
+    "&captionBar=false&captionMenus=true";
   return `${UMAP_BASE}${params}&theme=${themeParam}&layer=${layer}`;
 }
 
 /**************************************************************
- * 🌐 DOM
- **************************************************************/
-let OFFLINE_BANNER, ADD_EVENT_BTN, THEME_TOGGLE, LANG_TOGGLE;
-let MENU_BTN, SIDE_MENU, OVERLAY, SIDE_THEME_TOGGLE, SIDE_LANG_TOGGLE, MENU_CLOSE;
-let CONSENT_TEXT;
-
-/**************************************************************
- * 📘 TRADUCTIONS — INSTRUCTIONS
- **************************************************************/
-const INSTRUCTIONS_TRANSLATIONS = {
-  fr: {
-    instructionsTitle: "📋 Instructions TPL",
-    instructionsWelcome: "Bienvenue dans la section Instructions pour le TPL.",
-    step1Title: "🔹 Étape 1 — Préparation",
-    step1Items: [
-      "Avant de placer votre créneau, vérifiez sa disponibilité",
-      "Utilisez le bouton + pour ajouter un événement si nécessaire",
-      "Indiquez votre nom et prénom (exemple : DUPONT Jean)",
-      "Ne modifiez pas les créneaux des autres compagnons",
-      "Pour annuler un créneau, contactez frère Timothé DEVIN",
-      "Choisissez une affiche disponible lors du retrait du présentoir"
-    ],
-    step2Title: "🔹 Étape 2 — Sur place",
-    step2Items: [
-      "Respectez les emplacements indiqués sur la carte",
-      "Restez dans une zone sécurisée",
-      "En cas de danger, quittez le lieu si nécessaire"
-    ],
-    step3Title: "🔹 Étape 3 — Après le service",
-    step3Items: [
-      "Remontez les remarques importantes à frère Timothé DEVIN",
-      "Inscrivez-vous sur d’autres créneaux si possible"
-    ],
-    mapTitle: "🗺️ Carte des points TPL",
-    mapText: "Voici la carte des différents lieux utilisés pour le projet TPL :",
-    fullscreenMap: "🔎 Ouvrir la carte en plein écran",
-    tipsTitle: "ℹ️ Conseils",
-    tipsText: "Le site fonctionne hors ligne grâce à la PWA.",
-    rgpdTitle: "🔒 Protection des données personnelles (RGPD)",
-    rgpdText: "Seuls le nom et le prénom sont collectés pour l’organisation."
-  },
-  ru: {
-    instructionsTitle: "📋 Инструкции стенда",
-    instructionsWelcome: "Добро пожаловать в раздел инструкций.",
-    step1Title: "🔹 Шаг 1 — Подготовка",
-    step1Items: [
-      "Перед выбором времени проверьте его доступность",
-      "Используйте кнопку + при необходимости",
-      "Укажите имя и фамилию (пример: ИВАНОВ Иван)",
-      "Не изменяйте события других участников",
-      "Для отмены свяжитесь с братом Тимотэ ДЕВИН",
-      "Выберите доступный плакат при получении стенда"
-    ],
-    step2Title: "🔹 Шаг 2 — На месте",
-    step2Items: [
-      "Соблюдайте места, указанные на карте",
-      "Оставайтесь в безопасной зоне",
-      "При опасности покиньте место"
-    ],
-    step3Title: "🔹 Шаг 3 — После служения",
-    step3Items: [
-      "Передайте важные замечания брату Тимотэ ДЕВИН",
-      "Записывайтесь на другие смены"
-    ],
-    mapTitle: "🗺️ Карта точек стенда",
-    mapText: "Ниже показаны места служения:",
-    fullscreenMap: "🔎 Открыть карту на весь экран",
-    tipsTitle: "ℹ️ Советы",
-    tipsText: "Сайт работает офлайн благодаря PWA.",
-    rgpdTitle: "🔒 Защита персональных данных (RGPD)",
-    rgpdText: "Собираются только имя и фамилия."
-  }
-};
-
-/**************************************************************
- * 🌍 LANGUE
- **************************************************************/
-function changerLangue(lang) {
-  currentLang = lang;
-  localStorage.setItem("lang", lang);
-  document.documentElement.lang = lang;
-  applyInstructionsLanguage();
-  if (calendar) calendar.setOption("locale", lang);
-}
-
-function traduireTexte(fr, ru) {
-  return currentLang === "ru" ? ru : fr;
-}
-
-/**************************************************************
- * 📘 APPLICATION DES TRADUCTIONS INSTRUCTIONS
- **************************************************************/
-function applyInstructionsLanguage() {
-  const t = INSTRUCTIONS_TRANSLATIONS[currentLang];
-  if (!t) return;
-
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.getAttribute("data-i18n");
-    if (t[key]) el.textContent = t[key];
-  });
-
-  ["step1", "step2", "step3"].forEach(step => {
-    const ul = document.getElementById(`${step}-items`);
-    if (!ul) return;
-    ul.innerHTML = "";
-    t[`${step}Items`].forEach(text => {
-      const li = document.createElement("li");
-      li.textContent = text;
-      ul.appendChild(li);
-    });
-  });
-
-  const iframe = document.getElementById("umap-frame");
-  const fullscreen = document.getElementById("umap-fullscreen");
-  if (iframe) iframe.src = getUmapUrl(localStorage.getItem("theme") || "light");
-  if (fullscreen) fullscreen.href = getUmapUrl("light").replace("scrollWheelZoom=false", "scrollWheelZoom=true");
-}
-
-/**************************************************************
- * 🎨 THÈME
- **************************************************************/
-function appliquerTheme(theme) {
-  document.body.classList.toggle("dark", theme === "dark");
-  localStorage.setItem("theme", theme);
-
-  const icon = theme === "dark" ? "☀️" : "🌙";
-  THEME_TOGGLE && (THEME_TOGGLE.textContent = icon);
-  SIDE_THEME_TOGGLE && (SIDE_THEME_TOGGLE.textContent = icon);
-
-  applyInstructionsLanguage();
-}
-
-/**************************************************************
- * 📡 DOMContentLoaded
+ * 🌐 Éléments DOM & initialisations (après DOMContentLoaded)
  **************************************************************/
 document.addEventListener("DOMContentLoaded", () => {
+  // Récupération des éléments
   OFFLINE_BANNER = document.getElementById("offline-banner");
   ADD_EVENT_BTN = document.getElementById("add-event-btn");
   THEME_TOGGLE = document.getElementById("theme-toggle");
@@ -177,118 +56,387 @@ document.addEventListener("DOMContentLoaded", () => {
   MENU_CLOSE = document.getElementById("menu-close");
   CONSENT_TEXT = document.getElementById("consent-text");
 
-  appliquerTheme(localStorage.getItem("theme") || "light");
-  changerLangue(currentLang);
+  // Lecture thème + appli
+  const savedTheme = localStorage.getItem("theme") || "light";
+  appliquerTheme(savedTheme);
 
-  THEME_TOGGLE?.addEventListener("click", () =>
-    appliquerTheme(document.body.classList.contains("dark") ? "light" : "dark")
-  );
-  SIDE_THEME_TOGGLE?.addEventListener("click", () =>
-    appliquerTheme(document.body.classList.contains("dark") ? "light" : "dark")
-  );
+  // Toggle thème
+  THEME_TOGGLE?.addEventListener("click", () => {
+    appliquerTheme(document.body.classList.contains("dark") ? "light" : "dark");
+  });
+  SIDE_THEME_TOGGLE?.addEventListener("click", () => {
+    appliquerTheme(document.body.classList.contains("dark") ? "light" : "dark");
+  });
 
-  LANG_TOGGLE?.addEventListener("click", () =>
-    changerLangue(currentLang === "fr" ? "ru" : "fr")
-  );
-  SIDE_LANG_TOGGLE?.addEventListener("click", () =>
-    changerLangue(currentLang === "fr" ? "ru" : "fr")
-  );
+  // Langue
+  currentLang = localStorage.getItem("lang") || "fr";
+  if (LANG_TOGGLE) LANG_TOGGLE.textContent = currentLang === "fr" ? "🇫🇷" : "🇷🇺";
+  if (CONSENT_TEXT) updateConsentText();
+
+  LANG_TOGGLE?.addEventListener("click", () => {
+    const newLang = currentLang === "fr" ? "ru" : "fr";
+    changerLangue(newLang);
+    if (LANG_TOGGLE) LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
+    if (SIDE_LANG_TOGGLE) SIDE_LANG_TOGGLE.textContent = LANG_TOGGLE.textContent;
+    updateConsentText();
+    chargerPlanning();
+  });
+
+  SIDE_LANG_TOGGLE?.addEventListener("click", () => {
+    const newLang = currentLang === "fr" ? "ru" : "fr";
+    changerLangue(newLang);
+    if (LANG_TOGGLE) LANG_TOGGLE.textContent = newLang === "fr" ? "🇫🇷" : "🇷🇺";
+    if (SIDE_LANG_TOGGLE) SIDE_LANG_TOGGLE.textContent = LANG_TOGGLE.textContent;
+    updateConsentText();
+    chargerPlanning();
+  });
+
+  // Menu latéral
+  MENU_BTN?.addEventListener("click", openMenu);
+  OVERLAY?.addEventListener("click", closeMenu);
+  MENU_CLOSE?.addEventListener("click", closeMenu);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && document.body.classList.contains("menu-open")) closeMenu();
+  });
+
+  // Bouton + pour ouvrir la modale
+  ADD_EVENT_BTN?.addEventListener("click", () => openEventModal());
+
+  // Charger planning
+  chargerPlanning();
+});
+
+/***********************
+ * Menu
+ ***********************/
+function openMenu() {
+  document.body.classList.add("menu-open");
+  OVERLAY?.setAttribute("aria-hidden", "false");
+  SIDE_MENU?.setAttribute("aria-hidden", "false");
+  document.documentElement.style.overflow = "hidden";
+}
+
+function closeMenu() {
+  document.body.classList.remove("menu-open");
+  OVERLAY?.setAttribute("aria-hidden", "true");
+  SIDE_MENU?.setAttribute("aria-hidden", "true");
+  document.documentElement.style.overflow = "";
+}
+
+/**************************************************************
+ * Thème
+ **************************************************************/
+function appliquerTheme(theme) {
+  if (theme === "dark") {
+    document.body.classList.add("dark");
+    THEME_TOGGLE && (THEME_TOGGLE.textContent = "☀️");
+    SIDE_THEME_TOGGLE && (SIDE_THEME_TOGGLE.textContent = "☀️");
+  } else {
+    document.body.classList.remove("dark");
+    THEME_TOGGLE && (THEME_TOGGLE.textContent = "🌙");
+    SIDE_THEME_TOGGLE && (SIDE_THEME_TOGGLE.textContent = "🌙");
+  }
+
+  // Mise à jour carte uMap si présente
+  const MAP_IFRAME = document.getElementById("umap-frame");
+  const MAP_FULLSCREEN = document.getElementById("umap-fullscreen");
+  if (MAP_IFRAME) {
+    const newSrc = getUmapUrl(theme);
+    MAP_IFRAME.src = newSrc;
+    if (MAP_FULLSCREEN) MAP_FULLSCREEN.href = newSrc.replace("scrollWheelZoom=false", "scrollWheelZoom=true");
+  }
+
+  localStorage.setItem("theme", theme);
+}
+
+/**************************************************************
+ * Multilingue + consentement
+ **************************************************************/
+function traduireTexte(fr, ru) {
+  return currentLang === "ru" ? ru : fr;
+}
+
+function changerLangue(langue) {
+  currentLang = langue;
+  localStorage.setItem("lang", langue);
+}
+
+function updateConsentText() {
+  if (!CONSENT_TEXT) return;
+  const texts = {
+    fr: "En utilisant ce planning, vous acceptez d’écrire vos noms et prénoms. Aucune autre donnée personnelle n’est enregistrée.",
+    ru: "Используя это расписание, вы соглашаетесь указать свои имя и фамилию. Другие персональные данные не сохраняются."
+  };
+  CONSENT_TEXT.textContent = texts[currentLang] || texts.fr;
+}
+
+/**************************************************************
+ * Connexion réseau
+ **************************************************************/
+window.addEventListener("online", () => {
+  isOffline = false;
+  OFFLINE_BANNER?.classList.add("hidden");
+  chargerPlanning();
+});
+
+window.addEventListener("offline", () => {
+  isOffline = true;
+  OFFLINE_BANNER?.classList.remove("hidden");
 });
 
 /**************************************************************
- * 📡 OFFLINE
+ * Charger planning
  **************************************************************/
-window.addEventListener("online", () => location.reload());
-window.addEventListener("offline", () => OFFLINE_BANNER?.classList.remove("hidden"));
-
-/**************************************************************
- * 🌍 Traduction page instructions (SAFE)
- **************************************************************/
-const INSTRUCTIONS_I18N = {
-  fr: {
-    instructions_title: "📋 Instructions TPL",
-    instructions_intro: "Bienvenue dans la section Instructions pour le TPL.",
-    step1_title: "🔹 Étape 1 — Préparation",
-    step1_items: [
-      "Avant de placer votre créneau, vérifiez sa disponibilité",
-      "Utilisez le bouton + pour ajouter un événement si nécessaire",
-      "Indiquez votre nom et prénom (ex : DUPONT Jean)",
-      "Ne modifiez pas les créneaux des autres compagnons",
-      "Pour toute erreur, contactez Timothé DEVIN"
-    ],
-    step2_title: "🔹 Étape 2 — Sur place",
-    step2_items: [
-      "Respectez les emplacements indiqués sur la carte",
-      "Restez dans une zone sécurisée",
-      "En cas de danger, quittez le lieu si nécessaire"
-    ],
-    step3_title: "🔹 Étape 3 — Après le service",
-    step3_items: [
-      "Remontez les incidents",
-      "Inscrivez-vous à d'autres créneaux"
-    ],
-    map_title: "🗺️ Carte des points TPL",
-    map_text: "Voici les emplacements du projet TPL :",
-    map_fullscreen: "🔎 Ouvrir la carte en plein écran",
-    tips_title: "ℹ️ Conseils",
-    tips_text: "Le site fonctionne hors ligne grâce à la PWA.",
-    rgpd_title: "🔒 Protection des données (RGPD)",
-    rgpd_text: "Seuls les noms et prénoms sont enregistrés."
-  },
-  ru: {
-    instructions_title: "📋 Инструкции",
-    instructions_intro: "Добро пожаловать в раздел инструкций.",
-    step1_title: "🔹 Шаг 1 — Подготовка",
-    step1_items: [
-      "Проверьте доступность времени",
-      "Используйте кнопку + при необходимости",
-      "Укажите имя и фамилию",
-      "Не изменяйте записи других",
-      "При ошибке свяжитесь с Тимоте Девен"
-    ],
-    step2_title: "🔹 Шаг 2 — На месте",
-    step2_items: [
-      "Соблюдайте указанные места",
-      "Оставайтесь в безопасной зоне",
-      "При опасности покиньте место"
-    ],
-    step3_title: "🔹 Шаг 3 — После служения",
-    step3_items: [
-      "Сообщите о проблемах",
-      "Записывайтесь снова"
-    ],
-    map_title: "🗺️ Карта точек",
-    map_text: "Карта мест служения:",
-    map_fullscreen: "🔎 Открыть карту",
-    tips_title: "ℹ️ Советы",
-    tips_text: "Сайт работает офлайн.",
-    rgpd_title: "🔒 Защита данных",
-    rgpd_text: "Сохраняются только имя и фамилия."
+async function chargerPlanning() {
+  const loader = document.getElementById("loader");
+  if (loader) {
+    loader.classList.remove("hidden");
+    loader.textContent = isOffline
+      ? traduireTexte("Mode hors ligne — données locales...", "Автономный режим — локальные данные...")
+      : traduireTexte("Chargement du calendrier...", "Загрузка календаря...");
   }
-};
 
-function applyInstructionsLanguage() {
-  const container = document.querySelector(".instructions-container");
-  if (!container) return;
+  let events = [];
+  if (isOffline) {
+    events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+    loader && loader.classList.add("hidden");
+    return renderCalendar(events);
+  }
 
-  const lang = localStorage.getItem("lang") || "fr";
-  const t = INSTRUCTIONS_I18N[lang];
+  try {
+    const res = await fetch(PROXY_URL, { method: "GET", mode: "cors" });
+    const text = await res.text();
+    events = JSON.parse(text);
+    localStorage.setItem("tplEvents", JSON.stringify(events));
+  } catch (err) {
+    console.warn("⚠️ Erreur de chargement, mode local :", err);
+    events = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  }
 
-  document.querySelectorAll("[data-i18n]").forEach(el => {
-    const key = el.dataset.i18n;
-    if (t[key]) el.textContent = t[key];
-  });
-
-  ["step1","step2","step3"].forEach(step => {
-    const ul = document.getElementById(`${step}-items`);
-    if (!ul) return;
-    ul.innerHTML = "";
-    t[`${step}_items`].forEach(txt => {
-      const li = document.createElement("li");
-      li.textContent = txt;
-      ul.appendChild(li);
-    });
-  });
+  loader && loader.classList.add("hidden");
+  renderCalendar(events);
 }
 
-document.addEventListener("DOMContentLoaded", applyInstructionsLanguage);
+/**************************************************************
+ * Calendrier
+ **************************************************************/
+function renderCalendar(events) {
+  const calendarEl = document.getElementById("planning");
+  if (!calendarEl) return;
+
+  if (calendar) calendar.destroy();
+
+  const isMobile = window.innerWidth <= 900;
+
+  calendar = new FullCalendar.Calendar(calendarEl, {
+    locale: currentLang,
+    firstDay: 1,
+    nowIndicator: true,
+    initialView: isMobile ? "timeGridWeek" : "dayGridMonth",
+    headerToolbar: isMobile
+      ? { left: "prev,next", center: "title", right: "" }
+      : { left: "prev,next today", center: "title", right: "dayGridMonth,timeGridWeek,timeGridDay" },
+    buttonText: {
+      today: traduireTexte("Aujourd’hui", "Сегодня"),
+      month: traduireTexte("Mois", "Месяц"),
+      week: traduireTexte("Semaine", "Неделя"),
+      day: traduireTexte("Jour", "День"),
+      list: traduireTexte("Liste", "Список")
+    },
+    slotMinTime: "08:00:00",
+    slotMaxTime: "18:00:00",
+    allDaySlot: false,
+    selectable: true,
+    editable: true,
+    height: "auto",
+    events: events.map(e => ({
+      id: e.id,
+      title: e.title,
+      start: e.start,
+      end: e.end,
+      // on ajoute la propriété category également au niveau racine (pour robustesse)
+      category: e.category,
+      backgroundColor: getCategoryColor(e.category),
+      extendedProps: { category: e.category }
+    })),
+    select: (info) => openEventModal(null, info),
+    eventClick: (info) => openEventModal(info.event),
+    eventDrop: (info) => saveEvent(eventToData(info.event)),
+    eventResize: (info) => saveEvent(eventToData(info.event))
+  });
+
+  calendar.render();
+}
+
+/**************************************************************
+ * Couleurs catégories
+ **************************************************************/
+function getCategoryColor(category) {
+  const colors = {
+    "Hôtel-Dieu": "#FFD43B",
+    "Gréneraie/Resto du Cœur": "#2ECC71",
+    "Préfecture": "#E74C3C",
+    "Tour de Bretagne": "#3498DB",
+    "France Terre d’Asile": "#9B59B6",
+    "Pirmil": "#E67E22"
+  };
+  return colors[category] || "#6c757d";
+}
+
+/**************************************************************
+ * Sauvegarde locale + serveur
+ **************************************************************/
+function eventToData(event) {
+  // event peut être un objet FullCalendar EventApi
+  return {
+    id: event.id,
+    title: event.title,
+    start: event.startStr,
+    end: event.endStr,
+    // On vérifie extendedProps puis une propriété category possible
+    category: event.extendedProps?.category || event.category || "Autre"
+  };
+}
+
+async function saveEvent(event) {
+  let saved = JSON.parse(localStorage.getItem("tplEvents") || "[]");
+  const i = saved.findIndex((e) => e.id === event.id);
+  if (i >= 0) saved[i] = event;
+  else saved.push(event);
+  localStorage.setItem("tplEvents", JSON.stringify(saved));
+
+  if (!isOffline) {
+    try {
+      await fetch(PROXY_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ mode: "patch", data: [event] }),
+      });
+    } catch (err) {
+      console.warn("⚠️ Erreur réseau, enregistrement local uniquement :", err);
+    }
+  }
+}
+
+/**************************************************************
+ * Modale événement
+ **************************************************************/
+function openEventModal(event = null, info = null) {
+  const modal = document.getElementById("event-modal");
+  if (!modal) return;
+  const modalContent = modal.querySelector(".modal-content");
+  const titleInput = document.getElementById("event-title");
+  const startInput = document.getElementById("event-start");
+  const endInput = document.getElementById("event-end");
+  const categorySelect = document.getElementById("event-category");
+  const saveBtn = document.getElementById("save-event");
+  const cancelBtn = document.getElementById("cancel-event");
+  const modalTitle = document.getElementById("modal-title");
+
+  const labels = {
+    titleLabel: document.querySelector('label[for="event-title"]'),
+    startLabel: document.querySelector('label[for="event-start"]'),
+    endLabel: document.querySelector('label[for="event-end"]'),
+    categoryLabel: document.querySelector('label[for="event-category"]')
+  };
+
+  const texts = {
+    fr: {
+      newEvent: "Nouvel événement",
+      editEvent: "Modifier l’événement",
+      save: "💾 Enregistrer",
+      cancel: "Annuler",
+      titleLabel: "Titre",
+      startLabel: "Début",
+      endLabel: "Fin",
+      categoryLabel: "Catégorie",
+      titlePlaceholder: "Entrez un titre",
+      startPlaceholder: "Sélectionnez la date de début",
+      endPlaceholder: "Sélectionnez la date de fin"
+    },
+    ru: {
+      newEvent: "Новое событие",
+      editEvent: "Редактировать событие",
+      save: "💾 Сохранить",
+      cancel: "Отмена",
+      titleLabel: "Название",
+      startLabel: "Начало",
+      endLabel: "Конец",
+      categoryLabel: "Категория",
+      titlePlaceholder: "Введите название",
+      startPlaceholder: "Выберите дату начала",
+      endPlaceholder: "Выберите дату окончания"
+    }
+  };
+
+  const t = texts[currentLang] || texts.fr;
+
+  if (labels.titleLabel) labels.titleLabel.textContent = t.titleLabel;
+  if (labels.startLabel) labels.startLabel.textContent = t.startLabel;
+  if (labels.endLabel) labels.endLabel.textContent = t.endLabel;
+  if (labels.categoryLabel) labels.categoryLabel.textContent = t.categoryLabel;
+  if (titleInput) titleInput.placeholder = t.titlePlaceholder;
+  if (startInput) startInput.placeholder = t.startPlaceholder;
+  if (endInput) endInput.placeholder = t.endPlaceholder;
+  if (saveBtn) saveBtn.textContent = t.save;
+  if (cancelBtn) cancelBtn.textContent = t.cancel;
+  modalTitle && (modalTitle.textContent = event ? t.editEvent : t.newEvent);
+
+  modal.classList.remove("hidden");
+  setTimeout(() => titleInput?.focus(), 300);
+
+  if (!event) {
+    // Création : valeurs par défaut
+    titleInput.value = "";
+    startInput.value = info?.startStr?.slice(0, 16) || "";
+    endInput.value = info?.endStr?.slice(0, 16) || "";
+    categorySelect.value = "Hôtel-Dieu";
+    cancelBtn?.classList.remove("hidden");
+  } else {
+    // Édition : on restaure correctement la catégorie depuis extendedProps ou event.category
+    titleInput.value = event.title || "";
+    startInput.value = event.startStr ? event.startStr.slice(0, 16) : "";
+    endInput.value = event.endStr ? event.endStr.slice(0, 16) : startInput.value;
+    categorySelect.value = event.extendedProps?.category || event.category || "Autre";
+    cancelBtn?.classList.add("hidden");
+  }
+
+  const closeModal = () => modal.classList.add("hidden");
+  modal.onclick = (e) => { if (!modalContent.contains(e.target)) closeModal(); };
+
+  if (saveBtn) {
+    // on retire tout gestionnaire précédent pour éviter doublons si modal réutilisée
+    saveBtn.onclick = null;
+    saveBtn.onclick = () => {
+      const newEvent = {
+        id: event ? event.id : (crypto?.randomUUID ? crypto.randomUUID() : Date.now().toString()),
+        title: titleInput.value.trim() || "(Sans titre)",
+        start: startInput.value,
+        end: endInput.value || startInput.value,
+        category: categorySelect.value || "Autre"
+      };
+
+      // Si on est en édition, retirer l'ancienne instance du calendrier
+      if (event?.remove) {
+        try { event.remove(); } catch (e) { /* ignore */ }
+      }
+
+      // Ajouter dans FullCalendar avec extendedProps et couleur
+      calendar?.addEvent({
+        id: newEvent.id,
+        title: newEvent.title,
+        start: newEvent.start,
+        end: newEvent.end,
+        category: newEvent.category,
+        backgroundColor: getCategoryColor(newEvent.category),
+        extendedProps: { category: newEvent.category }
+      });
+
+      // Sauvegarde (local + serveur si disponible)
+      saveEvent(newEvent);
+      closeModal();
+    };
+  }
+
+  cancelBtn?.addEventListener("click", closeModal);
+}
