@@ -237,9 +237,9 @@
       
       // 🔁 Écoute changement de langue (autre onglet / page)
       window.addEventListener("storage", (e) => {
-      if (e.key === "lang") {
-        updateInstructionsLanguage(e.newValue || "fr");
-      }
+        if (e.key === "lang") {
+          updateInstructionsLanguage(e.newValue || "fr");
+        }
     	  });
     
       // Initialisation
