@@ -32,15 +32,25 @@ body.dark header {
 }
 
 /**************************************************************
- * PDF Section (Page d'accueil)
+ * Planning TPL Section (Page d'accueil)
  **************************************************************/
-.pdf-section {
+.programme-section {
   margin-top: 30px;
 }
 
-.pdf-section h2 {
-  margin-bottom: 10px;
+.programme-section h2 {
+  margin-bottom: 15px;
 }
+
+.programme-image {
+  width: 100%;
+  max-width: 1100px;
+  display: block;
+  margin: 0 auto;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
 
 /**************************************************************
  * 🪟 OVERLAY & SIDE MENU
