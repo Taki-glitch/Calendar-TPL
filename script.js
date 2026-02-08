@@ -102,6 +102,23 @@ document.addEventListener("DOMContentLoaded", () => {
   // Bouton + pour ouvrir la modale
   ADD_EVENT_BTN?.addEventListener("click", () => openEventModal());
 
+    /* ==============================
+     Gestion du consentement RGPD
+  ============================== */
+  const consentModal = document.getElementById("consent-modal");
+  const acceptConsentBtn = document.getElementById("accept-consent");
+
+  const consentGiven = localStorage.getItem("tplConsentAccepted");
+
+  if (!consentGiven && consentModal) {
+    consentModal.classList.remove("hidden");
+  }
+
+  acceptConsentBtn?.addEventListener("click", () => {
+    localStorage.setItem("tplConsentAccepted", "true");
+    consentModal.classList.add("hidden");
+  });
+
   // Charger planning
   chargerPlanning();
 });
