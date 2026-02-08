@@ -33,24 +33,26 @@ body.dark header {
 
 /**************************************************************
  * Planning TPL Section (Page d'accueil)
- **************************************************************/
+ *************************************************************/
 .programme-section {
   margin-top: 30px;
+  padding: 0 12px; /* évite que l’image touche les bords sur mobile */
 }
 
 .programme-section h2 {
   margin-bottom: 15px;
+  text-align: center;
 }
 
 .programme-image {
-  width: 100%;
-  max-width: 1100px;
+  width: 100%;        /* s’adapte toujours à la largeur de l’écran */
+  height: auto;       /* garde les proportions */
+  max-width: 1100px;  /* limite sur grand écran */
   display: block;
   margin: 0 auto;
   border: 1px solid #ccc;
   border-radius: 8px;
 }
-
 
 /**************************************************************
  * 🪟 OVERLAY & SIDE MENU
